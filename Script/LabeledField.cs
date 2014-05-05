@@ -1,5 +1,5 @@
-// Forms.cs
-//
+/* Copyright (c) Bendyline LLC. All rights reserved. Licensed under the Apache License, Version 2.0.
+    You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0. */
 
 using System;
 using System.Collections.Generic;
@@ -12,17 +12,17 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
-    public class FullField : FieldControl
+    public class LabeledField : FieldControl
     {
-        [ScriptName("c_fieldTitle")]
-        private FieldTitle fieldTitle;
+        [ScriptName("c_fieldLabel")]
+        private FieldLabel fieldLabel;
 
         [ScriptName("c_fieldValue")]
         private FieldValue fieldValue;
 
-        public FullField()
+        public LabeledField()
         {
-
+            this.MonitorItemEvents = false;
         }
 
         protected override void OnUpdate()
@@ -31,9 +31,9 @@ namespace BL.Forms
 
             if (this.IsReady)
             {
-                if (this.fieldTitle != null)
+                if (this.fieldLabel != null)
                 {
-                    this.ApplyToControl(this.fieldTitle);
+                    this.ApplyToControl(this.fieldLabel);
 
                   
                 }
@@ -47,9 +47,9 @@ namespace BL.Forms
 
         public override void PersistToItem()
         {
-            if (this.fieldTitle != null)
+            if (this.fieldLabel != null)
             {
-                this.fieldTitle.Update();
+                this.fieldLabel.Update();
             }
 
             if (this.fieldValue != null)

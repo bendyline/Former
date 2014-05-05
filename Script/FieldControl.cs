@@ -1,5 +1,6 @@
 // Forms.cs
-//
+/* Copyright (c) Bendyline LLC. All rights reserved. Licensed under the Apache License, Version 2.0.
+    You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0. */
 
 using System;
 using System.Collections.Generic;
@@ -12,10 +13,57 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
+    public enum FieldMode
+    {
+        FormDefault = 0,
+        Edit = 1,
+        View = 2,
+        Example = 3
+    }
+
     public class FieldControl : FormControl 
     {
         private IDataStoreField field;
         private String fieldName;
+        private FieldMode mode = FieldMode.Edit;
+
+        public FieldMode EffectiveMode
+        {
+            get
+            {
+                if (this.mode == FieldMode.FormDefault)
+                {
+                    if (this.Form.Mode == FormMode.Example)
+                    {
+                        return FieldMode.Example;
+                    }
+                    else if (this.Form.Mode == FormMode.NewForm || this.Form.Mode == FormMode.EditForm)
+                    {
+                        return FieldMode.Edit;
+                    }
+                    else
+                    {
+                        return FieldMode.View;
+                    }
+                }
+
+                return this.mode;
+            }
+        }
+
+        [ScriptName("i_mode")]
+        public FieldMode Mode
+        {
+            get
+            {
+                return this.mode;
+            }
+
+            set
+            {
+                this.mode = value;
+            }
+        }
 
         public IDataStoreField Field
         {
@@ -59,6 +107,7 @@ namespace BL.Forms
         {
             fc.Form = this.Form;
             fc.Item = this.Item;
+            fc.Mode = this.Mode;
             fc.FieldName = this.FieldName;
         }
     }

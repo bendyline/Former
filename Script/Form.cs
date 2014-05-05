@@ -1,5 +1,5 @@
-// Forms.cs
-//
+/* Copyright (c) Bendyline LLC. All rights reserved. Licensed under the Apache License, Version 2.0.
+    You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0. */
 
 using System;
 using System.Collections.Generic;
@@ -14,49 +14,98 @@ namespace BL.Forms
 {
     public enum FormMode
     {
-        Edit = 0,
+        EditForm = 0,
         NewForm = 1,
-        Display = 2
+        ViewForm = 2,
+        Example = 3
     }
 
     public enum AdjustedFieldState
     {
-        Hide = 0,
-        Show = 1
+        DefaultState = 0,
+        Hide = 1,
+        Show = 2
     }
 
     public class Form : ItemControl 
     {
-        private FormMode formMode = FormMode.Edit;
-
-        private Dictionary<String, String> fieldTitleOverrides;
-        private Dictionary<String, AdjustedFieldState> fieldStates;
-        private Dictionary<String, FieldChoiceCollection> fieldChoiceOverrides;
-
+        private FormSettings settings;
 
         [ScriptName("c_fieldIterator")]
         private Control fieldIterator;
+
+        public FormSettings Settings
+        {
+            get
+            {
+                if (this.settings == null)
+                {
+                    this.settings = new FormSettings();
+                }
+
+                return this.settings;
+            }
+
+            set
+            {
+                this.settings = value;
+            }
+        }
+
+        public FormMode Mode
+        {
+            get
+            {
+                return this.Settings.Mode;
+            }
+
+            set
+            {
+                this.Settings.Mode = value;
+            }
+        }
 
         public bool IsEditing
         {
             get
             {
-                return this.formMode == FormMode.Edit || this.formMode == FormMode.NewForm;
+                FormMode fm = this.Mode;
+
+                return fm == FormMode.EditForm || fm == FormMode.NewForm;
             }
         }
 
         public Form()
         {
-            this.fieldTitleOverrides = new Dictionary<string, string>();
-            this.fieldStates = new Dictionary<string, AdjustedFieldState>();
-            this.fieldChoiceOverrides = new Dictionary<string, FieldChoiceCollection>();
+        }
+
+        public String GetFieldTitleOverride(String fieldName)
+        {
+            return this.Settings.FieldSettingsCollection.GetFieldTitleOverride(fieldName);
+        }
+
+        public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
+        {
+            FieldChoiceCollection fcc = this.Settings.FieldSettingsCollection.GetFieldChoicesOverride(fieldName);
+
+            return fcc;
+        }
+
+
+        public AdjustedFieldState GetAdjustedFieldState(String fieldName)
+        {
+            return this.Settings.FieldSettingsCollection.GetAdjustedFieldState(fieldName);
+        }
+
+        public FieldMode GetFieldModeOverride(String fieldName)
+        {
+            return this.Settings.FieldSettingsCollection.GetFieldModeOverride(fieldName);
         }
 
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
         }
-
 
         public void Save()
         {
@@ -70,36 +119,6 @@ namespace BL.Forms
             }
 
             ((ODataEntity)this.Item).Save();
-        }
-
-        public FieldChoiceCollection GetFieldChoices(String fieldName)
-        {
-            return this.fieldChoiceOverrides[fieldName];
-        }
-
-        public void AddFieldChoices(String fieldName, FieldChoiceCollection fcc)
-        {
-            this.fieldChoiceOverrides[fieldName] = fcc;
-        }
-
-        public AdjustedFieldState GetFieldState(String fieldName)
-        {
-            return this.fieldStates[fieldName];
-        }
-
-        public void AddFieldState(String fieldName, AdjustedFieldState afs)
-        {
-            this.fieldStates[fieldName] = afs;
-        }
-
-        public String GetFieldTitleOverride(String fieldName)
-        {
-            return this.fieldTitleOverrides[fieldName];
-        }
-
-        public void AddFieldTitleOverride(String fieldName, String newFieldTitle)
-        {
-            this.fieldTitleOverrides[fieldName] = newFieldTitle;
         }
 
         protected override void OnUpdate()

@@ -25,24 +25,30 @@
     </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\web\gs\former\1.0\</OutputPath>
     <DefineConstants>CODE_ANALYSIS;SCRIPTSHARP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0028, 1591, 1684</NoWarn>
-    <DocumentationFile>bin\Release\BL.Forms.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Properties\FxCop.ruleset" />
     <None Include="Properties\Script.template" />
+    <Compile Include="FieldSettingsCollection.cs" />
     <Compile Include="ChoiceFieldValue.cs" />
+    <Compile Include="FormControl.cs" />
+    <Compile Include="FieldSettings.cs" />
+    <Compile Include="FormSettings.cs" />
+    <Compile Include="ItemSetEditor.cs" />
+    <Compile Include="UserValue.cs" />
     <Compile Include="TextFieldValue.cs" />
-    <Compile Include="FullField.cs" />
+    <Compile Include="LabeledField.cs" />
     <Compile Include="FieldIterator.cs" />
-    <Compile Include="FieldTitle.cs" />
+    <Compile Include="FieldLabel.cs" />
     <Compile Include="FieldValue.cs" />
     <Compile Include="FieldControl.cs" />
-    <Compile Include="FormControl.cs" />
     <Compile Include="ItemControl.cs" />
     <Compile Include="FormTemplate.cs" />
     <Compile Include="Form.cs" />
@@ -77,10 +83,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ChoiceFieldValue.htm" />
+    <Content Include="ItemSetEditor.htm" />
+    <Content Include="UserValue.htm" />
     <Content Include="TextFieldValue.htm" />
-    <Content Include="FullField.htm" />
+    <Content Include="LabeledField.htm" />
     <Content Include="FieldIterator.htm" />
-    <Content Include="FieldTitle.htm" />
+    <Content Include="FieldLabel.htm" />
     <Content Include="FieldValue.htm" />
     <Content Include="Form.htm" />
   </ItemGroup>

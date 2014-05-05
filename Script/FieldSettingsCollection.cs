@@ -1,0 +1,131 @@
+﻿// SensorSystemCollection.cs
+//
+
+using System;
+using System.Collections.Generic;
+using System.Collections;
+using BL;
+using BL.Data;
+
+namespace BL.Forms
+{
+    public class FieldSettingsCollection : ISerializableCollection, IEnumerable
+    {
+        private ArrayList fields;
+        private Dictionary<String, FieldSettings> fieldsByStorageFieldName;
+
+        public ArrayList Fields
+        {
+            get
+            {
+                return this.fields;
+            }
+        }
+
+        public FieldSettings this[int index]
+        {
+            get
+            {
+                return (FieldSettings)this.fields[index];
+            }
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return this.fields.GetEnumerator();
+        }
+
+        public FieldSettingsCollection()
+        {
+            this.fields = new ArrayList();
+            this.fieldsByStorageFieldName = new Dictionary<string, FieldSettings>();
+        }
+
+        public String GetFieldTitleOverride(String fieldName)
+        {
+            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+
+            if (fs == null)
+            {
+                return null;
+            }
+
+            return fs.TitleOverride;
+        }
+
+        public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
+        {
+            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+
+            if (fs == null)
+            {
+                return null;
+            }
+
+            return fs.ChoicesOverride;
+        }
+
+        public AdjustedFieldState GetAdjustedFieldState(String fieldName)
+        {
+            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+
+            if (fs == null)
+            {
+                return AdjustedFieldState.DefaultState;
+            }
+
+            return fs.FieldState;
+        }
+
+        public FieldMode GetFieldModeOverride(String fieldName)
+        {
+            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+
+            if (fs == null)
+            {
+                return FieldMode.FormDefault;
+            }
+
+            return fs.FieldModeOverride; ;
+        }
+
+        public FieldSettings Ensure(String fieldName)
+        {
+            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+
+            if (fs == null)
+            {
+                fs = (FieldSettings)this.Create();
+                fs.Name = fieldName;
+                this.fields.Add(fs);
+                this.fieldsByStorageFieldName[fieldName] = fs;
+            }
+
+            return fs;
+        }
+
+        public FieldSettings GetByStorageFieldName(String storageFieldName)
+        {
+            return this.fieldsByStorageFieldName[storageFieldName];
+        }
+
+        public void Clear()
+        {
+            this.fields.Clear();
+            this.fieldsByStorageFieldName.Clear();
+        }
+
+        public SerializableObject Create()
+        {
+            FieldSettings sens = new FieldSettings();
+
+            return sens;
+        }
+
+        public void Add(SerializableObject fieldSettings)
+        {
+            this.fields.Add(fieldSettings);
+            this.fieldsByStorageFieldName[((FieldSettings)fieldSettings).Name] = (FieldSettings)fieldSettings;
+        }
+    }
+}

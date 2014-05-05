@@ -1,5 +1,5 @@
-// Forms.cs
-//
+/* Copyright (c) Bendyline LLC. All rights reserved. Licensed under the Apache License, Version 2.0.
+    You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0. */
 
 using System;
 using System.Collections.Generic;
@@ -12,12 +12,12 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
-    public class FieldTitle : FieldControl
+    public class FieldLabel : FieldControl
     {
         [ScriptName("e_title")]
         private Element titleElement;
 
-        public FieldTitle()
+        public FieldLabel()
         {
 
         }

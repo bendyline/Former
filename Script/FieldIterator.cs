@@ -1,5 +1,5 @@
-// Forms.cs
-//
+/* Copyright (c) Bendyline LLC. All rights reserved. Licensed under the Apache License, Version 2.0.
+    You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0. */
 
 using System;
 using System.Collections.Generic;
@@ -17,11 +17,13 @@ namespace BL.Forms
         [ScriptName("e_fieldBin")]
         private Element fieldBin;
 
-        private List<FullField> fields;
+        private List<LabeledField> fields;
+        private Dictionary<String, LabeledField> fieldsByName;
 
         public FieldIterator()
         {
-            this.fields = new List<FullField>();
+            this.fields = new List<LabeledField>();
+            this.fieldsByName = new Dictionary<string, LabeledField>();
         }
 
         protected override void OnUpdate()
@@ -38,31 +40,57 @@ namespace BL.Forms
                 return;
             }
 
-            while (this.fieldBin.ChildNodes.Length > 0)
+            List<LabeledField> fieldsNotUsed = new List<LabeledField>();
+
+            foreach (LabeledField lf in fields)
             {
-                this.fieldBin.RemoveChild(this.fieldBin.ChildNodes[0]);
+                fieldsNotUsed.Add(lf);
+            }
+            
+            foreach (Field field in this.Item.Type.Fields)
+            {                
+                AdjustedFieldState afs = this.Form.GetAdjustedFieldState(field.Name);
+
+                if (afs != AdjustedFieldState.DefaultState)
+                {
+                    LabeledField ff = this.fieldsByName[field.Name];
+
+                    if (ff == null)
+                    {
+                        ff = new LabeledField();
+
+                        FieldMode fm = this.Form.GetFieldModeOverride(field.Name);
+
+                        if (fm != FieldMode.FormDefault)
+                        {
+                            ff.Mode = fm;
+                        }
+
+                        ff.Form = this.Form;
+                        ff.Item = this.Item;
+                        ff.FieldName = field.Name;
+
+                        ff.EnsureElements();
+
+                        this.fieldBin.AppendChild(ff.Element);
+
+                        this.fields.Add(ff);
+
+                        this.fieldsByName[field.Name] = ff;
+
+                    }
+                    else
+                    {
+                        fieldsNotUsed.Remove(ff);
+                    }
+                }
             }
 
-            this.fields.Clear();
-
-            foreach (Field field in this.Item.Type.Fields)
+            foreach (LabeledField f in fieldsNotUsed)
             {
-                AdjustedFieldState afs = this.Form.GetFieldState(field.Name);
-
-                if (afs != null)
-                {
-                    FullField ff = new FullField();
-
-                    ff.Form = this.Form;
-                    ff.Item = this.Item;
-                    ff.FieldName = field.Name;
-
-                    ff.EnsureElements();
-
-                    this.fieldBin.AppendChild(ff.Element);
-
-                    this.fields.Add(ff);
-                }
+                this.fieldBin.RemoveChild(f.Element);
+                this.fields.Remove(f);
+                this.fieldsByName[f.Field.Name] = null;
             }
         }
     }

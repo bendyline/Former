@@ -12,12 +12,22 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
-    public class TextFieldValue : FieldControl
+    public enum UserValueMode
+    {
+        MeOnly = 0,
+        TextInput = 1,
+        EmailAddress = 2
+    }
+
+    public class UserValue : FieldControl
     {
         [ScriptName("e_textInput")]
         private InputElement textInput;
 
-        public TextFieldValue()
+        [ScriptName("e_toggleButton")]
+        private InputElement toggleButton;
+
+        public UserValue()
         {
 
         }
@@ -30,6 +40,11 @@ namespace BL.Forms
             {
                 this.textInput.AddEventListener("change", this.HandleTextInputChanged, true);
             }
+
+            if (this.toggleButton != null)
+            {
+                this.toggleButton.AddEventListener("click", this.HandleMeToggleButton, true);
+            }
         }
 
         private void HandleTextInputChanged(ElementEvent e)
@@ -38,6 +53,10 @@ namespace BL.Forms
 
         }
 
+        private void HandleMeToggleButton(ElementEvent e)
+        {
+            this.Item.SetStringValue(this.FieldName, this.textInput.Value);
+        }
 
         protected override void OnUpdate()
         {
@@ -50,24 +69,18 @@ namespace BL.Forms
 
             if (this.EffectiveMode == FieldMode.Example)
             {
-                this.textInput.Value = "Example";
+                this.textInput.Value = "User Name";
                 this.textInput.Disabled = true;
             }
-            else if (this.EffectiveMode == FieldMode.Edit)
+            else
             {
                 this.textInput.Disabled = false;
             }
 
             if (this.IsReady)
             {
-                String val = this.Item.GetStringValue(this.FieldName);
+                this.textInput.Value = this.Item.GetStringValue(this.FieldName);
 
-                if (val == null)
-                {
-                    val = String.Empty;
-                }
-
-                this.textInput.Value = val;
             }
         }
 
