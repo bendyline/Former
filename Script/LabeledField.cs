@@ -34,8 +34,6 @@ namespace BL.Forms
                 if (this.fieldLabel != null)
                 {
                     this.ApplyToControl(this.fieldLabel);
-
-                  
                 }
 
                 if (this.fieldValue!= null)

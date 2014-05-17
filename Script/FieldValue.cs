@@ -35,9 +35,29 @@ namespace BL.Forms
 
             if (this.IsReady && this.fieldBin != null)
             {
-                FieldChoiceCollection fccAlternates = this.Form.GetFieldChoicesOverride(this.Field.Name);
+                String fieldName = this.Field.Name;
 
-                if (this.Field.Type == FieldType.Enumeration || (fccAlternates != null && fccAlternates.Choices.Count >0))
+                FieldChoiceCollection fccAlternates = this.Form.GetFieldChoicesOverride(fieldName);
+
+                FieldUserInterfaceType alternateUserInterfaceType = this.Form.GetFieldUserInterfaceTypeOverride(fieldName);
+
+                if (this.Field.Type == FieldType.ShortText && this.Field.UserInterfaceType == FieldUserInterfaceType.Scale)
+                {
+                    this.fieldControl = new ScaleFieldValue();
+                    this.ApplyToControl(this.fieldControl);
+                    this.fieldControl.EnsureElements();
+
+                    this.fieldBin.AppendChild(this.fieldControl.Element);
+                }
+                else if (this.Field.Type == FieldType.ShortText && this.Field.UserInterfaceType == FieldUserInterfaceType.User)
+                {
+                    this.fieldControl = new UserValue();
+                    this.ApplyToControl(this.fieldControl);
+                    this.fieldControl.EnsureElements();
+
+                    this.fieldBin.AppendChild(this.fieldControl.Element);
+                }
+                else if (this.Field.Type == FieldType.Enumeration || (fccAlternates != null && fccAlternates.Choices.Count > 0))
                 {
                     this.fieldControl = new ChoiceFieldValue();
                     this.ApplyToControl(this.fieldControl);
@@ -45,7 +65,7 @@ namespace BL.Forms
 
                     this.fieldBin.AppendChild(this.fieldControl.Element);
                 }
-                else if (this.Field.Type == FieldType.Text)
+                else if (this.Field.Type == FieldType.ShortText)
                 {
                     this.fieldControl = new TextFieldValue();
 

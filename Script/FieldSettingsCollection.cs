@@ -77,6 +77,18 @@ namespace BL.Forms
             return fs.FieldState;
         }
 
+        public FieldUserInterfaceType GetFieldUserInterfaceTypeOverride(String fieldName)
+        {
+            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+
+            if (fs == null)
+            {
+                return FieldUserInterfaceType.TypeDefault;
+            }
+
+            return fs.UserInterfaceTypeOverride;
+        }
+
         public FieldMode GetFieldModeOverride(String fieldName)
         {
             FieldSettings fs = this.fieldsByStorageFieldName[fieldName];

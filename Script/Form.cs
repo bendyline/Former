@@ -30,9 +30,29 @@ namespace BL.Forms
     public class Form : ItemControl 
     {
         private FormSettings settings;
+        private String iteratorFieldTemplateId;
 
         [ScriptName("c_fieldIterator")]
-        private Control fieldIterator;
+        private FieldIterator fieldIterator;
+
+        [ScriptName("c_fieldIteratorTemplateId")]
+        public String IteratorFieldTemplateId
+        {
+            get
+            {
+                return this.iteratorFieldTemplateId;
+            }
+
+            set
+            {
+                this.iteratorFieldTemplateId = value;
+
+                if (this.fieldIterator != null)
+                {
+                    ((FieldIterator)this.fieldIterator).FieldTemplateId = this.iteratorFieldTemplateId;
+                }
+            }
+        }
 
         public FormSettings Settings
         {
@@ -91,10 +111,14 @@ namespace BL.Forms
             return fcc;
         }
 
-
         public AdjustedFieldState GetAdjustedFieldState(String fieldName)
         {
             return this.Settings.FieldSettingsCollection.GetAdjustedFieldState(fieldName);
+        }
+
+        public FieldUserInterfaceType GetFieldUserInterfaceTypeOverride(String fieldName)
+        {
+            return this.Settings.FieldSettingsCollection.GetFieldUserInterfaceTypeOverride(fieldName);
         }
 
         public FieldMode GetFieldModeOverride(String fieldName)
@@ -105,6 +129,11 @@ namespace BL.Forms
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            if (this.fieldIterator != null)
+            {
+                this.fieldIterator.TemplateId = this.iteratorFieldTemplateId;
+            }
         }
 
         public void Save()
@@ -118,7 +147,7 @@ namespace BL.Forms
                 }
             }
 
-            ((ODataEntity)this.Item).Save();
+            ((ODataEntity)this.Item).Save(null, null);
         }
 
         protected override void OnUpdate()

@@ -17,8 +17,29 @@ namespace BL.Forms
         [ScriptName("e_fieldBin")]
         private Element fieldBin;
 
+        private String fieldTemplateId;
+
         private List<LabeledField> fields;
         private Dictionary<String, LabeledField> fieldsByName;
+
+        [ScriptName("s_fieldTemplateId")]
+        public String FieldTemplateId
+        {
+            get
+            {
+                return this.fieldTemplateId;
+            }
+
+            set
+            {
+                this.fieldTemplateId = value;
+
+                foreach (LabeledField lf in this.fields)
+                {
+                    lf.TemplateId = this.fieldTemplateId;
+                }
+            }
+        }
 
         public FieldIterator()
         {
@@ -69,6 +90,11 @@ namespace BL.Forms
                         ff.Form = this.Form;
                         ff.Item = this.Item;
                         ff.FieldName = field.Name;
+
+                        if (this.fieldTemplateId != null)
+                        {
+                            ff.TemplateId = this.fieldTemplateId;
+                        }
 
                         ff.EnsureElements();
 

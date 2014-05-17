@@ -39,7 +39,6 @@ namespace BL.Forms
                 return;
             }
 
-
             while (this.choiceBin.ChildNodes.Length > 0)
             {
                 this.choiceBin.RemoveChild(this.choiceBin.ChildNodes[0]);

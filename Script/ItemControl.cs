@@ -43,6 +43,8 @@ namespace BL.Forms
                     this.item.ItemChanged -= item_ItemChanged;
                 }
 
+                this.DelayApplyTemplate = false;
+
                 this.item = value;
 
                 if (this.item != null && this.monitorItemEvents)
@@ -52,6 +54,11 @@ namespace BL.Forms
 
                 this.Update();
             }
+        }
+
+        protected ItemControl() : base()
+        {
+            this.DelayApplyTemplate = true;
         }
 
         private void item_ItemChanged(object sender, DataStoreItemEventArgs e)

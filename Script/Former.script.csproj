@@ -33,9 +33,34 @@
     <DocumentationFile>
     </DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Staging|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\web\gs\former\stg\</OutputPath>
+    <DefineConstants>CODE_ANALYSIS;SCRIPTSHARP</DefineConstants>
+    <NoWarn>0028, 1591, 1684</NoWarn>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>ISO-2</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>Properties\FxCop.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'LocalRelease|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\web\gs\former\1.0\</OutputPath>
+    <DefineConstants>CODE_ANALYSIS;SCRIPTSHARP</DefineConstants>
+    <NoWarn>0028, 1591, 1684</NoWarn>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>ISO-2</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>Properties\FxCop.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="Properties\FxCop.ruleset" />
     <None Include="Properties\Script.template" />
+    <Compile Include="ScaleFieldValue.cs" />
     <Compile Include="FieldSettingsCollection.cs" />
     <Compile Include="ChoiceFieldValue.cs" />
     <Compile Include="FormControl.cs" />
@@ -82,8 +107,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ScaleFieldValue.htm" />
     <Content Include="ChoiceFieldValue.htm" />
+    <Content Include="FormGrid.htm" />
+    <Content Include="CompactForm.htm" />
+    <Content Include="UnlabeledField.htm" />
     <Content Include="ItemSetEditor.htm" />
+    <Content Include="HorizontalLabeledField.htm" />
     <Content Include="UserValue.htm" />
     <Content Include="TextFieldValue.htm" />
     <Content Include="LabeledField.htm" />

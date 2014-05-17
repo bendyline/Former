@@ -15,6 +15,7 @@ namespace BL.Forms
         private FieldChoiceCollection choicesOverride;
         private String name;
         private FieldMode fieldMode;
+        private FieldUserInterfaceType userInterfaceTypeOverride;
 
         [ScriptName("s_name")]
         public String Name
@@ -55,6 +56,20 @@ namespace BL.Forms
             set
             {
                 this.titleOverride = value;
+            }
+        }
+
+        [ScriptName("i_userInterfaceTypeOverride")]
+        public FieldUserInterfaceType UserInterfaceTypeOverride
+        {
+            get
+            {
+                return this.userInterfaceTypeOverride;
+            }
+
+            set
+            {
+                this.userInterfaceTypeOverride = value;
             }
         }
 

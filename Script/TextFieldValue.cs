@@ -17,6 +17,9 @@ namespace BL.Forms
         [ScriptName("e_textInput")]
         private InputElement textInput;
 
+        [ScriptName("e_textDisplay")]
+        private Element textDisplay;
+
         public TextFieldValue()
         {
 
@@ -35,7 +38,6 @@ namespace BL.Forms
         private void HandleTextInputChanged(ElementEvent e)
         {
             this.Item.SetStringValue(this.FieldName, this.textInput.Value);
-
         }
 
 
@@ -43,38 +45,44 @@ namespace BL.Forms
         {
             base.OnUpdate();
 
-            if (this.textInput == null)
+            if (this.textInput == null || !this.IsReady)
             {
                 return;
+            }
+
+            String val = this.Item.GetStringValue(this.FieldName);
+
+            if (val == null)
+            {
+                val = String.Empty;
             }
 
             if (this.EffectiveMode == FieldMode.Example)
             {
                 this.textInput.Value = "Example";
                 this.textInput.Disabled = true;
+                this.textDisplay.Style.Display = "none";
+                this.textInput.Style.Display = "block";
+                this.textInput.Value = val;
             }
             else if (this.EffectiveMode == FieldMode.Edit)
             {
                 this.textInput.Disabled = false;
-            }
-
-            if (this.IsReady)
-            {
-                String val = this.Item.GetStringValue(this.FieldName);
-
-                if (val == null)
-                {
-                    val = String.Empty;
-                }
-
+                this.textDisplay.Style.Display = "none";
+                this.textInput.Style.Display = "block";
                 this.textInput.Value = val;
+            }
+            else
+            {
+                this.textDisplay.Style.Display = "block";
+                this.textInput.Style.Display = "none";
+                this.textDisplay.InnerText = val;
             }
         }
 
         public override void PersistToItem()
         {
             
-        }
-       
+        }       
     }
 }
