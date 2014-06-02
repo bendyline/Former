@@ -35,7 +35,7 @@ namespace BL.Forms
         [ScriptName("c_fieldIterator")]
         private FieldIterator fieldIterator;
 
-        [ScriptName("c_fieldIteratorTemplateId")]
+        [ScriptName("s_iteratorFieldTemplateId")]
         public String IteratorFieldTemplateId
         {
             get
@@ -61,6 +61,8 @@ namespace BL.Forms
                 if (this.settings == null)
                 {
                     this.settings = new FormSettings();
+                    this.settings.PropertyChanged += settings_PropertyChanged;
+                    
                 }
 
                 return this.settings;
@@ -99,6 +101,7 @@ namespace BL.Forms
         {
         }
 
+
         public String GetFieldTitleOverride(String fieldName)
         {
             return this.Settings.FieldSettingsCollection.GetFieldTitleOverride(fieldName);
@@ -132,11 +135,14 @@ namespace BL.Forms
 
             if (this.fieldIterator != null)
             {
-                this.fieldIterator.TemplateId = this.iteratorFieldTemplateId;
+                if (this.iteratorFieldTemplateId != null)
+                {
+                    this.fieldIterator.FieldTemplateId = this.iteratorFieldTemplateId;
+                }
             }
         }
 
-        public void Save()
+        public void Save(AsyncCallback callback, object state)
         {
 
             foreach (Control ic in this.TemplateControls)
@@ -147,7 +153,16 @@ namespace BL.Forms
                 }
             }
 
-            ((ODataEntity)this.Item).Save(null, null);
+            ((ODataEntity)this.Item).Save(callback, state);
+        }
+
+
+        private void settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (this.fieldIterator != null)
+            {
+                this.fieldIterator.OnSettingsChange();
+            }
         }
 
         protected override void OnUpdate()

@@ -60,6 +60,7 @@
   <ItemGroup>
     <None Include="Properties\FxCop.ruleset" />
     <None Include="Properties\Script.template" />
+    <Compile Include="RowForm.cs" />
     <Compile Include="ScaleFieldValue.cs" />
     <Compile Include="FieldSettingsCollection.cs" />
     <Compile Include="ChoiceFieldValue.cs" />
@@ -107,10 +108,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="RowForm.htm" />
+    <Content Include="EmailTextFieldValue.htm" />
+    <Content Include="VerticalLabeledField.htm" />
     <Content Include="ScaleFieldValue.htm" />
     <Content Include="ChoiceFieldValue.htm" />
     <Content Include="FormGrid.htm" />
     <Content Include="CompactForm.htm" />
+    <Content Include="HorizontalUnlabeledField.htm" />
     <Content Include="UnlabeledField.htm" />
     <Content Include="ItemSetEditor.htm" />
     <Content Include="HorizontalLabeledField.htm" />

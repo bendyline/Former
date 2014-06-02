@@ -55,7 +55,22 @@ namespace BL.Forms
 
         private void HandleMeToggleButton(ElementEvent e)
         {
-            this.Item.SetStringValue(this.FieldName, this.textInput.Value);
+            Dialog d = new Dialog();
+
+            Control c = Context.Current.ObjectProvider.CreateObject("userLoginControl") as Control;
+
+            d.Content = c;
+            d.MaxHeight = 400;
+            d.MaxWidth = 500;
+
+            d.Show();
+
+            if (Context.Current.UserAccountName != null)
+            {
+                this.textInput.Value = Context.Current.UserAccountName;
+
+                this.Item.SetStringValue(this.FieldName, this.textInput.Value);
+            }
         }
 
         protected override void OnUpdate()
@@ -69,7 +84,7 @@ namespace BL.Forms
 
             if (this.EffectiveMode == FieldMode.Example)
             {
-                this.textInput.Value = "User Name";
+                this.textInput.Value = "(signed up name)";
                 this.textInput.Disabled = true;
             }
             else

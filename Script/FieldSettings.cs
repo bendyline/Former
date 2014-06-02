@@ -27,7 +27,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.name == value)
+                {
+                    return;
+                }
+
                 this.name = value;
+
+                this.NotifyPropertyChanged("Name");
             }
         }
 
@@ -41,7 +48,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.fieldMode == value)
+                {
+                    return;
+                }
+
                 this.fieldMode = value;
+
+                this.NotifyPropertyChanged("FieldMode");
             }
         }
 
@@ -55,7 +69,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.titleOverride == value)
+                {
+                    return;
+                }
+
                 this.titleOverride = value;
+
+                this.NotifyPropertyChanged("Title");
             }
         }
 
@@ -69,7 +90,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.userInterfaceTypeOverride == value)
+                {
+                    return;
+                }
+
                 this.userInterfaceTypeOverride = value;
+
+                this.NotifyPropertyChanged("UserInterfaceTypeOverride");
             }
         }
 
@@ -89,6 +117,8 @@ namespace BL.Forms
             set
             {
                 this.choicesOverride = value;
+
+                this.NotifyPropertyChanged("ChoicesOverride");
             }
         }
 
@@ -102,7 +132,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.fieldState == value)
+                {
+                    return;
+                }
+
                 this.fieldState = value;
+
+                this.NotifyPropertyChanged("FieldState");
             }
         }
 

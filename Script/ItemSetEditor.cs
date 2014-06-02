@@ -30,8 +30,22 @@ namespace BL.Forms
         private InputElement addButton;
 
         private bool showAddButton = true;
+        private String addItemCta;
 
         public event DataStoreItemEventHandler ItemAdded;
+
+        public String AddItemCta
+        {
+            get
+            {
+                return this.addItemCta;
+            }
+
+            set
+            {
+                this.addItemCta = value;
+            }
+        }
 
         public bool ShowAddButton
         {
@@ -98,11 +112,28 @@ namespace BL.Forms
 
             set
             {
+                if (this.itemSet == value)
+                {
+                    return;
+                }
+
+                if (this.itemSet != null)
+                {
+                    this.itemSet.ItemSetChanged -= itemSet_ItemSetChanged;
+                }
+
                 this.itemSet = value;
 
-                this.itemSet.ItemSetChanged += itemSet_ItemSetChanged;
+                if (this.itemSet != null)
+                {
+                    this.itemSet.ItemSetChanged += itemSet_ItemSetChanged;
 
-                this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
+                    this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
+                }
+                else
+                {
+                    this.Update();
+                }
             }
         }
 
@@ -136,7 +167,8 @@ namespace BL.Forms
 
             if (this.addButton != null)
             {
-                this.addButton.AddEventListener("click", this.AddButtonClick, true);
+                this.addButton.AddEventListener("mousedown", this.AddButtonClick, true);
+                this.addButton.AddEventListener("touchstart", this.AddButtonClick, true);
 
                 this.ApplyAddButtonVisibility();
             }
@@ -167,7 +199,7 @@ namespace BL.Forms
         {
             foreach (Form f in this.forms)
             {
-                f.Save();
+                f.Save(null, null);
             }
         }
 
@@ -182,22 +214,33 @@ namespace BL.Forms
 
             if (f != null)
             {
+                if (!this.itemsShown.Contains(item))
+                {
+                    f.Settings = this.Settings;
+                    f.Item = item;
+                    
+                    this.itemsShown.Add(item);
+
+                    this.formBin.AppendChild(f.Element);
+                }
+
                 return;
             }
 
-            f = new Form();
-
-            f.Settings = this.Settings;
-            f.Item = item;
+            f = new RowForm();
+            f.IteratorFieldTemplateId = "bl-forms-horizontalunlabeledfield";
 
             if (this.itemFormTemplateId != null)
             {
                 f.TemplateId = this.itemFormTemplateId;
             }
 
+            f.Settings = this.Settings;
+            f.Item = item;
+            
             this.formsByItem[item.Id] = f;
             this.forms.Add(f);
-            itemsShown.Add(item);
+            this.itemsShown.Add(item);
 
             f.EnsureElements();
 
@@ -206,25 +249,32 @@ namespace BL.Forms
 
         protected override void OnUpdate()
         {
-            if (this.itemSet == null || this.formBin == null)
+            if (this.formBin == null)
             {
                 return;
             }
 
+            if (this.addItemCta != null)
+            {
+                this.addButton.Value = this.addItemCta;
+            }           
+
             List<IItem> itemsNotSeen = new List<IItem>();
 
-            foreach (IItem item in itemsShown)
+            foreach (IItem item in this.itemsShown)
             {
                 itemsNotSeen.Add(item);
             }
 
-            foreach (IItem item in itemSet.Items)
+            if (this.itemSet != null)
             {
-                itemsNotSeen.Remove(item);
+                foreach (IItem item in itemSet.Items)
+                {
+                    itemsNotSeen.Remove(item);
 
-                this.EnsureFormForItem(item);
+                    this.EnsureFormForItem(item);
+                }
             }
-
 
             foreach (IItem item in itemsNotSeen)
             {
@@ -232,8 +282,13 @@ namespace BL.Forms
 
                 if (f != null)
                 {
-                    this.formBin.RemoveChild(f.Element);
+                    if (this.formBin.Contains(f.Element))
+                    {
+                        this.formBin.RemoveChild(f.Element);
+                    }
                 }
+
+                this.itemsShown.Remove(item);
             }
         }
     }

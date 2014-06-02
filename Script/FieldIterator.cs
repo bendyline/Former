@@ -47,6 +47,13 @@ namespace BL.Forms
             this.fieldsByName = new Dictionary<string, LabeledField>();
         }
 
+        protected internal override void OnSettingsChange()
+        {
+            base.OnSettingsChange();
+
+            this.OnUpdate();
+        }
+
         protected override void OnUpdate()
         {
             base.OnUpdate();
@@ -72,7 +79,7 @@ namespace BL.Forms
             {                
                 AdjustedFieldState afs = this.Form.GetAdjustedFieldState(field.Name);
 
-                if (afs != AdjustedFieldState.DefaultState)
+                if (afs == AdjustedFieldState.Show)
                 {
                     LabeledField ff = this.fieldsByName[field.Name];
 
@@ -80,15 +87,7 @@ namespace BL.Forms
                     {
                         ff = new LabeledField();
 
-                        FieldMode fm = this.Form.GetFieldModeOverride(field.Name);
-
-                        if (fm != FieldMode.FormDefault)
-                        {
-                            ff.Mode = fm;
-                        }
-
                         ff.Form = this.Form;
-                        ff.Item = this.Item;
                         ff.FieldName = field.Name;
 
                         if (this.fieldTemplateId != null)
@@ -109,6 +108,17 @@ namespace BL.Forms
                     {
                         fieldsNotUsed.Remove(ff);
                     }
+
+                    FieldMode fm = this.Form.GetFieldModeOverride(field.Name);
+
+                    if (fm != FieldMode.FormDefault)
+                    {
+                        ff.Mode = fm;
+                    }
+
+                    ff.Item = null;
+                    ff.Item = this.Item;
+
                 }
             }
 

@@ -9,18 +9,20 @@
         <!-- end sample preview content -->
 
         <style>
-
-            #title
+            BODY
             {
-                font-size: medium;
-                margin-right:20px;
-                font-family: 'Raleway', Helvetica, Arial, sansserif;
-                min-width:80px;
+                display:table-row;
             }
-   
+
+            #rowCell{
+                display:table-cell;
+            }
         </style>
 	</head>
 	<body>        
-        <div id="title"></div>
+        <div id="rowCell">
+            <BL.Forms.FieldLabel id="fieldLabel"/>
+            <BL.Forms.FieldValue id="fieldValue"/>
+        </div>
     </body>
 </html>

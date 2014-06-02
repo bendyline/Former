@@ -32,5 +32,10 @@ namespace BL.Forms
         {
             
         }
+
+        internal protected virtual void OnSettingsChange()
+        {
+
+        }
     }
 }

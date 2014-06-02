@@ -9,22 +9,28 @@
         <!-- end sample preview content -->
 
         <style>
-   
+            #body
+            {
+                display:table;
+            }
+            #row
+            {
+                display:table-row;
+            }
+
+            #rowCell{
+                display:table-cell;
+            }
         </style>
 	</head>
 	<body>        
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 col-xs-12">
-                    <BL.Forms.FieldLabel id="fieldLabel"/>
-                </div>
+        <div id="row">
+        <div id="rowCell">
+            <BL.Forms.FieldLabel id="fieldLabel"/>
+        </div>
+        <div id="rowCell">
+            <BL.Forms.FieldValue id="fieldValue"/>
+        </div>
             </div>
-
-            <div class="row">
-                <div class="col-md-12 col-xs-12">
-                   <BL.Forms.FieldValue id="fieldValue"/>
-                </div>
-            </div>
-         </div>
     </body>
 </html>

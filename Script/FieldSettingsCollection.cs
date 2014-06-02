@@ -9,10 +9,12 @@ using BL.Data;
 
 namespace BL.Forms
 {
-    public class FieldSettingsCollection : ISerializableCollection, IEnumerable
+    public class FieldSettingsCollection : ISerializableCollection, IEnumerable, INotifyCollectionChanged
     {
         private ArrayList fields;
         private Dictionary<String, FieldSettings> fieldsByStorageFieldName;
+        
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public ArrayList Fields
         {
@@ -39,6 +41,11 @@ namespace BL.Forms
         {
             this.fields = new ArrayList();
             this.fieldsByStorageFieldName = new Dictionary<string, FieldSettings>();
+        }
+
+        public FieldSettings GetFieldByName(String fieldName)
+        {
+            return this.fieldsByStorageFieldName[fieldName];
         }
 
         public String GetFieldTitleOverride(String fieldName)
@@ -138,6 +145,18 @@ namespace BL.Forms
         {
             this.fields.Add(fieldSettings);
             this.fieldsByStorageFieldName[((FieldSettings)fieldSettings).Name] = (FieldSettings)fieldSettings;
+
+            fieldSettings.PropertyChanged += fieldSettings_PropertyChanged;
+            
+            if (this.CollectionChanged != null)
+            {
+                this.CollectionChanged(this, NotifyCollectionChangedEventArgs.ItemAdded(fieldSettings));  
+            }
+        }
+
+        private void fieldSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+
         }
     }
 }
