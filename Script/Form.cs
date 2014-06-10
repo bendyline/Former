@@ -62,7 +62,7 @@ namespace BL.Forms
                 {
                     this.settings = new FormSettings();
                     this.settings.PropertyChanged += settings_PropertyChanged;
-                    
+                    this.settings.FieldSettingsCollection.CollectionChanged += FieldSettingsCollection_CollectionChanged;
                 }
 
                 return this.settings;
@@ -70,9 +70,20 @@ namespace BL.Forms
 
             set
             {
+                if (this.settings == value)
+                {
+                    return;
+                }
+
                 this.settings = value;
+
+                if (this.fieldIterator != null)
+                {
+                    this.fieldIterator.OnSettingsChange();
+                }
             }
         }
+
 
         public FormMode Mode
         {
@@ -124,6 +135,11 @@ namespace BL.Forms
             return this.Settings.FieldSettingsCollection.GetFieldUserInterfaceTypeOverride(fieldName);
         }
 
+        public FieldUserInterfaceOptions GetFieldUserInterfaceOptionsOverride(String fieldName)
+        {
+            return this.Settings.FieldSettingsCollection.GetFieldUserInterfaceOptionsOverride(fieldName);
+        }
+
         public FieldMode GetFieldModeOverride(String fieldName)
         {
             return this.Settings.FieldSettingsCollection.GetFieldModeOverride(fieldName);
@@ -156,6 +172,14 @@ namespace BL.Forms
             ((ODataEntity)this.Item).Save(callback, state);
         }
 
+
+        private void FieldSettingsCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (this.fieldIterator != null)
+            {
+                this.fieldIterator.OnSettingsChange();
+            }
+        }
 
         private void settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

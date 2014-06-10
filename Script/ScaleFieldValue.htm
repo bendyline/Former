@@ -14,6 +14,7 @@
             {
                 border: solid 0px;
                 margin: 7px;
+                padding:7px;
             }
 
             #normal
@@ -31,9 +32,43 @@
                 color: gray;
             }
 
+            #scaleTable
+            {
+                display:table;
+            }
+
+            #scaleRow
+            {
+                display:table-row;
+            }
+
+            #scaleBin
+            {
+                display:table-cell;
+                padding-top:3px;
+            }
+
+            #scaleMaxEnd
+            {
+                display:table-cell;
+                margin-left:10px;
+            }
+
+            #scaleMinEnd
+            {
+                display:table-cell;
+                margin-right:10px;
+            }
+
         </style>
 	</head>
-	<body>        
-       <div id="scaleBin"/>
+	<body>  
+        <div id="scaleTable">
+            <div id="scaleRow">
+                <div id="scaleMinEnd"></div>    
+                <div id="scaleBin"/>        
+                <div id="scaleMaxEnd"></div>
+            </div>
+        </div>
     </body>
 </html>

@@ -16,6 +16,7 @@ namespace BL.Forms
         private String name;
         private FieldMode fieldMode;
         private FieldUserInterfaceType userInterfaceTypeOverride;
+        private FieldUserInterfaceOptions userInterfaceOptionsOverride;
 
         [ScriptName("s_name")]
         public String Name
@@ -98,6 +99,27 @@ namespace BL.Forms
                 this.userInterfaceTypeOverride = value;
 
                 this.NotifyPropertyChanged("UserInterfaceTypeOverride");
+            }
+        }
+
+        [ScriptName("o_userInterfaceOptionsOverride")]
+        public FieldUserInterfaceOptions UserInterfaceOptionsOverride
+        {
+            get
+            {
+                return this.userInterfaceOptionsOverride;
+            }
+
+            set
+            {
+                if (this.userInterfaceOptionsOverride == value)
+                {
+                    return;
+                }
+
+                this.userInterfaceOptionsOverride = value;
+
+                this.NotifyPropertyChanged("UserInterfaceOptionsOverride");
             }
         }
 

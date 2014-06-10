@@ -38,6 +38,11 @@ namespace BL.Forms
 
             set
             {
+                if (this.item == value)
+                {
+                    return;
+                }
+
                 if (this.item != null && this.monitorItemEvents)
                 {
                     this.item.ItemChanged -= item_ItemChanged;

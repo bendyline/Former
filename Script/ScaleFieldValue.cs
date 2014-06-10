@@ -17,6 +17,11 @@ namespace BL.Forms
         [ScriptName("e_scaleBin")]
         private Element scaleBin;
 
+        [ScriptName("e_scaleMinEnd")]
+        private Element scaleMinEnd;
+
+        [ScriptName("e_scaleMaxEnd")]
+        private Element scaleMaxEnd;
 
         private List<InputElement> radioButtons;
 
@@ -30,9 +35,7 @@ namespace BL.Forms
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-
         }
-
 
         protected override void OnUpdate()
         {
@@ -54,6 +57,10 @@ namespace BL.Forms
                 {
                     InputElement b = (InputElement)this.CreateElementWithType("scaleButton example", "INPUT");
                     b.Type = "radio";
+                    b.ClassName += " k-radiobutton";
+
+                    // regrettably bootstrap overrides even the CSS we have declared in the template, so force it.
+                    b.Style.Margin = "4px";
 
                     b.Value = "Example 1";
                     this.scaleBin.AppendChild(b);
@@ -63,8 +70,10 @@ namespace BL.Forms
             {
                 for (int i = 0; i < 5; i++)
                 {
-                    InputElement b = (InputElement)this.CreateElementWithType("scaleButton", "INPUT"); ;
+                    InputElement b = (InputElement)this.CreateElementWithType("scaleButton", "INPUT");
                     b.Type = "radio";
+                    b.ClassName += " k-radiobutton";
+                    b.Style.Margin = "4px";
 
                     b.AddEventListener("click", this.HandleButtonClick, true);
 
@@ -73,8 +82,21 @@ namespace BL.Forms
                     this.radioButtons.Add(b);
                     this.scaleBin.AppendChild(b);
                 }
+            }
 
-         //       this.UpdateRadios();
+            FieldUserInterfaceOptions fuio = this.EffectiveUserInterfaceOptions;
+
+            if (fuio != null)
+            {
+                if (fuio.RangeStartDescription != null && this.scaleMinEnd != null)
+                {
+                    this.scaleMinEnd.InnerText = fuio.RangeStartDescription;
+                }
+
+                if (fuio.RangeEndDescription != null && this.scaleMaxEnd != null)
+                {
+                    this.scaleMaxEnd.InnerText = fuio.RangeEndDescription;
+                }
             }
         }
 
@@ -93,7 +115,6 @@ namespace BL.Forms
                     this.radioButtons[i].RemoveAttribute("checked");
                 }
             }
-
         }
 
         private void HandleButtonClick(ElementEvent e)

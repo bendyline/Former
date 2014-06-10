@@ -96,6 +96,18 @@ namespace BL.Forms
             return fs.UserInterfaceTypeOverride;
         }
 
+        public FieldUserInterfaceOptions GetFieldUserInterfaceOptionsOverride(String fieldName)
+        {
+            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+
+            if (fs == null)
+            {
+                return null;
+            }
+
+            return fs.UserInterfaceOptionsOverride;
+        }
+
         public FieldMode GetFieldModeOverride(String fieldName)
         {
             FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
@@ -116,8 +128,8 @@ namespace BL.Forms
             {
                 fs = (FieldSettings)this.Create();
                 fs.Name = fieldName;
-                this.fields.Add(fs);
-                this.fieldsByStorageFieldName[fieldName] = fs;
+
+                this.Add(fs);
             }
 
             return fs;

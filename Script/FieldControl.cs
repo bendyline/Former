@@ -26,6 +26,7 @@ namespace BL.Forms
         private IDataStoreField field;
         private String fieldName;
         private FieldMode mode = FieldMode.Edit;
+        private PropertyChangedEventHandler propertyChanged;
 
         public FieldMode EffectiveMode
         {
@@ -96,12 +97,104 @@ namespace BL.Forms
 
             set
             {
+                if (this.fieldName == value)
+                {
+                    return;
+                }
+
                 this.fieldName = value;
 
                 this.Update();
             }
         }
 
+        public FieldUserInterfaceOptions EffectiveUserInterfaceOptions
+        {
+            get
+            {
+                FieldUserInterfaceOptions efuio = this.Form.GetFieldUserInterfaceOptionsOverride(this.fieldName);
+
+                if (efuio == null)
+                {
+                    efuio = this.Field.UserInterfaceOptions;
+                }
+
+                return efuio;
+            }
+        }
+
+        public FieldControl()
+        {
+            this.propertyChanged = fs_PropertyChanged;
+        }
+
+        protected override void OnUpdate()
+        {
+            if (this.Item == null || this.Form == null || this.Field == null)
+            {
+                return;
+            }
+
+            this.UnhookExistingEvents();
+
+            this.Field.PropertyChanged += this.propertyChanged;
+
+            this.Field.UserInterfaceOptions.PropertyChanged += this.propertyChanged;
+
+            FieldSettings fs = this.Form.Settings.FieldSettingsCollection.GetFieldByName(this.fieldName);
+
+            if (fs != null)
+            {
+                fs.PropertyChanged += this.propertyChanged;
+
+                if (fs.UserInterfaceOptionsOverride != null)
+                {
+                    fs.UserInterfaceOptionsOverride.PropertyChanged += this.propertyChanged;
+                }
+            }
+        }
+
+        private void fs_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            this.Update();
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            this.UnhookExistingEvents();
+        }
+
+        private void UnhookExistingEvents()
+        {
+            if (this.Item == null || this.Form == null || this.Field == null)
+            {
+                return;
+            }
+
+            if (this.Field != null)
+            {
+                this.Field.PropertyChanged -= this.propertyChanged;
+            }
+
+            if (this.Field.UserInterfaceOptions != null)
+            {
+                this.Field.UserInterfaceOptions.PropertyChanged -= this.propertyChanged;
+            }
+
+            FieldSettings fs = this.Form.Settings.FieldSettingsCollection.GetFieldByName(this.fieldName);
+
+            if (fs != null)
+            {
+                fs.PropertyChanged -= this.propertyChanged;
+
+                if (fs.UserInterfaceOptionsOverride != null)
+                {
+                    fs.UserInterfaceOptionsOverride.PropertyChanged -= this.propertyChanged;
+                }
+            }
+        }
 
         protected void ApplyToControl(FieldControl fc)
         {

@@ -21,6 +21,8 @@ namespace BL.Forms
 
         private List<LabeledField> fields;
         private Dictionary<String, LabeledField> fieldsByName;
+        private PropertyChangedEventHandler propertyChanged;
+
 
         [ScriptName("s_fieldTemplateId")]
         public String FieldTemplateId
@@ -45,6 +47,8 @@ namespace BL.Forms
         {
             this.fields = new List<LabeledField>();
             this.fieldsByName = new Dictionary<string, LabeledField>();
+
+            this.propertyChanged = fs_PropertyChanged;
         }
 
         protected internal override void OnSettingsChange()
@@ -76,7 +80,15 @@ namespace BL.Forms
             }
             
             foreach (Field field in this.Item.Type.Fields)
-            {                
+            {
+                FieldSettings fs = this.Form.Settings.FieldSettingsCollection.GetFieldByName(field.Name);
+
+                if (fs != null)
+                {
+                    fs.PropertyChanged -= this.propertyChanged;
+                    fs.PropertyChanged += this.propertyChanged;
+                }
+
                 AdjustedFieldState afs = this.Form.GetAdjustedFieldState(field.Name);
 
                 if (afs == AdjustedFieldState.Show)
@@ -116,9 +128,7 @@ namespace BL.Forms
                         ff.Mode = fm;
                     }
 
-                    ff.Item = null;
                     ff.Item = this.Item;
-
                 }
             }
 
@@ -128,6 +138,11 @@ namespace BL.Forms
                 this.fields.Remove(f);
                 this.fieldsByName[f.Field.Name] = null;
             }
+        }
+
+        private void fs_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            this.Update();
         }
     }
 }

@@ -17,6 +17,8 @@ namespace BL.Forms
         [ScriptName("e_fieldBin")]
         private Element fieldBin;
 
+        private FieldUserInterfaceType previousUserInterfaceType = FieldUserInterfaceType.NoValue;
+
         private FieldControl fieldControl;
 
         public FieldValue()
@@ -35,24 +37,9 @@ namespace BL.Forms
 
             if (this.IsReady && this.fieldBin != null)
             {
-                while (this.fieldBin.ChildNodes.Length > 0)
-                {
-                    this.fieldBin.RemoveChild(this.fieldBin.ChildNodes[0]);
-                }
-
                 String fieldName = this.Field.Name;
 
-                FieldSettings fs = this.Form.Settings.FieldSettingsCollection.GetFieldByName(fieldName);
-
-                if (fs != null)
-                {
-                    fs.PropertyChanged -= fs_PropertyChanged;
-                    fs.PropertyChanged += fs_PropertyChanged;
-                }
-
-                FieldChoiceCollection fccAlternates = this.Form.GetFieldChoicesOverride(fieldName);
-
-                FieldUserInterfaceType userInterfaceType = this.Field.UserInterfaceType;             
+                FieldUserInterfaceType userInterfaceType = this.Field.UserInterfaceType;
                 FieldUserInterfaceType altUserInterfaceType = this.Form.GetFieldUserInterfaceTypeOverride(fieldName);
 
                 if (altUserInterfaceType != FieldUserInterfaceType.TypeDefault)
@@ -60,53 +47,63 @@ namespace BL.Forms
                     userInterfaceType = altUserInterfaceType;
                 }
 
-                if (this.Field.Type == FieldType.Integer && userInterfaceType == FieldUserInterfaceType.Scale)
+                if (userInterfaceType != previousUserInterfaceType)
                 {
-                    this.fieldControl = new ScaleFieldValue();
+                    previousUserInterfaceType = userInterfaceType;
 
-                    this.ApplyToControl(this.fieldControl);
-                    this.fieldControl.EnsureElements();
-
-                    this.fieldBin.AppendChild(this.fieldControl.Element);
-                }
-                else if (this.Field.Type == FieldType.ShortText && userInterfaceType == FieldUserInterfaceType.User)
-                {
-                    this.fieldControl = new UserValue();
-                    this.ApplyToControl(this.fieldControl);
-                    this.fieldControl.EnsureElements();
-
-                    this.fieldBin.AppendChild(this.fieldControl.Element);
-                }
-                else if (this.Field.Type == FieldType.Enumeration)
-                {
-                    this.fieldControl = new ChoiceFieldValue();
-
-                    this.ApplyToControl(this.fieldControl);
-                    this.fieldControl.EnsureElements();
-
-                    this.fieldBin.AppendChild(this.fieldControl.Element);
-                }
-                else if (this.Field.Type == FieldType.ShortText)
-                {
-                    this.fieldControl = new TextFieldValue();
-
-                    if (userInterfaceType == FieldUserInterfaceType.Email)
+                    if (this.fieldControl != null)
                     {
-                        this.fieldControl.TemplateId = "bl-forms-emailtextfieldvalue";
+                        this.fieldControl.Dispose();
                     }
 
-                    this.ApplyToControl(this.fieldControl);
+                    while (this.fieldBin.ChildNodes.Length > 0)
+                    {
+                        this.fieldBin.RemoveChild(this.fieldBin.ChildNodes[0]);
+                    }
 
-                    this.fieldControl.EnsureElements();
+                    if (this.Field.Type == FieldType.Integer && userInterfaceType == FieldUserInterfaceType.Scale)
+                    {
+                        this.fieldControl = new ScaleFieldValue();
 
-                    this.fieldBin.AppendChild(this.fieldControl.Element);
+                        this.ApplyToControl(this.fieldControl);
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
+                    else if (this.Field.Type == FieldType.ShortText && userInterfaceType == FieldUserInterfaceType.User)
+                    {
+                        this.fieldControl = new UserValue();
+                        this.ApplyToControl(this.fieldControl);
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
+                    else if (this.Field.Type == FieldType.ShortText && userInterfaceType == FieldUserInterfaceType.Choice)
+                    {
+                        this.fieldControl = new ChoiceFieldValue();
+
+                        this.ApplyToControl(this.fieldControl);
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
+                    else if (this.Field.Type == FieldType.ShortText)
+                    {
+                        this.fieldControl = new TextFieldValue();
+
+                        if (userInterfaceType == FieldUserInterfaceType.Email)
+                        {
+                            this.fieldControl.TemplateId = "bl-forms-emailtextfieldvalue";
+                        }
+
+                        this.ApplyToControl(this.fieldControl);
+
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
                 }
             }
-        }
-
-        private void fs_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            this.Update();
         }
 
         public override void PersistToItem()
