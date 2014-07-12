@@ -68,6 +68,7 @@
     <Compile Include="FieldSettings.cs" />
     <Compile Include="FormSettings.cs" />
     <Compile Include="ItemSetEditor.cs" />
+    <Compile Include="CheckboxFieldValue.cs" />
     <Compile Include="UserValue.cs" />
     <Compile Include="TextFieldValue.cs" />
     <Compile Include="LabeledField.cs" />
@@ -110,6 +111,7 @@
   <ItemGroup>
     <Content Include="RowForm.htm" />
     <Content Include="EmailTextFieldValue.htm" />
+    <Content Include="CheckboxFieldValue.htm" />
     <Content Include="VerticalLabeledField.htm" />
     <Content Include="ScaleFieldValue.htm" />
     <Content Include="ChoiceFieldValue.htm" />

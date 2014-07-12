@@ -102,6 +102,16 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
+                    else if (this.Field.Type == FieldType.BoolChoice)
+                    {
+                        this.fieldControl = new CheckboxFieldValue();
+
+                        this.ApplyToControl(this.fieldControl);
+
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
                 }
             }
         }

@@ -9,6 +9,7 @@ using jQueryApi;
 using BL.UI;
 using BL.Data;
 using System.Runtime.CompilerServices;
+using System.Serialization;
 
 namespace BL.Forms
 {
@@ -19,13 +20,29 @@ namespace BL.Forms
         EmailAddress = 2
     }
 
+    public enum UserValueDisplayMode
+    {
+        TextInput=0,
+        UserSummary = 1
+    }
+
     public class UserValue : FieldControl
     {
         [ScriptName("e_textInput")]
         private InputElement textInput;
+        
+        [ScriptName("e_userSummaryArea")]
+        private Element userSummaryArea;
 
         [ScriptName("e_toggleButton")]
         private InputElement toggleButton;
+
+        private UserControl userSummary;
+        private UserReference activeReference;
+
+        private bool commitPending = false;
+
+        private UserValueDisplayMode displayMode = UserValueDisplayMode.TextInput;
 
         public UserValue()
         {
@@ -39,7 +56,11 @@ namespace BL.Forms
             if (this.textInput != null)
             {
                 this.textInput.AddEventListener("change", this.HandleTextInputChanged, true);
+                this.textInput.AddEventListener("keypress", this.HandleTextInputKeyPressed, true);
+                this.textInput.AddEventListener("blur", this.HandleTextInputBlurred, true);
             }
+
+            this.userSummaryArea.AddEventListener("mouseup", this.HandleSummaryTap, true);
 
             if (this.toggleButton != null)
             {
@@ -47,29 +68,80 @@ namespace BL.Forms
             }
         }
 
+        private void HandleSummaryTap(ElementEvent e)
+        {
+            this.displayMode = UserValueDisplayMode.TextInput;
+            
+            this.ApplyDisplayMode();
+
+            this.textInput.Focus();
+        }
+
+        private void HandleTextInputKeyPressed(ElementEvent e)
+        {
+            if (!this.commitPending)
+            {
+                this.commitPending = true;
+
+                Window.SetTimeout(this.SaveValue, 2000);
+            }
+        }
+
         private void HandleTextInputChanged(ElementEvent e)
         {
-            this.Item.SetStringValue(this.FieldName, this.textInput.Value);
+            this.SaveValue();
+        }
 
+        private void SaveValue()
+        {
+            this.commitPending = false;
+
+            if (this.textInput.Value.Length > 0)
+            {
+                this.Item.SetStringValue(this.FieldName, this.textInput.Value);
+
+                if (this.activeReference != null)
+                {
+                    this.activeReference = null;
+                }
+            }
+        }
+
+        private void HandleTextInputBlurred(ElementEvent e)
+        {
+            if (this.textInput.Value.Length == 0 && this.activeReference != null)
+            {
+                this.displayMode = UserValueDisplayMode.UserSummary;
+
+                this.ApplyDisplayMode();
+            }
         }
 
         private void HandleMeToggleButton(ElementEvent e)
         {
-            Dialog d = new Dialog();
-
-            Control c = Context.Current.ObjectProvider.CreateObject("userLoginControl") as Control;
-
-            d.Content = c;
-            d.MaxHeight = 400;
-            d.MaxWidth = 500;
-
-            d.Show();
-
-            if (Context.Current.UserAccountName != null)
+            if (Context.Current.User == null)
             {
-                this.textInput.Value = Context.Current.UserAccountName;
+                Dialog d = new Dialog();
 
-                this.Item.SetStringValue(this.FieldName, this.textInput.Value);
+                Control c = Context.Current.ObjectProvider.CreateObject("userLoginControl") as Control;
+
+                d.Content = c;
+                d.MaxHeight = 400;
+                d.MaxWidth = 500;
+
+                d.Show();
+            }
+
+            if (Context.Current.User != null)
+            {
+                this.textInput.Value = String.Empty;
+
+                UserReference ur = new UserReference();
+
+                ur.Id = Context.Current.User.Id;
+                ur.NickName = Context.Current.User.NickName;
+
+                this.Item.SetStringValue(this.FieldName, Json.Stringify(ur.GetObject()));
             }
         }
 
@@ -94,8 +166,67 @@ namespace BL.Forms
 
             if (this.IsReady)
             {
-                this.textInput.Value = this.Item.GetStringValue(this.FieldName);
+                String value = this.Item.GetStringValue(this.FieldName);
+                this.displayMode = UserValueDisplayMode.TextInput;
 
+                if (value != null)
+                {
+                    value = value.Trim();
+
+                    if (value.StartsWith("{") && value.EndsWith("}"))
+                    {
+                        this.activeReference = new UserReference();
+
+                        this.activeReference.ApplyObject(Json.Parse(value));
+
+                        if (this.activeReference.Id != null && this.activeReference.NickName != null)
+                        {
+                            this.displayMode = UserValueDisplayMode.UserSummary;
+                        }
+                        else
+                        {
+                            this.activeReference = null;
+                        }
+                    }
+                    else
+                    {
+                        this.textInput.Value = value;
+                    }
+                }
+
+                this.ApplyDisplayMode();
+            }
+        }
+
+        private void ApplyDisplayMode()
+        {
+            if (this.displayMode == UserValueDisplayMode.TextInput)
+            {
+                this.textInput.Style.Display = "";
+            }
+            else
+            {
+                this.textInput.Style.Display = "none";
+            }
+
+
+            if (this.displayMode == UserValueDisplayMode.UserSummary)
+            {
+                if (this.userSummary == null)
+                {
+                    this.userSummary = Context.Current.ObjectProvider.CreateObject("userSummary") as UserControl;
+
+                    this.userSummary.EnsureElements();
+                }
+
+                this.userSummary.UserReference = this.activeReference;
+                this.userSummaryArea.AppendChild(this.userSummary.Element);
+
+                this.userSummaryArea.Style.Display = "";
+            }
+            else
+            {
+                this.userSummaryArea.Style.Display = "none";
             }
         }
 

@@ -20,6 +20,8 @@ namespace BL.Forms
         [ScriptName("e_textDisplay")]
         private Element textDisplay;
 
+        private bool commitPending = false;
+
         public TextFieldValue()
         {
 
@@ -32,14 +34,31 @@ namespace BL.Forms
             if (this.textInput != null)
             {
                 this.textInput.AddEventListener("change", this.HandleTextInputChanged, true);
+                this.textInput.AddEventListener("keypress", this.HandleTextInputKeyPressed, true);
+            }
+        }
+
+        private void HandleTextInputKeyPressed(ElementEvent e)
+        {
+            if (!this.commitPending)
+            {
+                this.commitPending = true;
+
+                Window.SetTimeout(this.SaveValue, 2000);
             }
         }
 
         private void HandleTextInputChanged(ElementEvent e)
         {
-            this.Item.SetStringValue(this.FieldName, this.textInput.Value);
+            this.SaveValue();
         }
 
+        private void SaveValue()
+        {
+            this.commitPending = false;
+
+            this.Item.SetStringValue(this.FieldName, this.textInput.Value);
+        }
 
         protected override void OnUpdate()
         {
