@@ -11,9 +11,11 @@ namespace BL.Forms
     public class FieldSettings : SerializableObject
     {
         private String titleOverride;
+        private bool requiredOverride;
         private AdjustedFieldState fieldState;
         private FieldChoiceCollection choicesOverride;
         private String name;
+        private int order;
         private FieldMode fieldMode;
         private FieldUserInterfaceType userInterfaceTypeOverride;
         private FieldUserInterfaceOptions userInterfaceOptionsOverride;
@@ -77,7 +79,49 @@ namespace BL.Forms
 
                 this.titleOverride = value;
 
-                this.NotifyPropertyChanged("Title");
+                this.NotifyPropertyChanged("TitleOverride");
+            }
+        }
+
+        [ScriptName("b_requiredOverride")]
+        public bool RequiredOverride
+        {
+            get
+            {
+                return this.requiredOverride;
+            }
+
+            set
+            {
+                if (this.requiredOverride == value)
+                {
+                    return;
+                }
+
+                this.requiredOverride = value;
+
+                this.NotifyPropertyChanged("RequiredOverride");
+            }
+        }
+
+        [ScriptName("i_order")]
+        public int Order
+        {
+            get
+            {
+                return this.order;
+            }
+
+            set
+            {
+                if (this.order == value)
+                {
+                    return;
+                }
+
+                this.order = value;
+
+                this.NotifyPropertyChanged("Order");
             }
         }
 

@@ -14,6 +14,8 @@ namespace BL.Forms
 {
     public class ScaleFieldValue : FieldControl
     {
+        private String groupName = null;
+
         [ScriptName("e_scaleBin")]
         private Element scaleBin;
 
@@ -24,17 +26,30 @@ namespace BL.Forms
         private Element scaleMaxEnd;
 
         private List<InputElement> radioButtons;
+        private List<Element> elementButtons;
 
-        private InputElement selectedElement;
+        private Element selectedElement;
+        private String lastOptionHash = null;
 
+        private ElementEventListener clickListener;
         public ScaleFieldValue()
         {
             this.radioButtons = new List<InputElement>();
+            this.elementButtons = new List<Element>();
+            this.groupName = Utilities.CreateRandomId();
+            this.clickListener = new ElementEventListener(this.HandleButtonClick);
         }
 
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+        }
+
+        private String GenerateOptionHash()
+        {
+            String results = this.EffectiveMode.ToString();
+
+            return results;
         }
 
         protected override void OnUpdate()
@@ -46,43 +61,104 @@ namespace BL.Forms
                 return;
             }
 
-            while (this.scaleBin.ChildNodes.Length > 0)
-            {
-                this.scaleBin.RemoveChild(this.scaleBin.ChildNodes[0]);
-            }
 
-            if (this.EffectiveMode == FieldMode.Example)
+            String newHash = this.GenerateOptionHash();
+
+            if (newHash != lastOptionHash)
             {
+                lastOptionHash = newHash;
+
+                while (this.scaleBin.ChildNodes.Length > 0)
+                {
+                    this.scaleBin.RemoveChild(this.scaleBin.ChildNodes[0]);
+                }
+
+                if (this.radioButtons != null)
+                {
+                    foreach (InputElement ie in this.radioButtons)
+                    {
+                        ie.RemoveEventListener("click", this.clickListener, true);
+                    }
+                    this.radioButtons.Clear();
+                }
+
+                Element divOuterElement = this.CreateElement("buttonItemOuter");
+                Element divInnerElement = this.CreateElement("buttonItemInner");
+
+                ScaleType scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
+
+                divOuterElement.AppendChild(divInnerElement);
+
                 for (int i = 0; i < 5; i++)
                 {
-                    InputElement b = (InputElement)this.CreateElementWithType("scaleButton example", "INPUT");
-                    b.Type = "radio";
-                    b.ClassName += " k-radiobutton";
+                    Element divButtonElement = this.CreateElement("buttonItemCell");
 
-                    // regrettably bootstrap overrides even the CSS we have declared in the template, so force it.
-                    b.Style.Margin = "4px";
+                    if (scaleType == ScaleType.FiveAgree || scaleType == ScaleType.FiveValues)
+                    {
+                        InputElement b = (InputElement)this.CreateElementWithType("scaleButton", "INPUT");
+                        b.Type = "radio";
+                        b.ClassName += " k-radiobutton";
+                        b.Name = this.groupName;
+                        b.Style.Margin = "4px";
 
-                    b.Value = "Example 1";
-                    this.scaleBin.AppendChild(b);
+                        if (this.EffectiveMode == FieldMode.Example)
+                        {
+                            b.Value = "Example " + (i + 1).ToString();
+                        }
+                        else
+                        {
+                            b.Value = (i + 1).ToString();
+                            b.AddEventListener("click", this.clickListener, true);
+                        }
+
+                        this.radioButtons.Add(b);
+                        divButtonElement.AppendChild(b);
+                    }
+
+                    if (scaleType == ScaleType.FiveStars)
+                    {
+                        Element e = this.CreateElement("star");
+                        e.ClassName += " glyphicon glyphicon-star";
+                        e.AddEventListener("click", this.clickListener, true);
+                        e.SetAttribute("Value", (i + 1).ToString());
+
+                        this.elementButtons.Add(e);
+                        divButtonElement.AppendChild(e);
+                    }
+    
+                    divInnerElement.AppendChild(divButtonElement);
+
+                    if (scaleType == ScaleType.FiveAgree)
+                    {
+                        Element divLabelElement = this.CreateElement("buttonItemLabelCell");
+
+                        switch (i)
+                        {
+                            case 0:
+                                ControlUtilities.SetText(divLabelElement, "Strongly Disagree");
+                                break;
+                            case 1:
+                                ControlUtilities.SetText(divLabelElement, "Disagree");
+                                break;
+                            case 2:
+                                ControlUtilities.SetText(divLabelElement, "Neutral");
+                                break;
+                            case 3:
+                                ControlUtilities.SetText(divLabelElement, "Agree");
+                                break;
+                            case 4:
+                                ControlUtilities.SetText(divLabelElement, "Strongly Agree");
+                                break;
+                        }
+
+                        divInnerElement.AppendChild(divLabelElement);
+                    }
                 }
+
+                this.scaleBin.AppendChild(divOuterElement);
             }
-            else
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    InputElement b = (InputElement)this.CreateElementWithType("scaleButton", "INPUT");
-                    b.Type = "radio";
-                    b.ClassName += " k-radiobutton";
-                    b.Style.Margin = "4px";
 
-                    b.AddEventListener("click", this.HandleButtonClick, true);
-
-                    b.Value = (i+1).ToString();
-
-                    this.radioButtons.Add(b);
-                    this.scaleBin.AppendChild(b);
-                }
-            }
+            this.UpdateRadios();
 
             FieldUserInterfaceOptions fuio = this.EffectiveUserInterfaceOptions;
 
@@ -106,35 +182,60 @@ namespace BL.Forms
 
             for (int i=0; i<this.radioButtons.Count; i++)
             {
+                InputElement elt = this.radioButtons[i];
+
                 if (valStr == this.radioButtons[i].Value)
                 {
-                    this.radioButtons[i].SetAttribute("checked", 1);
+                    elt.ClassName = this.GetElementClass("scaleButton selected");
+                    elt.SetAttribute("checked", 1);
                 }
                 else
                 {
-                    this.radioButtons[i].RemoveAttribute("checked");
+                    elt.RemoveAttribute("checked");
+                    elt.ClassName = this.GetElementClass("scaleButton normal");
                 }
             }
         }
 
         private void HandleButtonClick(ElementEvent e)
         {
-            InputElement element = (InputElement)e.SrcElement;
-
-            if (selectedElement != null)
-            {
-                selectedElement.ClassName = this.GetElementClass("scaleButton normal");
-            }
+            ScaleType scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
+            Element element = (Element)ControlUtilities.GetEventTarget(e);
 
             String val = (String)element.GetAttribute("Value");
+            
+            int oldSelected = (Int32)this.Item.GetValue(this.FieldName);
 
-            this.Item.SetValue(this.FieldName, Int32.Parse(val));
+            int selected = Int32.Parse(val);
+            this.Item.SetValue(this.FieldName, selected);
 
-            selectedElement = element;
+            if (scaleType == ScaleType.FiveStars)
+            {
+                for (int i = 0; i < oldSelected; i++)
+                {
+                    this.elementButtons[i].ClassName = this.GetElementClass("star normal") + " glyphicon glyphicon-star";
+                }
 
-            selectedElement.ClassName = this.GetElementClass("scaleButton selected");
+                selectedElement = element;
 
-            this.UpdateRadios();
+                for (int i = 0; i < selected; i++)
+                {
+                    this.elementButtons[i].ClassName = this.GetElementClass("star selected") + " glyphicon glyphicon-star";
+                }
+            }
+            else
+            {
+                if (selectedElement != null)
+                {
+                    selectedElement.ClassName = this.GetElementClass("scaleButton normal");
+                }
+
+                selectedElement = element;
+
+                selectedElement.ClassName = this.GetElementClass("scaleButton selected");
+
+                this.UpdateRadios();
+            }
         }
 
         public override void PersistToItem()

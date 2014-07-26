@@ -34,7 +34,7 @@ namespace BL.Forms
             if (this.textInput != null)
             {
                 this.textInput.AddEventListener("change", this.HandleTextInputChanged, true);
-                this.textInput.AddEventListener("keypress", this.HandleTextInputKeyPressed, true);
+                this.textInput.AddEventListener("keyup", this.HandleTextInputKeyPressed, true);
             }
         }
 
@@ -95,7 +95,7 @@ namespace BL.Forms
             {
                 this.textDisplay.Style.Display = "block";
                 this.textInput.Style.Display = "none";
-                this.textDisplay.InnerText = val;
+                ControlUtilities.SetText(this.textDisplay, val);
             }
         }
 

@@ -24,7 +24,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.form == value)
+                {
+                    return;
+                }
+
                 this.form = value;
+
+                this.Update();
             }
         }
 

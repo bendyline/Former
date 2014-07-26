@@ -12,12 +12,12 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
-    public class FieldLabel : FieldControl
+    public class FieldValidationIndicator : FieldControl
     {
-        [ScriptName("e_title")]
-        private Element titleElement;
+        [ScriptName("e_asterisk")]
+        private Element asteriskElement;
 
-        public FieldLabel()
+        public FieldValidationIndicator()
         {
 
         }
@@ -28,15 +28,13 @@ namespace BL.Forms
 
             if (this.IsReady)
             {
-                String fieldTitleOverride = this.Form.GetFieldTitleOverride(this.Field.Name);
-
-                if (fieldTitleOverride != null)
+                if (this.Form.IsFieldValidForItem(this.Field, this.Item))
                 {
-                    ControlUtilities.SetText(this.titleElement, fieldTitleOverride);
+                    this.asteriskElement.Style.Display = "none";
                 }
                 else
                 {
-                    ControlUtilities.SetText(this.titleElement, this.Field.DisplayName);
+                    this.asteriskElement.Style.Display = "block";
                 }
             }
         }

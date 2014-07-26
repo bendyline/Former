@@ -18,6 +18,8 @@ namespace BL.Forms
         private Element choiceBin;
 
         private InputElement selectedElement;
+
+        private String lastOptionsHash = null;
         public ChoiceFieldValue()
         {
 
@@ -29,6 +31,30 @@ namespace BL.Forms
 
         }
 
+        private String GetOptionsHash()
+        {
+            String results = this.EffectiveMode.ToString();
+
+            FieldChoiceCollection fcc = this.Field.Choices;
+
+            FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
+
+            if (alternateChoices != null)
+            {
+                fcc = alternateChoices;
+            }
+
+            String id = this.Item.GetStringValue(this.FieldName);
+
+            foreach (FieldChoice fc in fcc)
+            {
+                results += "|" + fc.Id + "|";
+            }
+
+            results += id;
+
+            return results;
+        }
 
         protected override void OnUpdate()
         {
@@ -38,66 +64,72 @@ namespace BL.Forms
             {
                 return;
             }
+            String newHash = this.GetOptionsHash();
 
-            while (this.choiceBin.ChildNodes.Length > 0)
+            if (this.lastOptionsHash != newHash)
             {
-                this.choiceBin.RemoveChild(this.choiceBin.ChildNodes[0]);
-            }
+                this.lastOptionsHash = newHash;
 
-            if (this.EffectiveMode == FieldMode.Example)
-            {
-                InputElement b = (InputElement)this.CreateElementWithType("choiceButton example", "INPUT");
-                b.Type = "button";
-
-                b.Value = "Example 1";
-                this.choiceBin.AppendChild(b);
-
-                b = (InputElement)this.CreateElementWithType("choiceButton example", "INPUT");
-                b.Type = "button";
-
-                b.Value = "Example 2";
-                this.choiceBin.AppendChild(b);
-            }
-            else
-            {
-                FieldChoiceCollection fcc = this.Field.Choices;
-
-                FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
-
-                if (alternateChoices != null)
+                while (this.choiceBin.ChildNodes.Length > 0)
                 {
-                    fcc = alternateChoices;
+                    this.choiceBin.RemoveChild(this.choiceBin.ChildNodes[0]);
                 }
 
-                String id = this.Item.GetStringValue(this.FieldName);
-
-                foreach (FieldChoice fc in fcc)
+                if (this.EffectiveMode == FieldMode.Example)
                 {
-                    String className;
-
-                    if (id == fc.DisplayName)
-                    {
-                        className = "choiceButton selected";
-                    }
-                    else
-                    {
-                        className = "choiceButton normal";
-                    }
-
-                    InputElement b = (InputElement)this.CreateElementWithType(className, "INPUT"); ;
+                    InputElement b = (InputElement)this.CreateElementWithType("choiceButton example", "INPUT");
                     b.Type = "button";
 
-                    b.SetAttribute("choiceId", fc.DisplayName);
-                    b.AddEventListener("click", this.HandleButtonClick, true);
-                    b.Value = fc.DisplayName;
+                    b.Value = "Example 1";
                     this.choiceBin.AppendChild(b);
+
+                    b = (InputElement)this.CreateElementWithType("choiceButton example", "INPUT");
+                    b.Type = "button";
+
+                    b.Value = "Example 2";
+                    this.choiceBin.AppendChild(b);
+                }
+                else
+                {
+                    FieldChoiceCollection fcc = this.Field.Choices;
+
+                    FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
+
+                    if (alternateChoices != null)
+                    {
+                        fcc = alternateChoices;
+                    }
+
+                    String id = this.Item.GetStringValue(this.FieldName);
+
+                    foreach (FieldChoice fc in fcc)
+                    {
+                        String className;
+
+                        if (id == fc.DisplayName)
+                        {
+                            className = "choiceButton selected";
+                        }
+                        else
+                        {
+                            className = "choiceButton normal";
+                        }
+
+                        InputElement b = (InputElement)this.CreateElementWithType(className, "INPUT");
+                        b.Type = "button";
+
+                        b.SetAttribute("choiceId", fc.DisplayName);
+                        b.AddEventListener("click", this.HandleButtonClick, true);
+                        b.Value = fc.DisplayName;
+                        this.choiceBin.AppendChild(b);
+                    }
                 }
             }
         }
 
         private void HandleButtonClick(ElementEvent e)
         {
-            InputElement element = (InputElement)e.SrcElement;
+            InputElement element = (InputElement)ControlUtilities.GetEventTarget(e);
 
             if (selectedElement != null)
             {

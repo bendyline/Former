@@ -54,6 +54,22 @@ namespace BL.Forms
             }
         }
 
+        public bool IsValid
+        {
+            get
+            {
+                foreach (IDataStoreField f in this.Item.Type.Fields)
+                {
+                    if (this.IsFieldValidForItem(f, this.Item))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
         public FormSettings Settings
         {
             get
@@ -112,10 +128,36 @@ namespace BL.Forms
         {
         }
 
+        public bool IsFieldValidForItem(IDataStoreField field, IItem item)
+        {
+            bool? requiredOverride = this.GetFieldRequiredOverride(field.Name);
+
+            if (requiredOverride == true || (requiredOverride == null && field.Required))
+            {
+                object value = item.GetValue(field.Name);
+
+                if (value == null)
+                {
+                    return false;
+                }
+
+                if ((field.Type == FieldType.ShortText || field.Type == FieldType.UnboundedText) && value == String.Empty)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public String GetFieldTitleOverride(String fieldName)
         {
             return this.Settings.FieldSettingsCollection.GetFieldTitleOverride(fieldName);
+        }
+
+        public bool? GetFieldRequiredOverride(String fieldName)
+        {
+            return this.Settings.FieldSettingsCollection.GetFieldRequiredOverride(fieldName);
         }
 
         public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
@@ -155,6 +197,8 @@ namespace BL.Forms
                 {
                     this.fieldIterator.FieldTemplateId = this.iteratorFieldTemplateId;
                 }
+
+                this.ApplyToControl(this.fieldIterator);
             }
         }
 

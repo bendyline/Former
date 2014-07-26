@@ -60,6 +60,18 @@ namespace BL.Forms
             return fs.TitleOverride;
         }
 
+        public bool? GetFieldRequiredOverride(String fieldName)
+        {
+            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+
+            if (fs == null)
+            {
+                return null;
+            }
+
+            return fs.RequiredOverride;
+        }
+
         public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
         {
             FieldSettings fs = this.fieldsByStorageFieldName[fieldName];

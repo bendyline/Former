@@ -16,13 +16,22 @@
 
             #rowCell{
                 display:table-cell;
+                padding-bottom:20px;
+            }
+
+            #fieldValueWrapper
+            {
+                padding-left:20px;
             }
         </style>
 	</head>
 	<body>        
         <div id="rowCell">
             <BL.Forms.FieldLabel id="fieldLabel"/>
-            <BL.Forms.FieldValue id="fieldValue"/>
+            <div id="fieldValueWrapper">
+                <BL.Forms.FieldValue id="fieldValue"/>
+                <BL.Forms.FieldValidationIndicator id="fieldValidationIndicator"/>
+            </div>
         </div>
     </body>
 </html>

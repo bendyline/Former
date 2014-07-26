@@ -78,8 +78,17 @@ namespace BL.Forms
             {
                 fieldsNotUsed.Add(lf);
             }
-            
+
+            List<Field> sortedFields = new List<Field>();
+
             foreach (Field field in this.Item.Type.Fields)
+            {
+                sortedFields.Add(field);
+            }
+
+            sortedFields.Sort(this.CompareFields);
+
+            foreach (Field field in sortedFields)
             {
                 FieldSettings fs = this.Form.Settings.FieldSettingsCollection.GetFieldByName(field.Name);
 
@@ -138,6 +147,53 @@ namespace BL.Forms
                 this.fields.Remove(f);
                 this.fieldsByName[f.Field.Name] = null;
             }
+        }
+
+
+        private int CompareFields(Field fieldA, Field fieldB)
+        {
+            FieldSettingsCollection fsc = this.Form.Settings.FieldSettingsCollection;
+
+            FieldSettings fieldSettingsA = fsc.GetFieldByName(fieldA.Name);
+            FieldSettings fieldSettingsB = fsc.GetFieldByName(fieldB.Name);
+
+            if (fieldSettingsA == null && fieldSettingsB == null)
+            {
+                return fieldA.Name.CompareTo(fieldB.Name);
+            }
+
+            int orderA = -1;
+
+            if (fieldSettingsA != null)
+            {
+                orderA = fieldSettingsA.Order;
+            }
+
+
+            int orderB = -1;
+
+            if (fieldSettingsB != null)
+            {
+                orderB = fieldSettingsB.Order;
+            }
+
+            if (orderA < 0)
+            {
+                orderA = 100000;
+            }
+
+            if (orderB < 0)
+            {
+                orderB = 100000;
+            }
+
+
+            if (orderA == orderB)
+            {
+                return fieldA.Name.CompareTo(fieldB.Name);
+            }
+
+            return orderA - orderB;
         }
 
         private void fs_PropertyChanged(object sender, PropertyChangedEventArgs e)

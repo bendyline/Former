@@ -20,6 +20,9 @@ namespace BL.Forms
         [ScriptName("c_fieldValue")]
         private FieldValue fieldValue;
 
+        [ScriptName("c_fieldValidationIndicator")]
+        private FieldValidationIndicator fieldValidationIndicator;
+
         public LabeledField()
         {
             this.MonitorItemEvents = false;
@@ -39,6 +42,11 @@ namespace BL.Forms
                 if (this.fieldValue!= null)
                 {
                     this.ApplyToControl(this.fieldValue);
+                }
+
+                if (this.fieldValidationIndicator != null)
+                {
+                    this.ApplyToControl(this.fieldValidationIndicator);
                 }
             }
         }
