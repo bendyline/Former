@@ -23,7 +23,6 @@ namespace BL.Forms
         private Dictionary<String, LabeledField> fieldsByName;
         private PropertyChangedEventHandler propertyChanged;
 
-
         [ScriptName("s_fieldTemplateId")]
         public String FieldTemplateId
         {

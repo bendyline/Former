@@ -17,7 +17,7 @@ namespace BL.Forms
         Rows = 0,
         TemplatePlacedItems=1
     }
-    public class ItemSetEditor : Control
+    public class ItemSetEditor : Control, IItemSetEditor
     {
         private IDataStoreItemSet itemSet;
 
@@ -299,7 +299,14 @@ namespace BL.Forms
 
             this.itemSet.Add(item);
 
-            this.EnsureFormForItem(item, this.itemSet.Items.Count - 1);
+            int index = this.itemSet.Items.Count - 1;
+ 
+            if (this.ItemPlacementFieldName != null)
+            {
+                index = (int)item.GetValue(this.ItemPlacementFieldName);
+            }
+
+            this.EnsureFormForItem(item, index);
 
             if (this.ItemAdded != null)
             {
@@ -418,8 +425,19 @@ namespace BL.Forms
                 {
                     itemsNotSeen.Remove(item);
 
-                    this.EnsureFormForItem(item, index);
-                    index++;
+                    Nullable<int>indexToUse = index;
+
+                    if (this.ItemPlacementFieldName != null)
+                    {
+                        indexToUse = item.GetInt32Value(this.ItemPlacementFieldName);
+                    }
+
+                    if (indexToUse != null)
+                    {
+                        this.EnsureFormForItem(item, (int)indexToUse);
+
+                        index++;
+                    }
                 }
             }
 

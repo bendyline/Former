@@ -27,6 +27,15 @@ namespace BL.Forms
         private String fieldName;
         private FieldMode mode = FieldMode.Edit;
         private PropertyChangedEventHandler propertyChanged;
+        private FieldSettings fieldSetings;
+
+        public FieldSettings FieldSettings
+        {
+            get
+            {
+                return this.Form.Settings.FieldSettingsCollection.GetFieldByName(this.FieldName);
+            }
+        }
 
         public FieldMode EffectiveMode
         {

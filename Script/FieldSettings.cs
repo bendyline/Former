@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
-    public class FieldSettings : SerializableObject
+    public class FieldSettings : FieldUserInterfaceOptions
     {
         private String titleOverride;
         private bool requiredOverride;
@@ -212,5 +212,28 @@ namespace BL.Forms
         public FieldSettings()
         {
         }
+
+        public override bool IsEqualTo(FieldUserInterfaceOptions fuio)
+        {
+            FieldSettings settings = (FieldSettings)fuio;
+
+            if (!base.IsEqualTo(settings))
+            {
+                return false;
+            }
+
+            if (this.FieldState != settings.FieldState)
+            {
+                return false;
+            }
+
+            if (this.FieldState != settings.FieldState)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
     }
 }

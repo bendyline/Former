@@ -89,13 +89,24 @@ namespace BL.Forms
                 this.textInput.Disabled = false;
                 this.textDisplay.Style.Display = "none";
                 this.textInput.Style.Display = "block";
+
                 this.textInput.Value = val;
             }
             else
             {
                 this.textDisplay.Style.Display = "block";
                 this.textInput.Style.Display = "none";
+
                 ControlUtilities.SetText(this.textDisplay, val);
+            }
+
+            if (this.FieldSettings != null && this.FieldSettings.Placeholder != null)
+            {
+                this.textInput.SetAttribute("placeholder", this.FieldSettings.Placeholder);
+            }
+            else
+            {
+                this.textInput.SetAttribute("placeholder", "");
             }
         }
 

@@ -121,6 +121,13 @@ namespace BL.Forms
             }
         }
 
+        protected override void OnSettingsChange()
+        {
+            base.OnSettingsChange();
+
+            this.Update();
+        }
+
 
         private int CompareFields(Field fieldA, Field fieldB)
         {

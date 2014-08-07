@@ -13,9 +13,9 @@ namespace BL.Forms
 {
     public class FormControl : ItemControl 
     {
-        private Form form;
+        private IForm form;
 
-        public Form Form
+        public IForm Form
         {
             get
             {

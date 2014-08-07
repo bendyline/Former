@@ -27,13 +27,16 @@ namespace BL.Forms
         Show = 2
     }
 
-    public class Form : ItemControl 
+    public class Form : ItemControl, IForm
     {
         private FormSettings settings;
         private String iteratorFieldTemplateId;
 
         [ScriptName("c_fieldIterator")]
         private FieldIterator fieldIterator;
+
+        private NotifyCollectionChangedEventHandler fieldSettingsChangeHandler;
+        private PropertyChangedEventHandler formSettingsChangeHandler;
 
         [ScriptName("s_iteratorFieldTemplateId")]
         public String IteratorFieldTemplateId
@@ -77,8 +80,8 @@ namespace BL.Forms
                 if (this.settings == null)
                 {
                     this.settings = new FormSettings();
-                    this.settings.PropertyChanged += settings_PropertyChanged;
-                    this.settings.FieldSettingsCollection.CollectionChanged += FieldSettingsCollection_CollectionChanged;
+                    this.settings.PropertyChanged += formSettingsChangeHandler;
+                    this.settings.FieldSettingsCollection.CollectionChanged += fieldSettingsChangeHandler;
                 }
 
                 return this.settings;
@@ -90,8 +93,17 @@ namespace BL.Forms
                 {
                     return;
                 }
+                
+                if (this.settings != null)
+                {
+                    this.settings.PropertyChanged -= formSettingsChangeHandler;
+                    this.settings.FieldSettingsCollection.CollectionChanged -= fieldSettingsChangeHandler;
+                }
 
                 this.settings = value;
+
+                this.settings.PropertyChanged += formSettingsChangeHandler;
+                this.settings.FieldSettingsCollection.CollectionChanged += fieldSettingsChangeHandler;
 
                 if (this.fieldIterator != null)
                 {
@@ -125,7 +137,9 @@ namespace BL.Forms
         }
 
         public Form()
-        {
+        {            
+            this.fieldSettingsChangeHandler = this.FieldSettingsCollection_CollectionChanged;
+            this.formSettingsChangeHandler = this.settings_PropertyChanged;
         }
 
         public bool IsFieldValidForItem(IDataStoreField field, IItem item)
@@ -204,7 +218,6 @@ namespace BL.Forms
 
         public void Save(AsyncCallback callback, object state)
         {
-
             foreach (Control ic in this.TemplateControls)
             {
                 if (ic is FieldControl)
@@ -219,10 +232,20 @@ namespace BL.Forms
 
         private void FieldSettingsCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (this.fieldIterator != null)
+            if (e.Action != NotifyCollectionChangedAction.ItemStateChanged || (e.Action == NotifyCollectionChangedAction.ItemStateChanged && e.StateChangePropertyName == "FieldState"))
             {
-                this.fieldIterator.OnSettingsChange();
+                if (this.fieldIterator != null)
+                {
+                    this.fieldIterator.OnSettingsChange();
+                }
+
+                this.OnSettingsChange();
             }
+        }
+
+        protected virtual void OnSettingsChange()
+        {
+
         }
 
         private void settings_PropertyChanged(object sender, PropertyChangedEventArgs e)

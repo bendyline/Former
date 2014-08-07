@@ -61,6 +61,9 @@
     <None Include="Properties\FxCop.ruleset" />
     <None Include="Properties\Script.template" />
     <Compile Include="FieldValidationIndicator.cs" />
+    <Compile Include="IItemSetEditor.cs" />
+    <Compile Include="IForm.cs" />
+    <Compile Include="GridItemSetEditor.cs" />
     <Compile Include="RowForm.cs" />
     <Compile Include="ScaleFieldValue.cs" />
     <Compile Include="FieldSettingsCollection.cs" />
@@ -111,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FieldValidationIndicator.htm" />
+    <Content Include="GridItemSetEditor.htm" />
     <Content Include="RowForm.htm" />
     <Content Include="EmailTextFieldValue.htm" />
     <Content Include="CheckboxFieldValue.htm" />

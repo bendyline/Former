@@ -9,13 +9,21 @@
         <!-- end sample preview content -->
 
         <style>
-            BODY
+            #addButton
             {
+                margin-top:20px;
+            }
+
+            #formBin
+            {
+                display:table;
             }
         </style>
 	</head>
 	<body>        
-        <input type="text" id="textInput" class="form-control" />
-        <div id="textDisplay"/>
+        <BL.UI.KendoControls.Grid id="grid"/>
+        <div id="k-content">
+        <input type="button" id="addButton" class="k-button" value="add item"/>
+            </div>
     </body>
 </html>
