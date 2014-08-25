@@ -20,7 +20,7 @@ namespace BL.Forms
         Example = 3
     }
 
-    public enum AdjustedFieldState
+    public enum DisplayState
     {
         DefaultState = 0,
         Hide = 1,
@@ -29,7 +29,7 @@ namespace BL.Forms
 
     public class Form : ItemControl, IForm
     {
-        private FormSettings settings;
+        private ItemSetInterface itemSetInterface;
         private String iteratorFieldTemplateId;
 
         [ScriptName("c_fieldIterator")]
@@ -73,41 +73,41 @@ namespace BL.Forms
             }
         }
 
-        public FormSettings Settings
+        public ItemSetInterface ItemSetInterface
         {
             get
             {
-                if (this.settings == null)
+                if (this.itemSetInterface == null)
                 {
-                    this.settings = new FormSettings();
-                    this.settings.PropertyChanged += formSettingsChangeHandler;
-                    this.settings.FieldSettingsCollection.CollectionChanged += fieldSettingsChangeHandler;
+                    this.itemSetInterface = new ItemSetInterface();
+                    this.itemSetInterface.PropertyChanged += formSettingsChangeHandler;
+                    this.itemSetInterface.FieldInterfaces.CollectionChanged += fieldSettingsChangeHandler;
                 }
 
-                return this.settings;
+                return this.itemSetInterface;
             }
 
             set
             {
-                if (this.settings == value)
+                if (this.itemSetInterface == value)
                 {
                     return;
                 }
                 
-                if (this.settings != null)
+                if (this.itemSetInterface != null)
                 {
-                    this.settings.PropertyChanged -= formSettingsChangeHandler;
-                    this.settings.FieldSettingsCollection.CollectionChanged -= fieldSettingsChangeHandler;
+                    this.itemSetInterface.PropertyChanged -= formSettingsChangeHandler;
+                    this.itemSetInterface.FieldInterfaces.CollectionChanged -= fieldSettingsChangeHandler;
                 }
 
-                this.settings = value;
+                this.itemSetInterface = value;
 
-                this.settings.PropertyChanged += formSettingsChangeHandler;
-                this.settings.FieldSettingsCollection.CollectionChanged += fieldSettingsChangeHandler;
+                this.itemSetInterface.PropertyChanged += formSettingsChangeHandler;
+                this.itemSetInterface.FieldInterfaces.CollectionChanged += fieldSettingsChangeHandler;
 
                 if (this.fieldIterator != null)
                 {
-                    this.fieldIterator.OnSettingsChange();
+                    this.fieldIterator.OnInterfaceChange();
                 }
             }
         }
@@ -117,12 +117,12 @@ namespace BL.Forms
         {
             get
             {
-                return this.Settings.Mode;
+                return this.ItemSetInterface.Mode;
             }
 
             set
             {
-                this.Settings.Mode = value;
+                this.ItemSetInterface.Mode = value;
             }
         }
 
@@ -166,39 +166,39 @@ namespace BL.Forms
 
         public String GetFieldTitleOverride(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetFieldTitleOverride(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetFieldTitleOverride(fieldName);
         }
 
         public bool? GetFieldRequiredOverride(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetFieldRequiredOverride(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetFieldRequiredOverride(fieldName);
         }
 
         public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
         {
-            FieldChoiceCollection fcc = this.Settings.FieldSettingsCollection.GetFieldChoicesOverride(fieldName);
+            FieldChoiceCollection fcc = this.ItemSetInterface.FieldInterfaces.GetFieldChoicesOverride(fieldName);
 
             return fcc;
         }
 
-        public AdjustedFieldState GetAdjustedFieldState(String fieldName)
+        public DisplayState GetAdjustedDisplayState(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetAdjustedFieldState(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetAdjustedDisplayState(fieldName);
         }
 
-        public FieldUserInterfaceType GetFieldUserInterfaceTypeOverride(String fieldName)
+        public Nullable<FieldInterfaceType> GetFieldInterfaceTypeOverride(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetFieldUserInterfaceTypeOverride(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOverride(fieldName);
         }
 
-        public FieldUserInterfaceOptions GetFieldUserInterfaceOptionsOverride(String fieldName)
+        public FieldInterfaceTypeOptions GetFieldInterfaceTypeOptionsOverride(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetFieldUserInterfaceOptionsOverride(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOptionsOverride(fieldName);
         }
 
         public FieldMode GetFieldModeOverride(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetFieldModeOverride(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetFieldModeOverride(fieldName);
         }
 
         protected override void OnApplyTemplate()
@@ -229,14 +229,13 @@ namespace BL.Forms
             ((ODataEntity)this.Item).Save(callback, state);
         }
 
-
         private void FieldSettingsCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action != NotifyCollectionChangedAction.ItemStateChanged || (e.Action == NotifyCollectionChangedAction.ItemStateChanged && e.StateChangePropertyName == "FieldState"))
+            if (e.Action != NotifyCollectionChangedAction.ItemStateChanged || (e.Action == NotifyCollectionChangedAction.ItemStateChanged && e.StateChangePropertyName == "Display"))
             {
                 if (this.fieldIterator != null)
                 {
-                    this.fieldIterator.OnSettingsChange();
+                    this.fieldIterator.OnInterfaceChange();
                 }
 
                 this.OnSettingsChange();
@@ -252,7 +251,7 @@ namespace BL.Forms
         {
             if (this.fieldIterator != null)
             {
-                this.fieldIterator.OnSettingsChange();
+                this.fieldIterator.OnInterfaceChange();
             }
         }
 

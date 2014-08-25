@@ -97,7 +97,7 @@ namespace BL.Forms
         private Dictionary<String, Form> formsByLocalId;
         private List<Form> forms;
 
-        private FormSettings formSettings;
+        private ItemSetInterface formSettings;
         private String itemFormTemplateId;
 
         [ScriptName("e_addButton")]
@@ -106,7 +106,11 @@ namespace BL.Forms
         private bool showAddButton = true;
         private String addItemCta;
 
+
+        private Element headerRowElement;
+        private event DataStoreItemSetEventHandler itemSetEventHandler;
         public event DataStoreItemEventHandler ItemAdded;
+        public event DataStoreItemEventHandler ItemDeleted;
 
         public String AddItemCta
         {
@@ -149,7 +153,7 @@ namespace BL.Forms
             }
         }
 
-        public bool ShowAddButton
+        public bool DisplayAddButton
         {
             get
             {
@@ -182,13 +186,13 @@ namespace BL.Forms
             }
         }
 
-        public FormSettings FormSettings
+        public ItemSetInterface ItemSetInterface
         {
             get
             {
                 if (this.formSettings == null)
                 {
-                    this.formSettings = new FormSettings();
+                    this.formSettings = new ItemSetInterface();
                 }
 
                 return this.formSettings;
@@ -200,7 +204,7 @@ namespace BL.Forms
 
                 foreach (Form f in this.forms)
                 {
-                    f.Settings = this.formSettings;
+                    f.ItemSetInterface = this.formSettings;
                 }
             }
         }
@@ -221,14 +225,14 @@ namespace BL.Forms
 
                 if (this.itemSet != null)
                 {
-                    this.itemSet.ItemSetChanged -= itemSet_ItemSetChanged;
+                    this.itemSet.ItemSetChanged -= this.itemSetEventHandler;
                 }
 
                 this.itemSet = value;
 
                 if (this.itemSet != null)
                 {
-                    this.itemSet.ItemSetChanged += itemSet_ItemSetChanged;
+                    this.itemSet.ItemSetChanged += this.itemSetEventHandler;
 
                     this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
                 }
@@ -244,6 +248,8 @@ namespace BL.Forms
             this.itemsShown = new List<IItem>();
             this.formsByLocalId = new Dictionary<String, Form>();
             this.forms = new List<Form>();
+
+            this.itemSetEventHandler = this.itemSet_ItemSetChanged;
         }
 
         private void ApplyAddButtonVisibility()
@@ -331,9 +337,87 @@ namespace BL.Forms
 
         private void itemSet_ItemSetChanged(object sender, DataStoreItemSetEventArgs e)
         {
+            if (e.RemovedItems != null)
+            {
+                foreach (IItem item in e.RemovedItems)
+                {
+                    Debug.WriteLine("(ItemSetEditor::itemSet_ItemSetChanged) - Item " + item.LocalOnlyUniqueId + " was removed.");
+
+                    Form f = this.formsByLocalId[item.LocalOnlyUniqueId];
+
+                    if (f != null)
+                    {
+                        this.formsByLocalId[item.LocalOnlyUniqueId] = null;
+                        this.forms.Remove(f);
+                        this.itemsShown.Remove(item);
+
+                        f.Dispose();
+                    }
+                }
+            }
+
             this.Update();
         }
         
+        private void EnsureHeaderRow()
+        {
+            if (this.formBin == null || this.ItemSet == null)
+            {
+                return;
+            }
+
+            if (this.headerRowElement == null)
+            {
+                this.headerRowElement = this.CreateElement("headerRow");
+
+                if (this.formBin.ChildNodes.Length > 0)
+                {
+                    this.formBin.InsertBefore(this.headerRowElement, this.formBin.ChildNodes[0]);
+                }
+                else
+                {
+                    this.formBin.AppendChild(this.headerRowElement);
+                }
+            }
+
+            ControlUtilities.ClearChildElements(this.headerRowElement);
+
+            List<Field> sortedFields = new List<Field>();
+
+            foreach (Field field in this.ItemSet.Type.Fields)
+            {
+                sortedFields.Add(field);
+            }
+
+            sortedFields.Sort(this.ItemSetInterface.CompareFields);
+
+            foreach (Field field in sortedFields)
+            {
+                DisplayState afs = this.GetAdjustedDisplayState(field.Name);
+
+                if (afs == DisplayState.Show)
+                {
+                    Element cellElement = this.CreateElement("headerCell");
+
+                    String text = this.GetFieldTitleOverride(field.Name);
+
+                    ControlUtilities.SetText(cellElement, text);
+
+                    this.headerRowElement.AppendChild(cellElement);
+                }
+            }
+        }
+
+        private DisplayState GetAdjustedDisplayState(String fieldName)
+        {
+            return this.ItemSetInterface.FieldInterfaces.GetAdjustedDisplayState(fieldName);
+        }
+
+        public String GetFieldTitleOverride(String fieldName)
+        {
+            return this.ItemSetInterface.FieldInterfaces.GetFieldTitleOverride(fieldName);
+        }
+
         private void EnsureFormForItem(IItem item, int index)
         {
             Form f = formsByLocalId[item.LocalOnlyUniqueId];
@@ -342,7 +426,7 @@ namespace BL.Forms
             {
                 if (!this.itemsShown.Contains(item))
                 {
-                    f.Settings = this.FormSettings;
+                    f.ItemSetInterface = this.ItemSetInterface;
                     f.Item = item;
                     
                     this.itemsShown.Add(item);
@@ -356,11 +440,13 @@ namespace BL.Forms
             if (this.mode == ItemSetEditorMode.Rows)
             {
                 f = new RowForm();
+                Debug.WriteLine("(ItemSetEditor::EnsureFormForItem) - Creating new rowform for item " + item.LocalOnlyUniqueId);
                 f.IteratorFieldTemplateId = "bl-forms-horizontalunlabeledfield";
             }
             else
             {
                 f = new Form();
+                Debug.WriteLine("(ItemSetEditor::EnsureFormForItem) - Creating new form for item " + item.LocalOnlyUniqueId);
                 f.IteratorFieldTemplateId = "bl-forms-horizontalunlabeledfield";
             }
 
@@ -369,7 +455,7 @@ namespace BL.Forms
                 f.TemplateId = this.itemFormTemplateId;
             }
 
-            f.Settings = this.FormSettings;
+            f.ItemSetInterface = this.ItemSetInterface;
             f.Item = item;
             
             this.formsByLocalId[item.LocalOnlyUniqueId] = f;
@@ -398,6 +484,25 @@ namespace BL.Forms
             }
         }
 
+        public void DisposeItemInterfaceItems()
+        {
+            foreach (String key in this.formsByLocalId.Keys)
+            {
+                Form f = this.formsByLocalId[key];
+
+                f.Dispose();
+            }
+
+            this.formsByLocalId = new Dictionary<string, Form>();
+        }
+
+        public override void Dispose()
+        {
+            this.DisposeItemInterfaceItems();
+
+            base.Dispose();
+        }
+
         protected override void OnUpdate()
         {
             if (this.formBin == null)
@@ -416,6 +521,8 @@ namespace BL.Forms
             {
                 itemsNotSeen.Add(item);
             }
+
+            this.EnsureHeaderRow();
 
             if (this.itemSet != null)
             {

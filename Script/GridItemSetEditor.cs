@@ -24,8 +24,10 @@ namespace BL.Forms
         private List<IItem> itemsShown;
 
         private IDataStoreItemSet itemSet;
+        private DataSource activeDataSource;
 
-        private FormSettings formSettings;
+
+        private ItemSetInterface itemSetInterface;
         private String itemFormTemplateId;
         private String itemPlacementFieldName;
 
@@ -39,29 +41,30 @@ namespace BL.Forms
         private PropertyChangedEventHandler propertyChanged;
         private NotifyCollectionChangedEventHandler collectionChanged;
         public event DataStoreItemEventHandler ItemAdded;
+        public event DataStoreItemEventHandler ItemDeleted;
 
-        public FormSettings FormSettings
+        public ItemSetInterface ItemSetInterface
         {
             get
             {
-                return this.formSettings;
+                return this.itemSetInterface;
             }
 
             set
             {
-                if (this.formSettings == value)
+                if (this.itemSetInterface == value)
                 {
                     return;
                 }
 
-                if (this.formSettings != null)
+                if (this.itemSetInterface != null)
                 {
-                    this.formSettings.FieldSettingsCollection.CollectionChanged -= this.collectionChanged;
+                    this.itemSetInterface.FieldInterfaces.CollectionChanged -= this.collectionChanged;
                 }
 
-                this.formSettings = value;
+                this.itemSetInterface = value;
 
-                this.formSettings.FieldSettingsCollection.CollectionChanged += this.collectionChanged;
+                this.itemSetInterface.FieldInterfaces.CollectionChanged += this.collectionChanged;
             }
         }
 
@@ -118,7 +121,7 @@ namespace BL.Forms
             }
         }
 
-        public bool ShowAddButton
+        public bool DisplayAddButton
         {
             get
             {
@@ -174,6 +177,11 @@ namespace BL.Forms
             this.collectionChanged = FieldSettingsCollection_CollectionChanged;
         }
 
+        public void DisposeItemInterfaceItems()
+        {
+
+        }
+
         private void ApplyAddButtonVisibility()
         {
             if (this.addButton == null)
@@ -203,22 +211,83 @@ namespace BL.Forms
                 this.ApplyAddButtonVisibility();
             }
 
-            this.grid.Save += this.HandleSave; 
+            this.grid.Save += this.HandleSave;
+      //      this.grid.Edit += this.HandleEdit;
+            this.grid.Remove += grid_Remove;
         }
 
-        private void HandleSave(object sender, ObjectEventArgs oe)
+        private void grid_Remove(ModelEventArgs e)
         {
-            object model = oe.Value;
+            Model model = e.Model;
 
             if (model != null)
             {
-                int? id = null;
+                String localId = (String)model.Get("LocalOnlyUniqueId");
 
-                Script.Literal("{0}={1}.Id", id, model);
+                if (!String.IsNullOrEmpty(localId))
+                {
+                    IItem item = this.itemSet.GetItemByLocalOnlyUniqueId(localId);
+
+
+                    if (item != null)
+                    {
+                        item.DeleteItem();
+
+                        if (this.ItemDeleted != null)
+                        {
+                            DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
+
+                            this.ItemDeleted(this, dsiea);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void HandleEdit(ModelEventArgs oe)
+        {
+            Model model = oe.Model;
+
+            if (model != null)
+            {
+                if (model.IsNew())
+                {
+                    String localId = (String)model.Get("LocalOnlyUniqueId");
+
+                    if (String.IsNullOrEmpty(localId))
+                    {
+                        IItem item = this.itemSet.Type.CreateItem();
+
+                        model.Set("LocalOnlyUniqueId", item.LocalOnlyUniqueId);
+
+                        this.itemSet.Add(item);
+
+                        if (this.ItemAdded != null)
+                        {
+                            DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
+
+                            this.ItemAdded(this, dsiea);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void HandleSave(ModelEventArgs oe)
+        {
+            Model model = oe.Model;
+
+            if (model != null)
+            {
+                String id = null;
+
+                Script.Literal("{0}={1}.id", id, model);
+
+                IItem item = null;
 
                 if (id != null)
                 {
-                    IItem item = this.ItemSet.GetItemById(id.ToString());
+                    item = this.ItemSet.GetItemByLocalOnlyUniqueId(id.ToString());
 
                     if (item != null)
                     {
@@ -242,9 +311,32 @@ namespace BL.Forms
 
         private void AddButtonClick(ElementEvent e)
         {
+            Dictionary<String, object> newRow = new Dictionary<string, object>();
             IItem item = this.itemSet.Type.CreateItem();
-
             this.itemSet.Add(item);
+
+            if (this.ItemAdded != null)
+            {
+                DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
+
+                this.ItemAdded(this, dsiea);
+            }
+
+            newRow["id "] = item.LocalOnlyUniqueId;
+       /*     this.grid.AddRow();
+
+            ObservableObject oo = this.grid.DataItem;
+
+            if (oo != null)
+            {
+                IItem item = this.itemSet.Type.CreateItem();
+                oo.Set("LocalOnlyUniqueId", item.LocalOnlyUniqueId);
+
+                this.itemSet.Add(item);
+            }*/
+        /*    
+
+            this.grid.AddRow();
 
             int index = this.itemSet.Items.Count - 1;
  
@@ -253,7 +345,7 @@ namespace BL.Forms
                 DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
 
                 this.ItemAdded(this, dsiea);
-            }
+            }*/
         }
 
         private void ItemsRetrieved(IAsyncResult result)
@@ -274,10 +366,10 @@ namespace BL.Forms
 
         private int CompareFields(Field fieldA, Field fieldB)
         {
-            FieldSettingsCollection fsc = this.FormSettings.FieldSettingsCollection;
+            FieldInterfaceCollection fsc = this.ItemSetInterface.FieldInterfaces;
 
-            FieldSettings fieldSettingsA = fsc.GetFieldByName(fieldA.Name);
-            FieldSettings fieldSettingsB = fsc.GetFieldByName(fieldB.Name);
+            FieldInterface fieldSettingsA = fsc.GetFieldByName(fieldA.Name);
+            FieldInterface fieldSettingsB = fsc.GetFieldByName(fieldB.Name);
 
             if (fieldSettingsA == null && fieldSettingsB == null)
             {
@@ -318,9 +410,9 @@ namespace BL.Forms
             return orderA - orderB;
         }
 
-        public AdjustedFieldState GetAdjustedFieldState(String fieldName)
+        public DisplayState GetAdjustedDisplayState(String fieldName)
         {
-            return this.FormSettings.FieldSettingsCollection.GetAdjustedFieldState(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetAdjustedDisplayState(fieldName);
         }
  
         protected override void OnUpdate()
@@ -339,7 +431,10 @@ namespace BL.Forms
             {
                 GridOptions go = new GridOptions();
 
-                go.Editable = "inline";
+                GridEditableOptions geo = new GridEditableOptions();
+                geo.Mode = "inline";
+                go.Editable = geo;
+
                 List<GridColumn> columns = new List<GridColumn>();
 
                 go.Columns = columns;
@@ -355,10 +450,15 @@ namespace BL.Forms
 
                 ModelOptions m = new ModelOptions();
                 m.Fields = new Dictionary<string, ModelField>();
-               
+                m.Id = "id";
+
+                ModelField mfId = new ModelField();
+                mfId.Editable = false;
+                m.Fields["id"] = mfId;
+
                 foreach (Field field in sortedFields)
                 {
-                    FieldSettings fs = this.FormSettings.FieldSettingsCollection.GetFieldByName(field.Name);
+                    FieldInterface fs = this.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
 
                     if (fs != null)
                     {
@@ -366,9 +466,9 @@ namespace BL.Forms
                         fs.PropertyChanged += this.propertyChanged;
                     }
 
-                    AdjustedFieldState afs = this.GetAdjustedFieldState(field.Name);
+                    DisplayState afs = this.GetAdjustedDisplayState(field.Name);
 
-                    if (afs == AdjustedFieldState.Show)
+                    if (afs == DisplayState.Show)
                     {
                         ModelField mf = new ModelField();
 
@@ -400,7 +500,7 @@ namespace BL.Forms
                             mf.Type = "string";
                         }
 
-                        if (fs.FieldModeOverride == FieldMode.View)
+                        if (fs.Mode == FieldMode.View)
                         {
                             mf.Editable = false;
                         } 
@@ -423,6 +523,7 @@ namespace BL.Forms
                 foreach (IItem item in this.ItemSet.Items)
                 {
                     object o = Item.GetDataObject(this.ItemSet, item);
+                    Script.Literal("{0}[\"id\"]={1}.get_localOnlyUniqueId()", o, item);
                     objects.Add(o);
                 }
 
@@ -434,8 +535,10 @@ namespace BL.Forms
                 DataSource ds = new DataSource(dso);
                 
                 go.DataSource = ds;
-                this.grid.Options = go;
+                
+                this.activeDataSource = ds;
 
+                this.grid.Options = go;
 
                 ds.Read();
             }

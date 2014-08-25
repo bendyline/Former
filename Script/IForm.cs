@@ -13,7 +13,7 @@ namespace BL.Forms
 {
     public interface IForm
     {
-        FormSettings Settings { get; set;  }
+        ItemSetInterface ItemSetInterface { get; set;  }
         FormMode Mode { get; set; }
         IItem Item { get; set; }
 
@@ -21,9 +21,9 @@ namespace BL.Forms
         String GetFieldTitleOverride(String fieldName);
         bool? GetFieldRequiredOverride(String fieldName);
         FieldChoiceCollection GetFieldChoicesOverride(String fieldName);
-        AdjustedFieldState GetAdjustedFieldState(String fieldName);
-        FieldUserInterfaceType GetFieldUserInterfaceTypeOverride(String fieldName);
-        FieldUserInterfaceOptions GetFieldUserInterfaceOptionsOverride(String fieldName);
+        DisplayState GetAdjustedDisplayState(String fieldName);
+        Nullable<FieldInterfaceType> GetFieldInterfaceTypeOverride(String fieldName);
+        FieldInterfaceTypeOptions GetFieldInterfaceTypeOptionsOverride(String fieldName);
         FieldMode GetFieldModeOverride(String fieldName);
     }
 }

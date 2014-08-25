@@ -160,7 +160,7 @@ namespace BL.Forms
 
             this.UpdateRadios();
 
-            FieldUserInterfaceOptions fuio = this.EffectiveUserInterfaceOptions;
+            FieldInterfaceTypeOptions fuio = this.EffectiveUserInterfaceOptions;
 
             if (fuio != null)
             {

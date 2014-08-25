@@ -9,10 +9,10 @@ using BL.Data;
 
 namespace BL.Forms
 {
-    public class FieldSettingsCollection : ISerializableCollection, IEnumerable, INotifyCollectionAndStateChanged
+    public class FieldInterfaceCollection : ISerializableCollection, IEnumerable, INotifyCollectionAndStateChanged
     {
         private ArrayList fields;
-        private Dictionary<String, FieldSettings> fieldsByStorageFieldName;
+        private Dictionary<String, FieldInterface> fieldsByStorageFieldName;
         
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -24,11 +24,11 @@ namespace BL.Forms
             }
         }
 
-        public FieldSettings this[int index]
+        public FieldInterface this[int index]
         {
             get
             {
-                return (FieldSettings)this.fields[index];
+                return (FieldInterface)this.fields[index];
             }
         }
 
@@ -37,20 +37,20 @@ namespace BL.Forms
             return this.fields.GetEnumerator();
         }
 
-        public FieldSettingsCollection()
+        public FieldInterfaceCollection()
         {
             this.fields = new ArrayList();
-            this.fieldsByStorageFieldName = new Dictionary<string, FieldSettings>();
+            this.fieldsByStorageFieldName = new Dictionary<string, FieldInterface>();
         }
 
-        public FieldSettings GetFieldByName(String fieldName)
+        public FieldInterface GetFieldByName(String fieldName)
         {
             return this.fieldsByStorageFieldName[fieldName];
         }
         
         public void RemoveByName(String fieldName)
         {
-            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 
             if (fs != null)
             {
@@ -61,7 +61,7 @@ namespace BL.Forms
 
         public String GetFieldTitleOverride(String fieldName)
         {
-            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 
             if (fs == null)
             {
@@ -73,7 +73,7 @@ namespace BL.Forms
 
         public bool? GetFieldRequiredOverride(String fieldName)
         {
-            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 
             if (fs == null)
             {
@@ -85,7 +85,7 @@ namespace BL.Forms
 
         public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
         {
-            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 
             if (fs == null)
             {
@@ -95,61 +95,61 @@ namespace BL.Forms
             return fs.ChoicesOverride;
         }
 
-        public AdjustedFieldState GetAdjustedFieldState(String fieldName)
+        public DisplayState GetAdjustedDisplayState(String fieldName)
         {
-            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 
             if (fs == null)
             {
-                return AdjustedFieldState.DefaultState;
+                return DisplayState.DefaultState;
             }
 
-            return fs.FieldState;
+            return fs.Display;
         }
 
-        public FieldUserInterfaceType GetFieldUserInterfaceTypeOverride(String fieldName)
+        public Nullable<FieldInterfaceType> GetFieldInterfaceTypeOverride(String fieldName)
         {
-            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 
             if (fs == null)
             {
-                return FieldUserInterfaceType.TypeDefault;
+                return FieldInterfaceType.TypeDefault;
             }
 
-            return fs.UserInterfaceTypeOverride;
+            return fs.InterfaceTypeOverride;
         }
 
-        public FieldUserInterfaceOptions GetFieldUserInterfaceOptionsOverride(String fieldName)
+        public FieldInterfaceTypeOptions GetFieldInterfaceTypeOptionsOverride(String fieldName)
         {
-            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 
             if (fs == null)
             {
                 return null;
             }
 
-            return fs.UserInterfaceOptionsOverride;
+            return fs.InterfaceTypeOptionsOverride;
         }
 
         public FieldMode GetFieldModeOverride(String fieldName)
         {
-            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 
             if (fs == null)
             {
                 return FieldMode.FormDefault;
             }
 
-            return fs.FieldModeOverride; ;
+            return fs.Mode; ;
         }
 
-        public FieldSettings Ensure(String fieldName)
+        public FieldInterface Ensure(String fieldName)
         {
-            FieldSettings fs = this.fieldsByStorageFieldName[fieldName];
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 
             if (fs == null)
             {
-                fs = (FieldSettings)this.Create();
+                fs = (FieldInterface)this.Create();
                 fs.Name = fieldName;
 
                 this.Add(fs);
@@ -158,7 +158,7 @@ namespace BL.Forms
             return fs;
         }
 
-        public FieldSettings GetByStorageFieldName(String storageFieldName)
+        public FieldInterface GetByStorageFieldName(String storageFieldName)
         {
             return this.fieldsByStorageFieldName[storageFieldName];
         }
@@ -171,7 +171,7 @@ namespace BL.Forms
 
         public SerializableObject Create()
         {
-            FieldSettings sens = new FieldSettings();
+            FieldInterface sens = new FieldInterface();
 
             return sens;
         }
@@ -179,7 +179,7 @@ namespace BL.Forms
         public void Add(SerializableObject fieldSettings)
         {
             this.fields.Add(fieldSettings);
-            this.fieldsByStorageFieldName[((FieldSettings)fieldSettings).Name] = (FieldSettings)fieldSettings;
+            this.fieldsByStorageFieldName[((FieldInterface)fieldSettings).Name] = (FieldInterface)fieldSettings;
 
             fieldSettings.PropertyChanged += fieldSettings_PropertyChanged;
             

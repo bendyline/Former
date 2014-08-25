@@ -15,8 +15,9 @@ namespace BL.Forms
     public interface IItemSetEditor
     {
         event DataStoreItemEventHandler ItemAdded;
+        event DataStoreItemEventHandler ItemDeleted;
 
-        bool ShowAddButton { get; set; }
+        bool DisplayAddButton { get; set; }
 
         [ScriptName("s_itemPlacementFieldName")]
         String ItemPlacementFieldName { get; set; }
@@ -28,7 +29,7 @@ namespace BL.Forms
 
         IDataStoreItemSet ItemSet { get; set; }
 
-        FormSettings FormSettings { get; set;  }
+        ItemSetInterface ItemSetInterface { get; set;  }
 
         [ScriptName("b_visible")]
         bool Visible { get; set; }
@@ -39,6 +40,10 @@ namespace BL.Forms
         Element Element { get; set; }
 
         void EnsureElements();
+        
         void Save();
+
+        void Dispose();
+        void DisposeItemInterfaceItems();
     }
 }

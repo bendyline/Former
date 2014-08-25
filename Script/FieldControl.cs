@@ -27,13 +27,15 @@ namespace BL.Forms
         private String fieldName;
         private FieldMode mode = FieldMode.Edit;
         private PropertyChangedEventHandler propertyChanged;
-        private FieldSettings fieldSetings;
 
-        public FieldSettings FieldSettings
+        private IDataStoreField lastField;
+        private FieldInterface fieldInterface;
+
+        public FieldInterface Settings
         {
             get
             {
-                return this.Form.Settings.FieldSettingsCollection.GetFieldByName(this.FieldName);
+                return this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(this.FieldName);
             }
         }
 
@@ -117,15 +119,15 @@ namespace BL.Forms
             }
         }
 
-        public FieldUserInterfaceOptions EffectiveUserInterfaceOptions
+        public FieldInterfaceTypeOptions EffectiveUserInterfaceOptions
         {
             get
             {
-                FieldUserInterfaceOptions efuio = this.Form.GetFieldUserInterfaceOptionsOverride(this.fieldName);
+                FieldInterfaceTypeOptions efuio = this.Form.GetFieldInterfaceTypeOptionsOverride(this.fieldName);
 
                 if (efuio == null)
                 {
-                    efuio = this.Field.UserInterfaceOptions;
+                    efuio = this.Field.InterfaceTypeOptions;
                 }
 
                 return efuio;
@@ -144,21 +146,32 @@ namespace BL.Forms
                 return;
             }
 
-            this.UnhookExistingEvents();
-
-            this.Field.PropertyChanged += this.propertyChanged;
-
-            this.Field.UserInterfaceOptions.PropertyChanged += this.propertyChanged;
-
-            FieldSettings fs = this.Form.Settings.FieldSettingsCollection.GetFieldByName(this.fieldName);
-
-            if (fs != null)
+            if (this.Field != this.lastField && this.Field != null)
             {
+                this.UnhookFieldEvents(this.lastField);
+
+                this.lastField = this.Field;
+
+                this.Field.PropertyChanged += this.propertyChanged;
+
+                this.Field.InterfaceTypeOptions.PropertyChanged += this.propertyChanged;
+            }
+
+            FieldInterface fs = this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(this.fieldName);
+
+            if (fs != null && fs != this.fieldInterface)
+            {
+                this.UnhookFieldInterfaceEvents(this.fieldInterface);
+
+                this.fieldInterface = fs;
+
                 fs.PropertyChanged += this.propertyChanged;
 
-                if (fs.UserInterfaceOptionsOverride != null)
+                // Debug.WriteLine("(FieldControl::OnUpdate) - Registering field interface property changed. Events: " + fs.GetPropertyChangedEventCount());
+
+                if (fs.InterfaceTypeOptionsOverride != null)
                 {
-                    fs.UserInterfaceOptionsOverride.PropertyChanged += this.propertyChanged;
+                    fs.InterfaceTypeOptionsOverride.PropertyChanged += this.propertyChanged;
                 }
             }
         }
@@ -170,38 +183,42 @@ namespace BL.Forms
 
         public override void Dispose()
         {
-            base.Dispose();
+            this.UnhookFieldEvents(this.Field);
+            this.UnhookFieldInterfaceEvents(this.fieldInterface);
 
-            this.UnhookExistingEvents();
+            base.Dispose();
         }
 
-        private void UnhookExistingEvents()
+
+        private void UnhookFieldEvents(IDataStoreField lastField)
         {
-            if (this.Item == null || this.Form == null || this.Field == null)
+            if (lastField == null)
             {
                 return;
             }
 
-            if (this.Field != null)
+            lastField.PropertyChanged -= this.propertyChanged;
+
+            if (lastField.InterfaceTypeOptions != null)
             {
-                this.Field.PropertyChanged -= this.propertyChanged;
+                lastField.InterfaceTypeOptions.PropertyChanged -= this.propertyChanged;
+            }
+        }
+
+        private void UnhookFieldInterfaceEvents(FieldInterface lastFieldInterface)
+        {
+            if (lastFieldInterface == null)
+            {
+                return;
             }
 
-            if (this.Field.UserInterfaceOptions != null)
+            lastFieldInterface.PropertyChanged -= this.propertyChanged;
+            
+            // Debug.WriteLine("(FieldControl::UnhookExistingEvents) - Detaching field events for " + this.fieldName + ". Events: " + lastFieldInterface.GetPropertyChangedEventCount());
+
+            if (lastFieldInterface.InterfaceTypeOptionsOverride != null)
             {
-                this.Field.UserInterfaceOptions.PropertyChanged -= this.propertyChanged;
-            }
-
-            FieldSettings fs = this.Form.Settings.FieldSettingsCollection.GetFieldByName(this.fieldName);
-
-            if (fs != null)
-            {
-                fs.PropertyChanged -= this.propertyChanged;
-
-                if (fs.UserInterfaceOptionsOverride != null)
-                {
-                    fs.UserInterfaceOptionsOverride.PropertyChanged -= this.propertyChanged;
-                }
+                lastFieldInterface.InterfaceTypeOptionsOverride.PropertyChanged -= this.propertyChanged;
             }
         }
 

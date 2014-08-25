@@ -17,7 +17,7 @@ namespace BL.Forms
         [ScriptName("e_fieldBin")]
         private Element fieldBin;
 
-        private FieldUserInterfaceType previousUserInterfaceType = FieldUserInterfaceType.NoValue;
+        private FieldInterfaceType previousInterfaceType = FieldInterfaceType.NoValue;
 
         private FieldControl fieldControl;
 
@@ -39,17 +39,17 @@ namespace BL.Forms
             {
                 String fieldName = this.Field.Name;
 
-                FieldUserInterfaceType userInterfaceType = this.Field.UserInterfaceType;
-                FieldUserInterfaceType altUserInterfaceType = this.Form.GetFieldUserInterfaceTypeOverride(fieldName);
+                FieldInterfaceType interfaceType = this.Field.InterfaceType;
+                Nullable<FieldInterfaceType> altInterfaceType = this.Form.GetFieldInterfaceTypeOverride(fieldName);
 
-                if (altUserInterfaceType != FieldUserInterfaceType.TypeDefault)
+                if (altInterfaceType != null && altInterfaceType != FieldInterfaceType.TypeDefault)
                 {
-                    userInterfaceType = altUserInterfaceType;
+                    interfaceType = (FieldInterfaceType)altInterfaceType;
                 }
 
-                if (userInterfaceType != previousUserInterfaceType)
+                if (interfaceType != previousInterfaceType)
                 {
-                    previousUserInterfaceType = userInterfaceType;
+                    previousInterfaceType = interfaceType;
 
                     if (this.fieldControl != null)
                     {
@@ -61,7 +61,7 @@ namespace BL.Forms
                         this.fieldBin.RemoveChild(this.fieldBin.ChildNodes[0]);
                     }
 
-                    if (this.Field.Type == FieldType.Integer && userInterfaceType == FieldUserInterfaceType.Scale)
+                    if (this.Field.Type == FieldType.Integer && interfaceType == FieldInterfaceType.Scale)
                     {
                         this.fieldControl = new ScaleFieldValue();
 
@@ -70,7 +70,7 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
-                    else if (this.Field.Type == FieldType.ShortText && userInterfaceType == FieldUserInterfaceType.User)
+                    else if (this.Field.Type == FieldType.ShortText && interfaceType == FieldInterfaceType.User)
                     {
                         this.fieldControl = new UserValue();
                         this.ApplyToControl(this.fieldControl);
@@ -78,7 +78,7 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
-                    else if (this.Field.Type == FieldType.ShortText && userInterfaceType == FieldUserInterfaceType.Choice)
+                    else if (this.Field.Type == FieldType.ShortText && interfaceType == FieldInterfaceType.Choice)
                     {
                         this.fieldControl = new ChoiceFieldValue();
 
@@ -91,7 +91,7 @@ namespace BL.Forms
                     {
                         this.fieldControl = new TextFieldValue();
 
-                        if (userInterfaceType == FieldUserInterfaceType.Email)
+                        if (interfaceType == FieldInterfaceType.Email)
                         {
                             this.fieldControl.TemplateId = "bl-forms-emailtextfieldvalue";
                         }
@@ -113,6 +113,16 @@ namespace BL.Forms
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
                 }
+            }
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            if (this.fieldControl != null)
+            {
+                this.fieldControl.Dispose();
             }
         }
 

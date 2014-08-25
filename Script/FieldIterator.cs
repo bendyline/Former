@@ -19,6 +19,7 @@ namespace BL.Forms
 
         private String fieldTemplateId;
 
+        private Dictionary<FieldInterface, Field> usedFieldInterfaces;
         private List<LabeledField> fields;
         private Dictionary<String, LabeledField> fieldsByName;
         private PropertyChangedEventHandler propertyChanged;
@@ -47,12 +48,13 @@ namespace BL.Forms
             this.fields = new List<LabeledField>();
             this.fieldsByName = new Dictionary<string, LabeledField>();
 
+            this.usedFieldInterfaces = new Dictionary<FieldInterface, Field>();
             this.propertyChanged = fs_PropertyChanged;
         }
 
-        protected internal override void OnSettingsChange()
+        protected internal override void OnInterfaceChange()
         {
-            base.OnSettingsChange();
+            base.OnInterfaceChange();
 
             this.OnUpdate();
         }
@@ -89,17 +91,19 @@ namespace BL.Forms
 
             foreach (Field field in sortedFields)
             {
-                FieldSettings fs = this.Form.Settings.FieldSettingsCollection.GetFieldByName(field.Name);
+                FieldInterface fs = this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
 
-                if (fs != null)
+                if (fs != null && !this.usedFieldInterfaces.ContainsKey(fs))
                 {
+                    this.usedFieldInterfaces[fs] = field;
+
                     fs.PropertyChanged -= this.propertyChanged;
                     fs.PropertyChanged += this.propertyChanged;
                 }
 
-                AdjustedFieldState afs = this.Form.GetAdjustedFieldState(field.Name);
+                DisplayState afs = this.Form.GetAdjustedDisplayState(field.Name);
 
-                if (afs == AdjustedFieldState.Show)
+                if (afs == DisplayState.Show)
                 {
                     LabeledField ff = this.fieldsByName[field.Name];
 
@@ -145,16 +149,30 @@ namespace BL.Forms
                 this.fieldBin.RemoveChild(f.Element);
                 this.fields.Remove(f);
                 this.fieldsByName[f.Field.Name] = null;
+
+                f.Dispose();
             }
         }
 
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            if (this.fields != null)
+            {
+                foreach (LabeledField lf in this.fields)
+                {
+                    lf.Dispose();
+                }
+            }
+        }
 
         private int CompareFields(Field fieldA, Field fieldB)
         {
-            FieldSettingsCollection fsc = this.Form.Settings.FieldSettingsCollection;
+            FieldInterfaceCollection fsc = this.Form.ItemSetInterface.FieldInterfaces;
 
-            FieldSettings fieldSettingsA = fsc.GetFieldByName(fieldA.Name);
-            FieldSettings fieldSettingsB = fsc.GetFieldByName(fieldB.Name);
+            FieldInterface fieldSettingsA = fsc.GetFieldByName(fieldA.Name);
+            FieldInterface fieldSettingsB = fsc.GetFieldByName(fieldB.Name);
 
             if (fieldSettingsA == null && fieldSettingsB == null)
             {

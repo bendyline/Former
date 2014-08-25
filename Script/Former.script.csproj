@@ -66,11 +66,11 @@
     <Compile Include="GridItemSetEditor.cs" />
     <Compile Include="RowForm.cs" />
     <Compile Include="ScaleFieldValue.cs" />
-    <Compile Include="FieldSettingsCollection.cs" />
+    <Compile Include="FieldInterfaceCollection.cs" />
     <Compile Include="ChoiceFieldValue.cs" />
     <Compile Include="FormControl.cs" />
-    <Compile Include="FieldSettings.cs" />
-    <Compile Include="FormSettings.cs" />
+    <Compile Include="FieldInterface.cs" />
+    <Compile Include="ItemSetInterface.cs" />
     <Compile Include="ItemSetEditor.cs" />
     <Compile Include="CheckboxFieldValue.cs" />
     <Compile Include="UserValue.cs" />

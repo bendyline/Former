@@ -52,13 +52,13 @@ namespace BL.Forms
                 sortedFields.Add(field);
             }
 
-            sortedFields.Sort(this.CompareFields);
+            sortedFields.Sort(this.ItemSetInterface.CompareFields);
 
             foreach (Field field in sortedFields)
             {                
-                AdjustedFieldState afs = this.GetAdjustedFieldState(field.Name);
+                DisplayState afs = this.GetAdjustedDisplayState(field.Name);
 
-                if (afs == AdjustedFieldState.Show)
+                if (afs == DisplayState.Show)
                 {
                     LabeledField ff = this.fieldsByName[field.Name];
 
@@ -108,6 +108,8 @@ namespace BL.Forms
 
             foreach (LabeledField f in fieldsNotUsed)
             {
+                f.Dispose();
+
                 if (f.Element != null)
                 {
                     if (f.Element.ParentNode != null)
@@ -128,78 +130,44 @@ namespace BL.Forms
             this.Update();
         }
 
-
-        private int CompareFields(Field fieldA, Field fieldB)
+        public override void Dispose()
         {
-            FieldSettingsCollection fsc = this.Settings.FieldSettingsCollection;
+            base.Dispose();
 
-            FieldSettings fieldSettingsA = fsc.GetFieldByName(fieldA.Name);
-            FieldSettings fieldSettingsB = fsc.GetFieldByName(fieldB.Name);
-
-            if (fieldSettingsA == null && fieldSettingsB == null)
+            if (this.fields != null)
             {
-                return fieldA.Name.CompareTo(fieldB.Name);
+                foreach (LabeledField lf in this.fields)
+                {
+                    lf.Dispose();
+                }
             }
-
-            int orderA = -1;
-
-            if (fieldSettingsA != null)
-            {
-                orderA = fieldSettingsA.Order;
-            }
-
-
-            int orderB = -1;
-
-            if (fieldSettingsB != null)
-            {
-                orderB = fieldSettingsB.Order;
-            }
-
-            if (orderA < 0)
-            {
-                orderA = 100000;
-            }
-
-            if (orderB < 0)
-            {
-                orderB = 100000;
-            }
-
-
-            if (orderA == orderB)
-            {
-                return fieldA.Name.CompareTo(fieldB.Name);
-            }
-
-            return orderA - orderB;
         }
 
         public String GetFieldTitleOverride(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetFieldTitleOverride(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetFieldTitleOverride(fieldName);
         }
 
         public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
         {
-            FieldChoiceCollection fcc = this.Settings.FieldSettingsCollection.GetFieldChoicesOverride(fieldName);
+            FieldChoiceCollection fcc = this.ItemSetInterface.FieldInterfaces.GetFieldChoicesOverride(fieldName);
 
             return fcc;
         }
 
-        public AdjustedFieldState GetAdjustedFieldState(String fieldName)
+        public DisplayState GetAdjustedDisplayState(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetAdjustedFieldState(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetAdjustedDisplayState(fieldName);
         }
 
-        public FieldUserInterfaceType GetFieldUserInterfaceTypeOverride(String fieldName)
+        public Nullable<FieldInterfaceType> GetFieldInterfaceTypeOverride(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetFieldUserInterfaceTypeOverride(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOverride(fieldName);
         }
 
         public FieldMode GetFieldModeOverride(String fieldName)
         {
-            return this.Settings.FieldSettingsCollection.GetFieldModeOverride(fieldName);
+            return this.ItemSetInterface.FieldInterfaces.GetFieldModeOverride(fieldName);
         }
 
         protected override void OnApplyTemplate()

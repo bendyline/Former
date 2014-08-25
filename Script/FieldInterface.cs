@@ -8,17 +8,17 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
-    public class FieldSettings : FieldUserInterfaceOptions
+    public class FieldInterface : SerializableObject
     {
         private String titleOverride;
-        private bool requiredOverride;
-        private AdjustedFieldState fieldState;
+        private bool? requiredOverride;
+        private DisplayState display;
         private FieldChoiceCollection choicesOverride;
         private String name;
         private int order;
         private FieldMode fieldMode;
-        private FieldUserInterfaceType userInterfaceTypeOverride;
-        private FieldUserInterfaceOptions userInterfaceOptionsOverride;
+        private Nullable<FieldInterfaceType> interfaceTypeOverride;
+        private FieldInterfaceTypeOptions interfaceTypeOptionsOverride;
 
         [ScriptName("s_name")]
         public String Name
@@ -41,8 +41,8 @@ namespace BL.Forms
             }
         }
 
-        [ScriptName("i_fieldMode")]
-        public FieldMode FieldModeOverride
+        [ScriptName("i_mode")]
+        public FieldMode Mode
         {
             get
             {
@@ -58,7 +58,7 @@ namespace BL.Forms
 
                 this.fieldMode = value;
 
-                this.NotifyPropertyChanged("FieldMode");
+                this.NotifyPropertyChanged("Mode");
             }
         }
 
@@ -84,7 +84,7 @@ namespace BL.Forms
         }
 
         [ScriptName("b_requiredOverride")]
-        public bool RequiredOverride
+        public bool? RequiredOverride
         {
             get
             {
@@ -125,45 +125,45 @@ namespace BL.Forms
             }
         }
 
-        [ScriptName("i_userInterfaceTypeOverride")]
-        public FieldUserInterfaceType UserInterfaceTypeOverride
+        [ScriptName("i_interfaceTypeOverride")]
+        public Nullable<FieldInterfaceType> InterfaceTypeOverride
         {
             get
             {
-                return this.userInterfaceTypeOverride;
+                return this.interfaceTypeOverride;
             }
 
             set
             {
-                if (this.userInterfaceTypeOverride == value)
+                if (this.interfaceTypeOverride == value)
                 {
                     return;
                 }
 
-                this.userInterfaceTypeOverride = value;
+                this.interfaceTypeOverride = value;
 
-                this.NotifyPropertyChanged("UserInterfaceTypeOverride");
+                this.NotifyPropertyChanged("InterfaceTypeOverride");
             }
         }
 
-        [ScriptName("o_userInterfaceOptionsOverride")]
-        public FieldUserInterfaceOptions UserInterfaceOptionsOverride
+        [ScriptName("o_interfaceTypeOptionsOverride")]
+        public FieldInterfaceTypeOptions InterfaceTypeOptionsOverride
         {
             get
             {
-                return this.userInterfaceOptionsOverride;
+                return this.interfaceTypeOptionsOverride;
             }
 
             set
             {
-                if (this.userInterfaceOptionsOverride == value)
+                if (this.interfaceTypeOptionsOverride == value)
                 {
                     return;
                 }
 
-                this.userInterfaceOptionsOverride = value;
+                this.interfaceTypeOptionsOverride = value;
 
-                this.NotifyPropertyChanged("UserInterfaceOptionsOverride");
+                this.NotifyPropertyChanged("InterfaceTypeOptionsOverride");
             }
         }
 
@@ -188,46 +188,39 @@ namespace BL.Forms
             }
         }
 
-        [ScriptName("i_fieldState")]
-        public AdjustedFieldState FieldState
+        [ScriptName("i_display")]
+        public DisplayState Display
         {
             get
             {
-                return this.fieldState;
+                return this.display;
             }
 
             set
             {
-                if (this.fieldState == value)
+                if (this.display == value)
                 {
                     return;
                 }
 
-                this.fieldState = value;
+                this.display = value;
 
-                this.NotifyPropertyChanged("FieldState");
+                this.NotifyPropertyChanged("Display");
             }
         }
 
-        public FieldSettings()
+        public FieldInterface()
         {
         }
 
-        public override bool IsEqualTo(FieldUserInterfaceOptions fuio)
+        public bool IsEqualTo(FieldInterface settings)
         {
-            FieldSettings settings = (FieldSettings)fuio;
-
-            if (!base.IsEqualTo(settings))
+            if (this.Display != settings.Display)
             {
                 return false;
             }
 
-            if (this.FieldState != settings.FieldState)
-            {
-                return false;
-            }
-
-            if (this.FieldState != settings.FieldState)
+            if (this.Display != settings.Display)
             {
                 return false;
             }

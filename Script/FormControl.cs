@@ -40,7 +40,7 @@ namespace BL.Forms
             
         }
 
-        internal protected virtual void OnSettingsChange()
+        internal protected virtual void OnInterfaceChange()
         {
 
         }
