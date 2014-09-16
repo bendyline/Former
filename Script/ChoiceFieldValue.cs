@@ -129,7 +129,7 @@ namespace BL.Forms
 
         private void HandleButtonClick(ElementEvent e)
         {
-            InputElement element = (InputElement)ControlUtilities.GetEventTarget(e);
+            InputElement element = (InputElement)ElementUtilities.GetEventTarget(e);
 
             if (selectedElement != null)
             {

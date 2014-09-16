@@ -32,11 +32,11 @@ namespace BL.Forms
 
                 if (fieldTitleOverride != null)
                 {
-                    ControlUtilities.SetText(this.titleElement, fieldTitleOverride);
+                    ElementUtilities.SetText(this.titleElement, fieldTitleOverride);
                 }
                 else
                 {
-                    ControlUtilities.SetText(this.titleElement, this.Field.DisplayName);
+                    ElementUtilities.SetText(this.titleElement, this.Field.DisplayName);
                 }
             }
         }

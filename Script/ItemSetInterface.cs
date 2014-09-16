@@ -11,7 +11,8 @@ namespace BL.Forms
     public class ItemSetInterface :  SerializableObject
     {
         private FormMode formMode = FormMode.EditForm;
-
+        private bool displayColumns = true;
+        private bool displayDeleteItemButton = true;
         private FieldInterfaceCollection fieldInterfaces;
 
         [ScriptName("i_mode")]
@@ -25,6 +26,34 @@ namespace BL.Forms
             set
             {
                 this.formMode = value;
+            }
+        }
+
+        [ScriptName("b_displayDeleteItemButton")]
+        public bool DisplayDeleteItemButton
+        {
+            get
+            {
+                return this.displayDeleteItemButton;
+            }
+
+            set
+            {
+                this.displayDeleteItemButton = value;
+            }
+        }
+
+        [ScriptName("b_displayColumns")]
+        public bool DisplayColumns
+        {
+            get
+            {
+                return this.displayColumns;
+            }
+
+            set
+            {
+                this.displayColumns = value;
             }
         }
 

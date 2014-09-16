@@ -97,7 +97,7 @@ namespace BL.Forms
                 this.textDisplay.Style.Display = "block";
                 this.textInput.Style.Display = "none";
 
-                ControlUtilities.SetText(this.textDisplay, val);
+                ElementUtilities.SetText(this.textDisplay, val);
             }
 
             if (this.Settings != null && this.Settings.InterfaceTypeOptionsOverride != null && this.Settings.InterfaceTypeOptionsOverride.Placeholder != null)

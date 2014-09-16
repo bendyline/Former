@@ -38,6 +38,9 @@ namespace BL.Forms
         private NotifyCollectionChangedEventHandler fieldSettingsChangeHandler;
         private PropertyChangedEventHandler formSettingsChangeHandler;
 
+
+        public event DataStoreItemEventHandler ItemDeleted;
+
         [ScriptName("s_iteratorFieldTemplateId")]
         public String IteratorFieldTemplateId
         {
@@ -109,6 +112,8 @@ namespace BL.Forms
                 {
                     this.fieldIterator.OnInterfaceChange();
                 }
+
+                this.Update();
             }
         }
 
@@ -162,6 +167,18 @@ namespace BL.Forms
             }
 
             return true;
+        }
+
+        public void DeleteItem()
+        {
+            this.Item.DeleteItem();
+
+            if (this.ItemDeleted != null)
+            {
+                DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(this.Item);
+
+                this.ItemDeleted(this, dsiea);
+            }
         }
 
         public String GetFieldTitleOverride(String fieldName)

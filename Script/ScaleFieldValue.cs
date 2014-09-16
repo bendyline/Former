@@ -135,19 +135,19 @@ namespace BL.Forms
                         switch (i)
                         {
                             case 0:
-                                ControlUtilities.SetText(divLabelElement, "Strongly Disagree");
+                                ElementUtilities.SetText(divLabelElement, "Strongly Disagree");
                                 break;
                             case 1:
-                                ControlUtilities.SetText(divLabelElement, "Disagree");
+                                ElementUtilities.SetText(divLabelElement, "Disagree");
                                 break;
                             case 2:
-                                ControlUtilities.SetText(divLabelElement, "Neutral");
+                                ElementUtilities.SetText(divLabelElement, "Neutral");
                                 break;
                             case 3:
-                                ControlUtilities.SetText(divLabelElement, "Agree");
+                                ElementUtilities.SetText(divLabelElement, "Agree");
                                 break;
                             case 4:
-                                ControlUtilities.SetText(divLabelElement, "Strongly Agree");
+                                ElementUtilities.SetText(divLabelElement, "Strongly Agree");
                                 break;
                         }
 
@@ -166,12 +166,12 @@ namespace BL.Forms
             {
                 if (fuio.RangeStartDescription != null && this.scaleMinEnd != null)
                 {
-                    this.scaleMinEnd.InnerText = fuio.RangeStartDescription;
+                    ElementUtilities.SetText(this.scaleMinEnd, fuio.RangeStartDescription);
                 }
 
                 if (fuio.RangeEndDescription != null && this.scaleMaxEnd != null)
                 {
-                    this.scaleMaxEnd.InnerText = fuio.RangeEndDescription;
+                    ElementUtilities.SetText(this.scaleMaxEnd, fuio.RangeEndDescription);
                 }
             }
         }
@@ -200,7 +200,7 @@ namespace BL.Forms
         private void HandleButtonClick(ElementEvent e)
         {
             ScaleType scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
-            Element element = (Element)ControlUtilities.GetEventTarget(e);
+            Element element = (Element)ElementUtilities.GetEventTarget(e);
 
             String val = (String)element.GetAttribute("Value");
             

@@ -17,6 +17,7 @@ namespace BL.Forms
         Rows = 0,
         TemplatePlacedItems=1
     }
+
     public class ItemSetEditor : Control, IItemSetEditor
     {
         private IDataStoreItemSet itemSet;
@@ -97,7 +98,7 @@ namespace BL.Forms
         private Dictionary<String, Form> formsByLocalId;
         private List<Form> forms;
 
-        private ItemSetInterface formSettings;
+        private ItemSetInterface itemSetInterface;
         private String itemFormTemplateId;
 
         [ScriptName("e_addButton")]
@@ -105,7 +106,6 @@ namespace BL.Forms
 
         private bool showAddButton = true;
         private String addItemCta;
-
 
         private Element headerRowElement;
         private event DataStoreItemSetEventHandler itemSetEventHandler;
@@ -190,22 +190,24 @@ namespace BL.Forms
         {
             get
             {
-                if (this.formSettings == null)
+                if (this.itemSetInterface == null)
                 {
-                    this.formSettings = new ItemSetInterface();
+                    this.itemSetInterface = new ItemSetInterface();
                 }
 
-                return this.formSettings;
+                return this.itemSetInterface;
             }
 
             set
             {
-                this.formSettings = value;
+                this.itemSetInterface = value;
 
                 foreach (Form f in this.forms)
                 {
-                    f.ItemSetInterface = this.formSettings;
+                    f.ItemSetInterface = this.itemSetInterface;
                 }
+
+                this.Update();
             }
         }
 
@@ -347,6 +349,11 @@ namespace BL.Forms
 
                     if (f != null)
                     {
+                        if (ElementUtilities.ElementIsChildOf(f.Element, this.formBin))
+                        {
+                            this.formBin.RemoveChild(f.Element);
+                        }
+
                         this.formsByLocalId[item.LocalOnlyUniqueId] = null;
                         this.forms.Remove(f);
                         this.itemsShown.Remove(item);
@@ -366,6 +373,16 @@ namespace BL.Forms
                 return;
             }
 
+            if (this.ItemSetInterface != null && !this.ItemSetInterface.DisplayColumns)
+            {
+                if (this.headerRowElement != null && ElementUtilities.ElementIsChildOf(this.headerRowElement, this.formBin))
+                {
+                    this.formBin.RemoveChild(this.headerRowElement);
+                }
+
+                return;
+            }
+
             if (this.headerRowElement == null)
             {
                 this.headerRowElement = this.CreateElement("headerRow");
@@ -380,7 +397,7 @@ namespace BL.Forms
                 }
             }
 
-            ControlUtilities.ClearChildElements(this.headerRowElement);
+            ElementUtilities.ClearChildElements(this.headerRowElement);
 
             List<Field> sortedFields = new List<Field>();
 
@@ -401,7 +418,7 @@ namespace BL.Forms
 
                     String text = this.GetFieldTitleOverride(field.Name);
 
-                    ControlUtilities.SetText(cellElement, text);
+                    ElementUtilities.SetText(cellElement, text);
 
                     this.headerRowElement.AppendChild(cellElement);
                 }
@@ -450,6 +467,8 @@ namespace BL.Forms
                 f.IteratorFieldTemplateId = "bl-forms-horizontalunlabeledfield";
             }
 
+            f.ItemDeleted += f_ItemDeleted;
+
             if (this.itemFormTemplateId != null)
             {
                 f.TemplateId = this.itemFormTemplateId;
@@ -484,13 +503,30 @@ namespace BL.Forms
             }
         }
 
+        private void f_ItemDeleted(object sender, DataStoreItemEventArgs e)
+        {
+            if (this.ItemDeleted != null)
+            {
+                DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(e.Item);
+
+                this.ItemDeleted(this, dsiea);
+            }
+        }
+
         public void DisposeItemInterfaceItems()
         {
             foreach (String key in this.formsByLocalId.Keys)
             {
-                Form f = this.formsByLocalId[key];
+                if (key != null)
+                {
+                    Form f = this.formsByLocalId[key];
 
-                f.Dispose();
+                    if (f != null)
+                    {
+                        f.Dispose();
+                    }
+
+                }
             }
 
             this.formsByLocalId = new Dictionary<string, Form>();

@@ -34,7 +34,7 @@ namespace BL.Forms
 
         private void HandleTextInputChanged(ElementEvent e)
         {
-            this.Item.SetStringValue(this.FieldName, ControlUtilities.GetIsChecked(this.checkboxInput).ToString());
+            this.Item.SetStringValue(this.FieldName, ElementUtilities.GetIsChecked(this.checkboxInput).ToString());
         }
 
 
@@ -59,13 +59,13 @@ namespace BL.Forms
                 this.checkboxInput.Value = "Example";
                 this.checkboxInput.Disabled = true;
                 this.checkboxInput.Style.Display = "block";
-                ControlUtilities.SetIsCheckedFromObject(this.checkboxInput, val);
+                ElementUtilities.SetIsCheckedFromObject(this.checkboxInput, val);
             }
             else if (this.EffectiveMode == FieldMode.Edit)
             {
                 this.checkboxInput.Disabled = false;
                 this.checkboxInput.Style.Display = "block";
-                ControlUtilities.SetIsCheckedFromObject(this.checkboxInput, val);
+                ElementUtilities.SetIsCheckedFromObject(this.checkboxInput, val);
             }
             else
             {

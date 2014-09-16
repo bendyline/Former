@@ -17,6 +17,8 @@ namespace BL.Forms
     {
         private List<LabeledField> fields;
         private Dictionary<String, LabeledField> fieldsByName;
+        private Element specialButtonsCell;
+        private InputElement deleteButton;
    
         public RowForm()
         {
@@ -44,6 +46,35 @@ namespace BL.Forms
             {
                 fieldsNotUsed.Add(lf);
             }
+
+            if (this.specialButtonsCell == null && this.ItemSetInterface.DisplayDeleteItemButton)
+            {
+                this.specialButtonsCell = this.CreateElement("cell");
+
+                this.deleteButton = (InputElement)this.CreateElementWithTypeAndAdditionalClasses("deleteButton", "BUTTON", "k-button");
+                this.deleteButton.AddEventListener("click", this.HandleItemDelete, true);
+
+                Element e = this.CreateElementWithAdditionalClasses("backIcon", "glyphicon glyphicon-remove");
+
+                this.deleteButton.AppendChild(e);
+
+                this.specialButtonsCell.AppendChild(this.deleteButton);
+            }
+            else if (this.specialButtonsCell != null && !this.ItemSetInterface.DisplayDeleteItemButton)
+            {
+                this.Element.RemoveChild(this.specialButtonsCell);
+
+                this.specialButtonsCell = null;
+            }
+
+            if (this.ItemSetInterface.DisplayDeleteItemButton)
+            {
+                if (!ElementUtilities.ElementIsChildOf(this.specialButtonsCell, this.Element))
+                {
+                    this.Element.AppendChild(this.specialButtonsCell);
+                }
+            }
+
 
             List<Field> sortedFields = new List<Field>();
 
@@ -90,7 +121,15 @@ namespace BL.Forms
                         ff.EnsureElements();
 
                         cellElement.AppendChild(ff.Element);
-                        this.Element.AppendChild(cellElement);
+
+                        if (this.specialButtonsCell != null)
+                        {
+                            this.Element.InsertBefore(cellElement, this.specialButtonsCell);
+                        }
+                        else
+                        {
+                            this.Element.AppendChild(cellElement);
+                        }
                     }
 
                     FieldMode fm = this.GetFieldModeOverride(field.Name);
@@ -121,6 +160,11 @@ namespace BL.Forms
                 this.fields.Remove(f);
                 this.fieldsByName[f.Field.Name] = null;
             }
+        }
+
+        private void HandleItemDelete(ElementEvent eventData)
+        {
+            this.DeleteItem();
         }
 
         protected override void OnSettingsChange()
