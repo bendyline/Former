@@ -31,10 +31,15 @@ namespace BL.Forms
         private IDataStoreField lastField;
         private FieldInterface fieldInterface;
 
-        public FieldInterface Settings
+        public FieldInterface FieldInterface
         {
             get
             {
+                if (this.fieldInterface != null)
+                {
+                    return this.fieldInterface;
+                }
+
                 return this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(this.FieldName);
             }
         }
@@ -176,6 +181,16 @@ namespace BL.Forms
             }
         }
 
+        public void ConsiderFieldInterfaceUpdated()
+        {
+            if (this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(this.fieldName) == this.fieldInterface)
+            {
+                return;
+            }
+
+            this.Update();
+        }
+
         private void fs_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             this.Update();
@@ -228,6 +243,7 @@ namespace BL.Forms
             fc.Item = this.Item;
             fc.Mode = this.Mode;
             fc.FieldName = this.FieldName;
+            fc.ConsiderFieldInterfaceUpdated();
         }
     }
 }

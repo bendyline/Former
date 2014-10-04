@@ -100,9 +100,9 @@ namespace BL.Forms
                 ElementUtilities.SetText(this.textDisplay, val);
             }
 
-            if (this.Settings != null && this.Settings.InterfaceTypeOptionsOverride != null && this.Settings.InterfaceTypeOptionsOverride.Placeholder != null)
+            if (this.FieldInterface != null && this.FieldInterface.InterfaceTypeOptionsOverride != null && this.FieldInterface.InterfaceTypeOptionsOverride.Placeholder != null)
             {
-                this.textInput.SetAttribute("placeholder", this.Settings.InterfaceTypeOptionsOverride.Placeholder);
+                this.textInput.SetAttribute("placeholder", this.FieldInterface.InterfaceTypeOptionsOverride.Placeholder);
             }
             else
             {

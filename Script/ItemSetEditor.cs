@@ -418,6 +418,11 @@ namespace BL.Forms
 
                     String text = this.GetFieldTitleOverride(field.Name);
 
+                    if (text == null)
+                    {
+                        text = String.Empty;
+                    }
+
                     ElementUtilities.SetText(cellElement, text);
 
                     this.headerRowElement.AppendChild(cellElement);
