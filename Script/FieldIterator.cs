@@ -146,7 +146,8 @@ namespace BL.Forms
 
             foreach (LabeledField f in fieldsNotUsed)
             {
-                this.fieldBin.RemoveChild(f.Element);
+                ElementUtilities.RemoveIfChildOf(f.Element, this.fieldBin);
+
                 this.fields.Remove(f);
                 this.fieldsByName[f.Field.Name] = null;
 
