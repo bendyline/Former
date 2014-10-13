@@ -14,62 +14,80 @@ namespace BL.Forms
 {
     public class CheckboxFieldValue : FieldControl
     {
-        [ScriptName("e_checkboxInput")]
-        private InputElement checkboxInput;
+        [ScriptName("e_checkboxText")]
+        private Element checkboxText;
 
-        public CheckboxFieldValue()
+        public Boolean CurrentValue
         {
-
-        }
-
-        protected override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            if (this.checkboxInput != null)
+            get
             {
-                this.checkboxInput.AddEventListener("change", this.HandleTextInputChanged, true);
+               
+                String val = this.Item.GetStringValue(this.FieldName);
+
+                if (val == null)
+                {
+                    return false;
+                }
+
+                return Boolean.Parse(val);
             }
         }
-
-        private void HandleTextInputChanged(ElementEvent e)
+        public CheckboxFieldValue()
         {
-            this.Item.SetStringValue(this.FieldName, ElementUtilities.GetIsChecked(this.checkboxInput).ToString());
+            this.TrackInteractionEvents = true;
         }
 
+        protected override void OnClick(ElementEvent e)
+        {
+            base.OnClick(e);
+
+            if (CurrentValue)
+            {
+                this.Item.SetBooleanValue(this.FieldName, false);
+            }
+            else
+            {
+                this.Item.SetBooleanValue(this.FieldName, true);
+            }
+
+        }
+
+   
 
         protected override void OnUpdate()
         {
             base.OnUpdate();
 
-            if (this.checkboxInput == null || !this.IsReady)
+            if (this.checkboxText== null || !this.IsReady)
             {
                 return;
             }
 
-            String val = this.Item.GetStringValue(this.FieldName);
-
-            if (val == null)
-            {
-                val = String.Empty;
-            }
-
             if (this.EffectiveMode == FieldMode.Example)
             {
-                this.checkboxInput.Value = "Example";
-                this.checkboxInput.Disabled = true;
-                this.checkboxInput.Style.Display = "block";
-                ElementUtilities.SetIsCheckedFromObject(this.checkboxInput, val);
+                this.checkboxText.Style.Display = "";
             }
             else if (this.EffectiveMode == FieldMode.Edit)
             {
-                this.checkboxInput.Disabled = false;
-                this.checkboxInput.Style.Display = "block";
-                ElementUtilities.SetIsCheckedFromObject(this.checkboxInput, val);
+                if (this.CurrentValue)
+                {
+                    this.checkboxText.Style.Display = "";
+                }
+                else
+                {
+                    this.checkboxText.Style.Display = "none";
+                }
             }
             else
             {
-                this.checkboxInput.Style.Display = "none";
+                if (this.CurrentValue)
+                {
+                    this.checkboxText.Style.Display = "";
+                }
+                else
+                {
+                    this.checkboxText.Style.Display = "none";
+                }
             }
         }
 

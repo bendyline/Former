@@ -12,10 +12,38 @@
             BODY
             {
                 text-align:center;
+                width:32px;
+                height:32px;
+                background-color:white;
+                vertical-align:middle;
+                text-align:center;
+                border: solid 1px #909090;
+                transition: background-color .3s ease; 
+                cursor:default;
+                margin-left:3px;
+                margin-right:3px;
+            }
+
+            BODY:hover
+            {
+                background-color:#DADAFF;
+                transition: background-color .3s ease; 
+            }
+
+            #checkboxText
+            {
+                padding-top:5px;
+            }
+
+            #spacer
+            {
+                font-size:1pt;
+                cursor:default;
             }
         </style>
 	</head>
-	<body>        
-        <input type="checkbox" id="checkboxInput" class="k-form"/>
+	<body>   
+        <span id="spacer">&#160;</span>     
+        <span id="checkboxText" class="glyphicon glyphicon-ok"/>
     </body>
 </html>

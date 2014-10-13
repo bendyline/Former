@@ -29,6 +29,7 @@ namespace BL.Forms
 
         private ItemSetInterface itemSetInterface;
         private String itemFormTemplateId;
+        private String itemFormTemplateIdSmall;
         private String itemPlacementFieldName;
 
         [ScriptName("e_addButton")]
@@ -93,6 +94,20 @@ namespace BL.Forms
                 this.itemFormTemplateId = value;
             }
         }
+
+        public String ItemFormTemplateIdSmall
+        {
+            get
+            {
+                return this.itemFormTemplateIdSmall;
+            }
+
+            set
+            {
+                this.itemFormTemplateIdSmall = value;
+            }
+        }
+
 
         public ItemSetEditorMode Mode
         {

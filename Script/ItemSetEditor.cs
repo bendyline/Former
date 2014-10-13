@@ -100,10 +100,12 @@ namespace BL.Forms
 
         private ItemSetInterface itemSetInterface;
         private String itemFormTemplateId;
+        private String itemFormTemplateIdSmall;
 
         [ScriptName("e_addButton")]
         private InputElement addButton;
 
+        private bool useRowFormsIfPossible = true;
         private bool showAddButton = true;
         private String addItemCta;
 
@@ -122,6 +124,19 @@ namespace BL.Forms
             set
             {
                 this.addItemCta = value;
+            }
+        }
+
+        public bool UseRowFormsIfPossible
+        {
+            get
+            {
+                return this.useRowFormsIfPossible;
+            }
+
+            set
+            {
+                this.useRowFormsIfPossible = value;
             }
         }
 
@@ -179,9 +194,33 @@ namespace BL.Forms
             {
                 this.itemFormTemplateId = value;
 
-                foreach (Form f in this.forms)
+                if (!Context.Current.IsSmallFormFactor)
                 {
-                    f.TemplateId = this.itemFormTemplateId;
+                    foreach (Form f in this.forms)
+                    {
+                        f.TemplateId = this.itemFormTemplateId;
+                    }
+                }
+            }
+        }
+
+        public String ItemFormTemplateIdSmall
+        {
+            get
+            {
+                return this.itemFormTemplateIdSmall;
+            }
+
+            set
+            {
+                this.itemFormTemplateIdSmall = value;
+
+                if (Context.Current.IsSmallFormFactor)
+                {
+                    foreach (Form f in this.forms)
+                    {
+                        f.TemplateId = this.itemFormTemplateId;
+                    }
                 }
             }
         }
@@ -373,7 +412,7 @@ namespace BL.Forms
                 return;
             }
 
-            if (this.ItemSetInterface != null && !this.ItemSetInterface.DisplayColumns)
+            if (this.ItemSetInterface != null && (!this.ItemSetInterface.DisplayColumns || Context.Current.IsSmallFormFactor))
             {
                 if (this.headerRowElement != null && ElementUtilities.ElementIsChildOf(this.headerRowElement, this.formBin))
                 {
@@ -459,7 +498,7 @@ namespace BL.Forms
                 return;
             }
 
-            if (this.mode == ItemSetEditorMode.Rows)
+            if (this.mode == ItemSetEditorMode.Rows && !Context.Current.IsSmallFormFactor && this.useRowFormsIfPossible)
             {
                 f = new RowForm();
                 Debug.WriteLine("(ItemSetEditor::EnsureFormForItem) - Creating new rowform for item " + item.LocalOnlyUniqueId);
@@ -469,14 +508,17 @@ namespace BL.Forms
             {
                 f = new Form();
                 Debug.WriteLine("(ItemSetEditor::EnsureFormForItem) - Creating new form for item " + item.LocalOnlyUniqueId);
-                f.IteratorFieldTemplateId = "bl-forms-horizontalunlabeledfield";
             }
 
             f.ItemDeleted += f_ItemDeleted;
 
-            if (this.itemFormTemplateId != null)
+            if (this.itemFormTemplateId != null && (!Context.Current.IsSmallFormFactor || this.itemFormTemplateIdSmall == null))
             {
                 f.TemplateId = this.itemFormTemplateId;
+            }
+            else if (this.itemFormTemplateIdSmall  != null && Context.Current.IsSmallFormFactor)
+            {
+                f.TemplateId = this.itemFormTemplateIdSmall;
             }
 
             f.ItemSetInterface = this.ItemSetInterface;
@@ -488,7 +530,7 @@ namespace BL.Forms
 
             f.EnsureElements();
 
-            if (this.mode == ItemSetEditorMode.Rows)
+            if (this.mode == ItemSetEditorMode.Rows || Context.Current.IsSmallFormFactor)
             {
                 this.formBin.AppendChild(f.Element);
             }

@@ -26,6 +26,7 @@ namespace BL.Forms
         ItemSetEditorMode Mode { get; set; }
 
         String ItemFormTemplateId { get; set;  }
+        String ItemFormTemplateIdSmall { get; set; }
 
         IDataStoreItemSet ItemSet { get; set; }
 
