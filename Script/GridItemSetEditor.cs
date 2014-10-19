@@ -243,7 +243,6 @@ namespace BL.Forms
                 {
                     IItem item = this.itemSet.GetItemByLocalOnlyUniqueId(localId);
 
-
                     if (item != null)
                     {
                         item.DeleteItem();
@@ -326,6 +325,8 @@ namespace BL.Forms
 
         private void AddButtonClick(ElementEvent e)
         {
+            this.grid.SaveRow();
+
             Dictionary<String, object> newRow = new Dictionary<string, object>();
             IItem item = this.itemSet.Type.CreateItem();
             this.itemSet.Add(item);
@@ -375,7 +376,17 @@ namespace BL.Forms
 
         private void itemSet_ItemSetChanged(object sender, DataStoreItemSetEventArgs e)
         {
-            this.Update();
+            if (e.AddedItems.Count >= 1 && this.activeDataSource != null)
+            {
+                foreach (IItem item in e.AddedItems)
+                {
+                    this.activeDataSource.Add(this.CreateDataObjectForItem(item));
+                }
+            }
+            else
+            {
+                this.Update();
+            }
         }
 
 
@@ -397,7 +408,6 @@ namespace BL.Forms
             {
                 orderA = fieldSettingsA.Order;
             }
-
 
             int orderB = -1;
 
@@ -445,7 +455,7 @@ namespace BL.Forms
             if (this.itemSet != null)
             {
                 GridOptions go = new GridOptions();
-
+    //            go.Toolbar = new String[] { "create" };
                 GridEditableOptions geo = new GridEditableOptions();
                 geo.Mode = "inline";
                 go.Editable = geo;
@@ -458,7 +468,12 @@ namespace BL.Forms
 
                 foreach (Field field in this.ItemSet.Type.Fields)
                 {
-                    sortedFields.Add(field);
+                    DisplayState afs = this.GetAdjustedDisplayState(field.Name);
+
+                    if (afs == DisplayState.Show)
+                    {
+                        sortedFields.Add(field);
+                    }
                 }
 
                 sortedFields.Sort(this.CompareFields);
@@ -537,9 +552,7 @@ namespace BL.Forms
 
                 foreach (IItem item in this.ItemSet.Items)
                 {
-                    object o = Item.GetDataObject(this.ItemSet, item);
-                    Script.Literal("{0}[\"id\"]={1}.get_localOnlyUniqueId()", o, item);
-                    objects.Add(o);
+                    objects.Add(CreateDataObjectForItem(item));
                 }
 
                 DataSourceOptions dso= new DataSourceOptions();
@@ -548,7 +561,7 @@ namespace BL.Forms
 
                 dso.Data = objects;
                 DataSource ds = new DataSource(dso);
-                
+               
                 go.DataSource = ds;
                 
                 this.activeDataSource = ds;
@@ -557,6 +570,14 @@ namespace BL.Forms
 
                 ds.Read();
             }
+        }
+
+        private object CreateDataObjectForItem(IItem item)
+        {
+            object o = Item.GetDataObject(this.ItemSet, item);
+            Script.Literal("{0}[\"id\"]={1}.get_localOnlyUniqueId()", o, item);
+
+            return o;
         }
     }
 }
