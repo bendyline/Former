@@ -162,11 +162,6 @@ namespace BL.Forms
             }
         }
 
-        private void HandleItemDelete(ElementEvent eventData)
-        {
-            this.DeleteItem();
-        }
-
         protected override void OnSettingsChange()
         {
             base.OnSettingsChange();

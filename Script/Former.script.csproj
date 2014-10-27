@@ -73,6 +73,7 @@
     <Compile Include="ItemSetInterface.cs" />
     <Compile Include="ItemSetEditor.cs" />
     <Compile Include="CheckboxFieldValue.cs" />
+    <Compile Include="MultilineTextFieldValue.cs" />
     <Compile Include="UserValue.cs" />
     <Compile Include="TextFieldValue.cs" />
     <Compile Include="LabeledField.cs" />
@@ -114,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FieldValidationIndicator.htm" />
+    <Content Include="MultilineTextFieldValue.htm" />
     <Content Include="UnlabeledForm.htm" />
     <Content Include="VerticalSmallForm.htm" />
     <Content Include="GridItemSetEditor.htm" />

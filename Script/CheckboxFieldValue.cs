@@ -17,6 +17,8 @@ namespace BL.Forms
         [ScriptName("e_checkboxText")]
         private Element checkboxText;
 
+        private long lastClickTime = -1;
+
         public Boolean CurrentValue
         {
             get
@@ -41,18 +43,23 @@ namespace BL.Forms
         {
             base.OnClick(e);
 
-            if (CurrentValue)
-            {
-                this.Item.SetBooleanValue(this.FieldName, false);
-            }
-            else
-            {
-                this.Item.SetBooleanValue(this.FieldName, true);
-            }
+            int nowTime = Date.Now.GetTime();
 
+            // add a bit of a deadtime to switch around
+            if ((nowTime - lastClickTime) > 200)
+            {
+                lastClickTime = nowTime;
+
+                if (CurrentValue)
+                {
+                    this.Item.SetBooleanValue(this.FieldName, false);
+                }
+                else
+                {
+                    this.Item.SetBooleanValue(this.FieldName, true);
+                }
+            }
         }
-
-   
 
         protected override void OnUpdate()
         {

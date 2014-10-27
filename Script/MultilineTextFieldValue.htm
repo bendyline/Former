@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html>
 	<head>
-        <title></title>
 
         <!-- standard template preview content.  point base href at your facer template sample folder.  -->
             <base href="../../facer/ts/" />
@@ -10,14 +9,25 @@
         <!-- end sample preview content -->
 
         <style>
-   
+            BODY
+            {
+            }
+
+            #textInput
+            {
+                border: solid 1px #C0C0C0;
+                min-height:80px;
+                min-width:200px;
+            }
+
+            #textDisplay
+            {
+                margin-top:4px;
+            }
         </style>
 	</head>
-	<body> 
-        <form action="">       
-            <BL.Forms.FieldIterator id="fieldIterator"/>
-            <div id="specialButtons">
-            </div>
-        </form> 
+	<body>        
+        <textarea id="textInput" class="k-textarea" />
+        <div id="textDisplay"/>
     </body>
 </html>

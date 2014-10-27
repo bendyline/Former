@@ -35,9 +35,13 @@ namespace BL.Forms
         [ScriptName("c_fieldIterator")]
         private FieldIterator fieldIterator;
 
+        [ScriptName("e_specialButtons")]
+        private Element specialButtons;
+
+        private Element deleteButton;
+
         private NotifyCollectionChangedEventHandler fieldSettingsChangeHandler;
         private PropertyChangedEventHandler formSettingsChangeHandler;
-
 
         public event DataStoreItemEventHandler ItemDeleted;
 
@@ -285,6 +289,33 @@ namespace BL.Forms
             {
                 this.ApplyToControl(this.fieldIterator);
             }
+
+            if (this.specialButtons != null && this.ItemSetInterface != null && this.ItemSetInterface.DisplayDeleteItemButton)
+            {
+                if (this.deleteButton == null)
+                {
+                    this.deleteButton = (InputElement)this.CreateElementWithTypeAndAdditionalClasses("deleteButton", "BUTTON", "k-button");
+                    this.deleteButton.AddEventListener("click", this.HandleItemDelete, true);
+
+                    Element e = this.CreateElementWithAdditionalClasses("backIcon", "glyphicon glyphicon-remove");
+
+                    this.deleteButton.AppendChild(e);
+                    this.specialButtons.AppendChild(this.deleteButton);
+                }
+                else
+                {
+                    this.deleteButton.Style.Display = "";
+                }
+            }
+            else if (this.deleteButton != null)
+            {
+                this.deleteButton.Style.Display = "none";
+            }
+        }
+
+        protected void HandleItemDelete(ElementEvent eventData)
+        {
+            this.DeleteItem();
         }
 
         public void ApplyToControl(Control c)

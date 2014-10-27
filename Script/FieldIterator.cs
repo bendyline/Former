@@ -130,6 +130,11 @@ namespace BL.Forms
                     }
                     else
                     {
+                        if (fs != ff.FieldInterface)
+                        {
+                            ff.Update();
+                        }
+
                         fieldsNotUsed.Remove(ff);
                     }
 
@@ -172,27 +177,27 @@ namespace BL.Forms
         {
             FieldInterfaceCollection fsc = this.Form.ItemSetInterface.FieldInterfaces;
 
-            FieldInterface fieldSettingsA = fsc.GetFieldByName(fieldA.Name);
-            FieldInterface fieldSettingsB = fsc.GetFieldByName(fieldB.Name);
+            FieldInterface fieldInterfaceA = fsc.GetFieldByName(fieldA.Name);
+            FieldInterface fieldInterfaceB = fsc.GetFieldByName(fieldB.Name);
 
-            if (fieldSettingsA == null && fieldSettingsB == null)
+            if (fieldInterfaceA == null && fieldInterfaceB == null)
             {
                 return fieldA.Name.CompareTo(fieldB.Name);
             }
 
             int orderA = -1;
 
-            if (fieldSettingsA != null)
+            if (fieldInterfaceA != null)
             {
-                orderA = fieldSettingsA.Order;
+                orderA = fieldInterfaceA.Order;
             }
 
 
             int orderB = -1;
 
-            if (fieldSettingsB != null)
+            if (fieldInterfaceB != null)
             {
-                orderB = fieldSettingsB.Order;
+                orderB = fieldInterfaceB.Order;
             }
 
             if (orderA < 0)
