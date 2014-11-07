@@ -60,6 +60,8 @@
   <ItemGroup>
     <None Include="Properties\FxCop.ruleset" />
     <None Include="Properties\Script.template" />
+    <Compile Include="ItemSetControl.cs" />
+    <Compile Include="PersistButton.cs" />
     <Compile Include="FieldValidationIndicator.cs" />
     <Compile Include="IItemSetEditor.cs" />
     <Compile Include="IForm.cs" />
@@ -114,6 +116,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="PersistButton.htm" />
     <Content Include="FieldValidationIndicator.htm" />
     <Content Include="MultilineTextFieldValue.htm" />
     <Content Include="UnlabeledForm.htm" />

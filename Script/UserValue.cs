@@ -123,7 +123,7 @@ namespace BL.Forms
             {
                 Dialog d = new Dialog();
 
-                Control c = Context.Current.ObjectProvider.CreateObject("userLoginControl") as Control;
+                Control c = Context.Current.ObjectProvider.CreateObject("assignuserlogin") as Control;
 
                 d.Content = c;
                 d.MaxHeight = 400;

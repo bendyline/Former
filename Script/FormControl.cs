@@ -30,7 +30,7 @@ namespace BL.Forms
                 }
 
                 this.form = value;
-
+                this.OnFormChange();
                 this.Update();
             }
         }
@@ -38,6 +38,10 @@ namespace BL.Forms
         public virtual void PersistToItem()
         {
             
+        }
+
+        internal protected virtual void OnFormChange()
+        {
         }
 
         internal protected virtual void OnInterfaceChange()

@@ -36,6 +36,7 @@ namespace BL.Forms
         private InputElement addButton;
 
         private bool showAddButton = true;
+        private bool isEditingRow = false;
         private String addItemCta;
 
         private ItemSetEditorMode mode;
@@ -227,7 +228,8 @@ namespace BL.Forms
             }
 
             this.grid.Save += this.HandleSave;
-      //      this.grid.Edit += this.HandleEdit;
+            this.grid.Edit += this.HandleEdit;
+            this.grid.Cancel += this.HandleCancel;
             this.grid.Remove += grid_Remove;
         }
 
@@ -258,9 +260,19 @@ namespace BL.Forms
             }
         }
 
+        private void HandleCancel(ModelEventArgs oe)
+        {
+            this.isEditingRow = false;
+
+            this.UpdateIsEditing();
+        }
+
         private void HandleEdit(ModelEventArgs oe)
         {
-            Model model = oe.Model;
+            this.isEditingRow = true;
+
+            this.UpdateIsEditing();
+      /*      Model model = oe.Model;
 
             if (model != null)
             {
@@ -284,11 +296,15 @@ namespace BL.Forms
                         }
                     }
                 }
-            }
+            }*/
         }
 
         private void HandleSave(ModelEventArgs oe)
         {
+            this.isEditingRow = false;
+
+            this.UpdateIsEditing();
+
             Model model = oe.Model;
 
             if (model != null)
@@ -322,11 +338,26 @@ namespace BL.Forms
             this.Update();
         }
 
+        private void UpdateIsEditing()
+        {
+            if (this.addButton == null)
+            {
+                return;
+            }
+
+            if (this.isEditingRow)
+            {
+                this.addButton.Disabled = true;
+            }
+            else
+            {
+                this.addButton.Disabled = false;
+            }
+        }
+
 
         private void AddButtonClick(ElementEvent e)
         {
-            this.grid.SaveRow();
-
             Dictionary<String, object> newRow = new Dictionary<string, object>();
             IItem item = this.itemSet.Type.CreateItem();
             this.itemSet.Add(item);
@@ -339,7 +370,8 @@ namespace BL.Forms
             }
 
             newRow["id "] = item.LocalOnlyUniqueId;
-       /*     this.grid.AddRow();
+
+            /*     this.grid.AddRow();
 
             ObservableObject oo = this.grid.DataItem;
 
@@ -350,8 +382,8 @@ namespace BL.Forms
 
                 this.itemSet.Add(item);
             }*/
-        /*    
 
+        /*    
             this.grid.AddRow();
 
             int index = this.itemSet.Items.Count - 1;
@@ -545,7 +577,6 @@ namespace BL.Forms
 
                 GridColumn gcCommand = new GridColumn();
                 gcCommand.Command = new String[] { "edit", "destroy" };
-
                 go.Columns.Add(gcCommand);
 
                 List<object> objects = new List<object>();
@@ -569,6 +600,8 @@ namespace BL.Forms
                 this.grid.Options = go;
 
                 ds.Read();
+
+                this.UpdateIsEditing();
             }
         }
 
