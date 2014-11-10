@@ -21,6 +21,10 @@ namespace BL.Forms
         [ScriptName("c_grid")]
         private BL.UI.KendoControls.Grid grid;
 
+        [ScriptName("c_persist")]
+        private PersistButton persist;
+
+
         private List<IItem> itemsShown;
 
         private IDataStoreItemSet itemSet;
@@ -482,7 +486,13 @@ namespace BL.Forms
             if (this.addItemCta != null)
             {
                 this.addButton.Value = this.addItemCta;
-            }           
+            }
+
+            if (this.persist != null)
+            {
+                this.persist.ItemSet = this.ItemSet;
+                this.persist.ItemSetEditor = this;
+            }
 
             if (this.itemSet != null)
             {

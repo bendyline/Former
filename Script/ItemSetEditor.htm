@@ -34,12 +34,53 @@
                 color:#C0C0C0;
             }
 
+            #buttonArea
+            {
+                margin-top:20px;
+            }
+            
+            #toolbar
+            {
+                display:table;
+                width:100%;
+            }
+
+            #toolbarInner
+            {
+                display:table-row;
+            }
+            
+            #toolbarCell
+            {
+                display:table-cell;
+                vertical-align:top;
+                padding-top:20px;
+            }
+
+            #persistCell
+            {
+                text-align:right;
+            }
+
+            #spacerCell
+            {
+                width:100%;
+            }
+
         </style>
 	</head>
 	<body>        
         <div id="formBin"></div>
-        <div id="k-content">
-        <input type="button" id="addButton" class="k-button" value="add item"/>
+        <div id="toolbar">
+            <div id="toolbarInner">
+                <div data-ctl-class="toolbarCell">
+                    <input type="button" id="addButton" class="k-button" value="add item"/>
+                </div>       
+                <div id="persistCell" data-ctl-class="toolbarCell">
+                    <BL.Forms.PersistButton id="persist"/>
+                </div>
             </div>
+        </div>
+
     </body>
 </html>

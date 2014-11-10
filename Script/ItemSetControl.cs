@@ -14,18 +14,18 @@ namespace BL.Forms
     public class ItemSetControl : Control 
     {
         private IDataStoreItemSet itemSet;
-        private bool monitorItemEvents = true;
+        private bool monitorItemSetEvents = true;
 
         protected bool MonitorItemEvents
         {
             get
             {
-                return this.monitorItemEvents;
+                return this.monitorItemSetEvents;
             }
 
             set
             {
-                this.monitorItemEvents = value;
+                this.monitorItemSetEvents = value;
             }
         }
 
@@ -43,7 +43,7 @@ namespace BL.Forms
                     return;
                 }
 
-                if (this.itemSet != null && this.monitorItemEvents)
+                if (this.itemSet != null && this.monitorItemSetEvents)
                 {
                     this.itemSet.ItemSetChanged -= itemSet_ItemSetChanged;
                 }
@@ -52,7 +52,9 @@ namespace BL.Forms
 
                 this.itemSet = value;
 
-                if (this.itemSet != null && this.monitorItemEvents)
+                this.OnItemSetChanged();
+
+                if (this.itemSet != null && this.monitorItemSetEvents)
                 {
                     this.itemSet.ItemSetChanged += itemSet_ItemSetChanged;
                 }
@@ -69,6 +71,11 @@ namespace BL.Forms
         private void itemSet_ItemSetChanged(object sender, DataStoreItemSetEventArgs e)
         {
             this.Update();
+        }
+
+        protected virtual void OnItemSetChanged()
+        {
+
         }
     }
 }

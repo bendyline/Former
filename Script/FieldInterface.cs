@@ -19,6 +19,7 @@ namespace BL.Forms
         private FieldMode fieldMode;
         private Nullable<FieldInterfaceType> interfaceTypeOverride;
         private FieldInterfaceTypeOptions interfaceTypeOptionsOverride;
+        private PropertyChangedEventHandler interfaceTypeOptionsOverridePropertyChanged;
 
         [ScriptName("s_name")]
         public String Name
@@ -161,7 +162,14 @@ namespace BL.Forms
                     return;
                 }
 
+                if (this.interfaceTypeOptionsOverride != null)
+                {
+                    this.interfaceTypeOptionsOverride.PropertyChanged -= interfaceTypeOptionsOverridePropertyChanged;
+                }
+
                 this.interfaceTypeOptionsOverride = value;
+
+                this.interfaceTypeOptionsOverride.PropertyChanged += interfaceTypeOptionsOverridePropertyChanged;
 
                 this.NotifyPropertyChanged("InterfaceTypeOptionsOverride");
             }
@@ -211,6 +219,16 @@ namespace BL.Forms
 
         public FieldInterface()
         {
+            this.interfaceTypeOptionsOverridePropertyChanged = this.interfaceTypeOptionsOverride_PropertyChanged;
+
+            this.interfaceTypeOptionsOverride = new FieldInterfaceTypeOptions();
+
+            this.interfaceTypeOptionsOverride.PropertyChanged += interfaceTypeOptionsOverridePropertyChanged;
+        }
+
+        private void interfaceTypeOptionsOverride_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            this.NotifyPropertyChanged("InterfaceTypeOptionsOverride");
         }
 
         public bool IsEqualTo(FieldInterface settings)

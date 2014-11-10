@@ -183,7 +183,9 @@ namespace BL.Forms
 
         public void ConsiderFieldInterfaceUpdated()
         {
-            if (this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(this.fieldName) == this.fieldInterface)
+            FieldInterface current = this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(this.fieldName);
+
+            if (current == this.fieldInterface)
             {
                 return;
             }

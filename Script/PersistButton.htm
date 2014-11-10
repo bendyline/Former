@@ -12,32 +12,76 @@
             BODY
             {
                 text-align:center;
-                width:132px;
-                height:32px;
+                width:96px;
+                height:40px;
                 background-color:white;
                 vertical-align:middle;
                 text-align:center;
-                border: solid 1px #909090;
+                border: solid 1px #B0B0B0;
+                border-radius:4px;
                 transition: background-color .3s ease; 
                 cursor:default;
                 margin-left:3px;
                 margin-right:3px;
+                display:table;
+                transition: all 0.2s ease-in-out;
+            }
+
+            #animatingIcon
+            {
+                animation-name: rotate;
+                animation-duration: 2.5s;
+                animation-iteration-count: infinite;
+                animation-timing-function: linear;
+                transform-origin: 50% 50%;
+                width:30px;
+                height:24px;
+                vertical-align:middle;
+                text-align:center;
+                padding-bottom:2px;
             }
 
             #icon
             {
-                padding-top:5px;
+                width:30px;
+                height:24px;
+                vertical-align:middle;
+                text-align:center;
+                padding-bottom:2px;
+            }
+
+            #row
+            {
+                display:table-row;
+            }
+
+            #iconCell
+            {
+                display:table-cell;
+                width:32px;
+                padding-top:8px;
             }
 
             #text
             {
-                font-size:1pt;
+                display:table-cell;
+                font-size:medium;
                 cursor:default;
+                padding-top:8px;
+                vertical-align:top;
+                text-align:left;
+                transition: all 0.2s ease-in-out;
+                color:#808080;
             }
         </style>
 	</head>
 	<body>   
-        <div id="icon"></div>
-        <div id="text">Up to date</div>
+        <div id="row">
+            <div id="iconCell">
+                <div id="icon" style="display:none"><span class="glyphicon glyphicon-refresh"></span></div>
+                <div id="animatingIcon"  style="display:none"><span class="glyphicon glyphicon-refresh"></span></div>
+            </div>
+            <div id="text"></div>
+        </div>
     </body>
 </html>

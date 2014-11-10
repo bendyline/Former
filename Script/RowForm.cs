@@ -62,7 +62,10 @@ namespace BL.Forms
             }
             else if (this.specialButtonsCell != null && !this.ItemSetInterface.DisplayDeleteItemButton)
             {
-                this.Element.RemoveChild(this.specialButtonsCell);
+                if (this.Element != null)
+                {
+                    this.Element.RemoveChild(this.specialButtonsCell);
+                }
 
                 this.specialButtonsCell = null;
             }

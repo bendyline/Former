@@ -85,7 +85,7 @@ namespace BL.Forms
                 Element divOuterElement = this.CreateElement("buttonItemOuter");
                 Element divInnerElement = this.CreateElement("buttonItemInner");
 
-                ScaleType scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
+                Nullable<ScaleType> scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
 
                 divOuterElement.AppendChild(divInnerElement);
 
@@ -93,7 +93,7 @@ namespace BL.Forms
                 {
                     Element divButtonElement = this.CreateElement("buttonItemCell");
 
-                    if (scaleType == ScaleType.FiveAgree || scaleType == ScaleType.FiveValues)
+                    if (scaleType == ScaleType.FiveAgree || scaleType == ScaleType.FiveValues || scaleType == null)
                     {
                         InputElement b = (InputElement)this.CreateElementWithType("scaleButton", "INPUT");
                         b.Type = "radio";
@@ -199,7 +199,7 @@ namespace BL.Forms
 
         private void HandleButtonClick(ElementEvent e)
         {
-            ScaleType scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
+            Nullable<ScaleType> scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
             Element element = (Element)ElementUtilities.GetEventTarget(e);
 
             String val = (String)element.GetAttribute("Value");

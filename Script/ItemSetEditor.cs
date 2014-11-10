@@ -25,6 +25,9 @@ namespace BL.Forms
         [ScriptName("e_formBin")]
         private Element formBin;
 
+        [ScriptName("c_persist")]
+        private PersistButton persist;
+
         [ScriptName("e_item0")]
         private Element item0;
 
@@ -106,7 +109,8 @@ namespace BL.Forms
         private InputElement addButton;
 
         private bool useRowFormsIfPossible = true;
-        private bool showAddButton = true;
+        private bool displayAddButton = true;
+        private bool displayPersistButton = true;
         private String addItemCta;
 
         private Element headerRowElement;
@@ -114,6 +118,23 @@ namespace BL.Forms
         public event DataStoreItemEventHandler ItemAdded;
         public event DataStoreItemEventHandler ItemDeleted;
 
+        [ScriptName("b_displayPersistButton")]
+        public bool DisplayPersistButton
+        {
+            get
+            {
+                return this.displayPersistButton;
+            }
+
+            set
+            {
+                this.displayPersistButton = value;
+
+                this.Update();
+            }
+        }
+
+        [ScriptName("s_addItemCta")]
         public String AddItemCta
         {
             get
@@ -168,16 +189,17 @@ namespace BL.Forms
             }
         }
 
+        [ScriptName("b_displayAddButton")]
         public bool DisplayAddButton
         {
             get
             {
-                return this.showAddButton;
+                return this.displayAddButton;
             }
 
             set
             {
-                this.showAddButton = value;
+                this.displayAddButton = value;
 
                 this.ApplyAddButtonVisibility();
             }
@@ -300,7 +322,7 @@ namespace BL.Forms
                 return;
             }
 
-            if (this.showAddButton)
+            if (this.displayAddButton)
             {
                 this.addButton.Style.Display = "block";
             }
@@ -596,7 +618,22 @@ namespace BL.Forms
             if (this.addItemCta != null)
             {
                 this.addButton.Value = this.addItemCta;
-            }           
+            }      
+
+            if (this.persist != null)
+            {
+                if (this.displayPersistButton)
+                {
+                    this.persist.Element.Style.Display = "";
+                }
+                else
+                {
+                    this.persist.Element.Style.Display = "none";
+                }
+
+                this.persist.ItemSet = this.ItemSet;
+                this.persist.ItemSetEditor = this;
+            }
 
             List<IItem> itemsNotSeen = new List<IItem>();
 

@@ -10,21 +10,53 @@
         <!-- end sample preview content -->
 
         <style>
-            #addButton
-            {
-                margin-top:20px;
-            }
-
             #formBin
             {
                 display:table;
             }
+
+            #toolbar
+            {
+                display:table;
+                width:100%;
+            }
+
+            #toolbarInner
+            {
+                display:table-row;
+            }
+            
+            #toolbarCell
+            {
+                display:table-cell;
+                vertical-align:top;
+                padding-top:20px;
+            }
+
+            #persistCell
+            {
+                text-align:right;
+            }
+
+            #spacerCell
+            {
+                width:100%;
+            }
+
         </style>
 	</head>
 	<body>        
         <BL.UI.KendoControls.Grid id="grid"/>
-        <div id="k-content">
-        <input type="button" id="addButton" class="k-button" value="add item"/>
+        <div id="toolbar">
+            <div id="toolbarInner">
+                <div data-ctl-class="toolbarCell">
+                    <input type="button" id="addButton" class="k-button" value="add item"/>
+                </div>       
+                <div data-ctl-class="toolbarCell" id="spacerCell">&#160;</div>    
+                <div id="persistCell" data-ctl-class="toolbarCell">
+                    <BL.Forms.PersistButton id="persist"/>
+                </div>
             </div>
+        </div>
     </body>
 </html>

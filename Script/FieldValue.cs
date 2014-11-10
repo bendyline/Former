@@ -123,6 +123,10 @@ namespace BL.Forms
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
                 }
+                else
+                {
+                    this.ApplyToControl(this.fieldControl);
+                }
             }
         }
 
