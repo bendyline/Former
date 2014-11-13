@@ -15,6 +15,37 @@ namespace BL.Forms
         private bool displayDeleteItemButton = true;
         private FieldInterfaceCollection fieldInterfaces;
 
+        private String accentColor1;
+        private String accentColor2;
+
+        [ScriptName("s_accentColor1")]
+        public String AccentColor1
+        {
+            get
+            {
+                return this.accentColor1;
+            }
+
+            set
+            {
+                this.accentColor1 = value;
+            }
+        }
+
+        [ScriptName("s_accentColor2")]
+        public String AccentColor2
+        {
+            get
+            {
+                return this.accentColor2;
+            }
+
+            set
+            {
+                this.accentColor2 = value;
+            }
+        }
+
         [ScriptName("i_mode")]
         public FormMode Mode
         {

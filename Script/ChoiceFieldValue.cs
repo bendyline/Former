@@ -118,9 +118,31 @@ namespace BL.Forms
                         InputElement b = (InputElement)this.CreateElementWithType(className, "INPUT");
                         b.Type = "button";
 
+                        if (this.Form.ItemSetInterface != null)
+                        {
+                            String color = this.Form.ItemSetInterface.AccentColor1;
+
+                            if (color != null)
+                            {
+                                // selected = natural (darker) accent color
+                                if (id == fc.DisplayName)
+                                {
+                                    b.Style.BackgroundColor = color;
+                                }
+                                else
+                                {
+
+                                    color = ColorDefinition.CreateFromString(color).GetPrecentageAdjustedColor(.25).ToString();
+
+                                    b.Style.BackgroundColor = color;
+                                }
+                            }
+                        }
+
                         b.SetAttribute("choiceId", fc.DisplayName);
                         b.AddEventListener("click", this.HandleButtonClick, true);
                         b.Value = fc.DisplayName;
+
                         this.choiceBin.AppendChild(b);
                     }
                 }
