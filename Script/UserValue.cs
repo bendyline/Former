@@ -177,7 +177,7 @@ namespace BL.Forms
                     {
                         this.activeReference = new UserReference();
 
-                        this.activeReference.ApplyObject(Json.Parse(value));
+                        this.activeReference.ApplyString(value);
 
                         if (this.activeReference.Id != null && this.activeReference.NickName != null)
                         {

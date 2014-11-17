@@ -47,7 +47,7 @@ namespace BL.Forms
                     interfaceType = (FieldInterfaceType)altInterfaceType;
                 }
 
-                if (interfaceType != previousInterfaceType)
+                if (interfaceType != previousInterfaceType || this.fieldControl == null)
                 {
                     previousInterfaceType = interfaceType;
 

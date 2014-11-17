@@ -25,12 +25,6 @@ namespace BL.Forms
 
         }
 
-        protected override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-        }
-
         private String GetOptionsHash()
         {
             String results = this.EffectiveMode.ToString();

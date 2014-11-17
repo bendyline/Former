@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using BL.UI.KendoControls;
 using Kendo.UI;
 using kendo.data;
+using System.Serialization;
 
 namespace BL.Forms
 {
@@ -25,8 +26,12 @@ namespace BL.Forms
         private PersistButton persist;
 
 
+        private DataStoreItemEventHandler itemInSetChanged;
+        private DataStoreItemSetEventHandler itemSetChanged;
+
         private List<IItem> itemsShown;
 
+        private List<Field> userListFields;
         private IDataStoreItemSet itemSet;
         private DataSource activeDataSource;
 
@@ -39,15 +44,21 @@ namespace BL.Forms
         [ScriptName("e_addButton")]
         private InputElement addButton;
 
-        private bool showAddButton = true;
+        [ScriptName("e_exportButton")]
+        private InputElement exportButton;
+
+        private bool displayAddButton = true;
         private bool isEditingRow = false;
         private String addItemCta;
 
         private ItemSetEditorMode mode;
-        private PropertyChangedEventHandler propertyChanged;
+        private PropertyChangedEventHandler itemSetInterfacePropertyChanged;
+        private PropertyChangedEventHandler fieldPropertyChanged;
         private NotifyCollectionChangedEventHandler collectionChanged;
         public event DataStoreItemEventHandler ItemAdded;
         public event DataStoreItemEventHandler ItemDeleted;
+
+        private Dictionary<String, Form> formsByItemId;
 
         public ItemSetInterface ItemSetInterface
         {
@@ -65,11 +76,15 @@ namespace BL.Forms
 
                 if (this.itemSetInterface != null)
                 {
+                    this.itemSetInterface.PropertyChanged -= this.itemSetInterfacePropertyChanged;
                     this.itemSetInterface.FieldInterfaces.CollectionChanged -= this.collectionChanged;
                 }
 
                 this.itemSetInterface = value;
 
+                this.Update();
+
+                this.itemSetInterface.PropertyChanged += this.itemSetInterfacePropertyChanged;
                 this.itemSetInterface.FieldInterfaces.CollectionChanged += this.collectionChanged;
             }
         }
@@ -83,7 +98,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.itemPlacementFieldName == value)
+                {
+                    return;
+                }
+
                 this.itemPlacementFieldName = value;
+
+                this.Update();
             }
         }
 
@@ -96,7 +118,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.itemFormTemplateId == value)
+                {
+                    return;
+                }
+
                 this.itemFormTemplateId = value;
+
+                this.Update();
             }
         }
 
@@ -109,7 +138,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.itemFormTemplateIdSmall == value)
+                {
+                    return;
+                }
+
                 this.itemFormTemplateIdSmall = value;
+
+                this.Update();
             }
         }
 
@@ -123,7 +159,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.mode == value)
+                {
+                    return;
+                }
+
                 this.mode = value;
+
+                this.Update();
             }
         }
 
@@ -137,7 +180,14 @@ namespace BL.Forms
 
             set
             {
+                if (this.addItemCta == value)
+                {
+                    return;
+                }
+
                 this.addItemCta = value;
+
+                return;
             }
         }
 
@@ -145,12 +195,17 @@ namespace BL.Forms
         {
             get
             {
-                return this.showAddButton;
+                return this.displayAddButton;
             }
 
             set
             {
-                this.showAddButton = value;
+                if (this.displayAddButton == value)
+                {
+                    return;
+                }
+
+                this.displayAddButton = value;
 
                 this.ApplyAddButtonVisibility();
             }
@@ -172,14 +227,14 @@ namespace BL.Forms
 
                 if (this.itemSet != null)
                 {
-                    this.itemSet.ItemSetChanged -= itemSet_ItemSetChanged;
+                    this.itemSet.ItemSetChanged -= this.itemSetChanged;
                 }
 
                 this.itemSet = value;
 
                 if (this.itemSet != null)
                 {
-                    this.itemSet.ItemSetChanged += itemSet_ItemSetChanged;
+                    this.itemSet.ItemSetChanged += this.itemSetChanged;
 
                     this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
                 }
@@ -193,7 +248,13 @@ namespace BL.Forms
         public GridItemSetEditor()
         {
             this.itemsShown = new List<IItem>();
-            this.propertyChanged = fs_PropertyChanged;
+            this.formsByItemId = new Dictionary<string, Form>();
+
+            this.itemInSetChanged = this.itemSet_ItemInSetChanged;
+            this.itemSetChanged = this.itemSet_ItemSetChanged;
+
+            this.itemSetInterfacePropertyChanged = itemSetOrFieldInterface_PropertyChanged;
+            this.fieldPropertyChanged = itemSetOrFieldInterface_PropertyChanged;
             this.collectionChanged = FieldSettingsCollection_CollectionChanged;
         }
 
@@ -209,7 +270,7 @@ namespace BL.Forms
                 return;
             }
 
-            if (this.showAddButton)
+            if (this.displayAddButton)
             {
                 this.addButton.Style.Display = "block";
             }
@@ -229,6 +290,12 @@ namespace BL.Forms
                 this.addButton.AddEventListener("touchstart", this.AddButtonClick, true);
 
                 this.ApplyAddButtonVisibility();
+            }
+
+            if (this.exportButton != null)
+            {
+                this.exportButton.AddEventListener("mousedown", this.ExportButtonClick, true);
+                this.exportButton.AddEventListener("touchstart", this.ExportButtonClick, true);
             }
 
             this.grid.Save += this.HandleSave;
@@ -331,7 +398,7 @@ namespace BL.Forms
             }
         }
 
-        private void fs_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void itemSetOrFieldInterface_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             this.Update();
         }
@@ -359,6 +426,10 @@ namespace BL.Forms
             }
         }
 
+        private void ExportButtonClick(ElementEvent e)
+        {
+            this.grid.SaveAsExcel();
+        }
 
         private void AddButtonClick(ElementEvent e)
         {
@@ -372,8 +443,6 @@ namespace BL.Forms
 
                 this.ItemAdded(this, dsiea);
             }
-
-            newRow["id "] = item.LocalOnlyUniqueId;
 
             /*     this.grid.AddRow();
 
@@ -408,6 +477,11 @@ namespace BL.Forms
         public void Save()
         {
      
+        }
+
+        private void itemSet_ItemInSetChanged(object sender, DataStoreItemEventArgs e)
+        {
+            this.Update();
         }
 
         private void itemSet_ItemSetChanged(object sender, DataStoreItemSetEventArgs e)
@@ -497,6 +571,11 @@ namespace BL.Forms
             if (this.itemSet != null)
             {
                 GridOptions go = new GridOptions();
+
+                go.Filterable = true;
+                go.Sortable = new GridSortableOptions();
+                go.Sortable.Mode = "single";
+                go.Scrollable = true;
     //            go.Toolbar = new String[] { "create" };
                 GridEditableOptions geo = new GridEditableOptions();
                 geo.Mode = "inline";
@@ -528,14 +607,16 @@ namespace BL.Forms
                 mfId.Editable = false;
                 m.Fields["id"] = mfId;
 
+                int userFieldCount = 0;
+
                 foreach (Field field in sortedFields)
                 {
                     FieldInterface fs = this.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
 
                     if (fs != null)
                     {
-                        fs.PropertyChanged -= this.propertyChanged;
-                        fs.PropertyChanged += this.propertyChanged;
+                        fs.PropertyChanged -= this.fieldPropertyChanged;
+                        fs.PropertyChanged += this.fieldPropertyChanged;
                     }
 
                     DisplayState afs = this.GetAdjustedDisplayState(field.Name);
@@ -570,6 +651,54 @@ namespace BL.Forms
                         else
                         {
                             mf.Type = "string";
+                        }
+
+                        if ((field.InterfaceType == FieldInterfaceType.User && fs.InterfaceTypeOverride == null) || fs.InterfaceTypeOverride == FieldInterfaceType.User)
+                        {
+
+                            if (userFieldCount == 0)
+                            {
+                                this.userListFields = new List<Field>();
+                            }
+
+
+                            this.userListFields.Add(field);
+
+                            // SUPER HACKY workaround: in a template display function, we don't know what field to pull to
+                            // display the user for an item.
+                            // so, use some pre-defined functions that will display using the appropriate field from the item
+                            // base on the ordinal of the user field we're processing here.
+                            switch (userFieldCount)
+                            {
+                                case 0:
+                                    gc.Template = this.UserItemTemplateDisplay0;
+                                    break;
+
+                                case 1:
+                                    gc.Template = this.UserItemTemplateDisplay1;
+                                    break;
+
+
+                                case 2:
+                                    gc.Template = this.UserItemTemplateDisplay2;
+                                    break;
+
+                                case 3:
+                                    gc.Template = this.UserItemTemplateDisplay3;
+                                    break;
+
+                                default:
+                                    gc.Template = this.AmbiguousResponse;
+                                    break;
+                            }
+
+                            userFieldCount++;
+                        }
+
+                        
+                        if ((field.InterfaceType != FieldInterfaceType.TypeDefault && fs.InterfaceTypeOverride == null) || (fs.InterfaceTypeOverride != null && fs.InterfaceTypeOverride != FieldInterfaceType.TypeDefault))
+                        {
+                            gc.Editor = this.ColumnChoiceCreator;
                         }
 
                         if (fs.Mode == FieldMode.View)
@@ -613,6 +742,105 @@ namespace BL.Forms
 
                 this.UpdateIsEditing();
             }
+        }
+
+        private String UserItemTemplateDisplay0(object item)
+        {
+            return this.GetUserValueByIndex(item, 0);
+        }
+
+        private String UserItemTemplateDisplay1(object item)
+        {
+            return this.GetUserValueByIndex(item, 1);
+        }
+
+        private String UserItemTemplateDisplay2(object item)
+        {
+            return this.GetUserValueByIndex(item, 2);
+        }
+
+        private String UserItemTemplateDisplay3(object item)
+        {
+            return this.GetUserValueByIndex(item, 3);
+        }
+
+        private String AmbiguousResponse(object item)
+        {
+            return String.Empty;
+        }
+
+        private String GetUserValueByIndex(object item, int index)
+        {
+            Field f = this.userListFields[index];
+
+            String userFieldValue = null;
+
+            Script.Literal("{0} = {1}[{2}]", userFieldValue, item, f.Name);
+
+            if (userFieldValue == null)
+            {
+                return String.Empty;
+            }
+
+            userFieldValue = userFieldValue.Trim();
+
+            if (userFieldValue.StartsWith("{") && userFieldValue.EndsWith("}"))
+            {
+                UserReference ur = new UserReference();
+
+                ur.ApplyString(userFieldValue);
+
+                return ur.NickName;
+            }
+
+            return userFieldValue;
+        }
+
+        private void ColumnChoiceCreator(jQueryObject container, GridColumnUserInterfaceFactoryOptions options)
+        {
+            String id = null;
+
+            Script.Literal("{1} = {0}.model.LocalOnlyUniqueId", options, id);
+
+            if (id != null)
+            {
+                IItem item = this.ItemSet.GetItemByLocalOnlyUniqueId(id);
+
+                if (item != null)
+                {
+                    Item objectItem = new Item(item.Type);
+                    objectItem.Data = options.Model;
+
+                    Form f = this.EnsureForm(item);
+                    f.ItemSetInterface = this.ItemSetInterface;
+                    f.Item = objectItem;
+
+                    FieldValue chfe = new FieldValue();
+
+                  
+                    chfe.Item = objectItem;
+                    chfe.Form = f;
+                    chfe.FieldName = options.Field;
+                
+                    chfe.EnsureElements();
+
+                    container.GetElement(0).AppendChild(chfe.Element);
+                }
+            }
+        }
+
+        private Form EnsureForm(IItem item)
+        {
+            if (this.formsByItemId.ContainsKey(item.Id))
+            {
+                return this.formsByItemId[item.Id];
+            }
+
+            Form f = new Form();
+
+            this.formsByItemId[item.Id] = f;
+
+            return f;
         }
 
         private object CreateDataObjectForItem(IItem item)
