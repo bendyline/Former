@@ -15,7 +15,7 @@ namespace BL.Forms
         private DisplayState display;
         private FieldChoiceCollection choicesOverride;
         private String name;
-        private int order;
+        private Nullable<int> order;
         private FieldMode fieldMode;
         private Nullable<FieldInterfaceType> interfaceTypeOverride;
         private FieldInterfaceTypeOptions interfaceTypeOptionsOverride;
@@ -106,7 +106,7 @@ namespace BL.Forms
         }
 
         [ScriptName("i_order")]
-        public int Order
+        public Nullable<int> Order
         {
             get
             {

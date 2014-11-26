@@ -516,14 +516,28 @@ namespace BL.Forms
 
             if (fieldSettingsA != null)
             {
-                orderA = fieldSettingsA.Order;
+                if (fieldSettingsA.Order == null)
+                {
+                    orderA = 0;
+                }
+                else
+                {
+                    orderA = (int)fieldSettingsA.Order;
+                }
             }
 
             int orderB = -1;
 
             if (fieldSettingsB != null)
             {
-                orderB = fieldSettingsB.Order;
+                if (fieldSettingsB == null)
+                {
+                    orderB = 0;
+                }
+                else
+                {
+                    orderB = (int)fieldSettingsB.Order;
+                }
             }
 
             if (orderA < 0)

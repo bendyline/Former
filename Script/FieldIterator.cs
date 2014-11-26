@@ -189,7 +189,14 @@ namespace BL.Forms
 
             if (fieldInterfaceA != null)
             {
-                orderA = fieldInterfaceA.Order;
+                if (fieldInterfaceA.Order == null)
+                {
+                    orderA = 0;
+                }
+                else
+                {
+                    orderA = (int)fieldInterfaceA.Order;
+                }
             }
 
 
@@ -197,7 +204,14 @@ namespace BL.Forms
 
             if (fieldInterfaceB != null)
             {
-                orderB = fieldInterfaceB.Order;
+                if (fieldInterfaceB.Order == null)
+                {
+                    orderB = 0;
+                }
+                else
+                {
+                    orderB = (int)fieldInterfaceB.Order;
+                }
             }
 
             if (orderA < 0)

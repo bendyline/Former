@@ -110,6 +110,7 @@ namespace BL.Forms
             this.fieldInterfaces = new FieldInterfaceCollection();
         }
 
+
         public int CompareFields(Field fieldA, Field fieldB)
         {
             FieldInterfaceCollection fsc = this.FieldInterfaces;
@@ -126,14 +127,14 @@ namespace BL.Forms
 
             if (fieldSettingsA != null)
             {
-                orderA = fieldSettingsA.Order;
+                orderA = (int)fieldSettingsA.Order;
             }
 
             int orderB = -1;
 
             if (fieldSettingsB != null)
             {
-                orderB = fieldSettingsB.Order;
+                orderB = (int)fieldSettingsB.Order;
             }
 
             if (orderA < 0)
