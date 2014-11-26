@@ -89,6 +89,8 @@ namespace BL.Forms
 
             sortedFields.Sort(this.CompareFields);
 
+            ElementUtilities.ClearChildElements(this.fieldBin);
+
             foreach (Field field in sortedFields)
             {
                 FieldInterface fs = this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
@@ -121,8 +123,6 @@ namespace BL.Forms
 
                         ff.EnsureElements();
 
-                        this.fieldBin.AppendChild(ff.Element);
-
                         this.fields.Add(ff);
 
                         this.fieldsByName[field.Name] = ff;
@@ -137,6 +137,8 @@ namespace BL.Forms
 
                         fieldsNotUsed.Remove(ff);
                     }
+
+                    this.fieldBin.AppendChild(ff.Element);
 
                     FieldMode fm = this.Form.GetFieldModeOverride(field.Name);
 
@@ -185,30 +187,22 @@ namespace BL.Forms
                 return fieldA.Name.CompareTo(fieldB.Name);
             }
 
-            int orderA = -1;
+            int orderA = 0;
 
             if (fieldInterfaceA != null)
             {
-                if (fieldInterfaceA.Order == null)
-                {
-                    orderA = 0;
-                }
-                else
+                if (fieldInterfaceA.Order != null)
                 {
                     orderA = (int)fieldInterfaceA.Order;
                 }
             }
 
 
-            int orderB = -1;
+            int orderB = 0;
 
             if (fieldInterfaceB != null)
             {
-                if (fieldInterfaceB.Order == null)
-                {
-                    orderB = 0;
-                }
-                else
+                if (fieldInterfaceB.Order != null)
                 {
                     orderB = (int)fieldInterfaceB.Order;
                 }

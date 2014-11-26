@@ -19,12 +19,13 @@ namespace BL.Forms
 
     public class GridItemSetEditor : Control, IItemSetEditor
     {
-        [ScriptName("c_grid")]
-        private BL.UI.KendoControls.Grid grid;
+        [ScriptName("e_gridContainer")]
+        private Element gridContainer;
 
         [ScriptName("c_persist")]
         private PersistButton persist;
 
+        private BL.UI.KendoControls.Grid grid;
 
         private DataStoreItemEventHandler itemInSetChanged;
         private DataStoreItemSetEventHandler itemSetChanged;
@@ -54,9 +55,16 @@ namespace BL.Forms
         private ItemSetEditorMode mode;
         private PropertyChangedEventHandler itemSetInterfacePropertyChanged;
         private PropertyChangedEventHandler fieldPropertyChanged;
-        private NotifyCollectionChangedEventHandler collectionChanged;
+        private NotifyCollectionChangedEventHandler fieldInterfaceCollectionChanged;
         public event DataStoreItemEventHandler ItemAdded;
         public event DataStoreItemEventHandler ItemDeleted;
+
+        private event ModelEventHandler gridSave;
+        private event ModelEventHandler gridEdit;
+        private event ModelEventHandler gridRemove;
+        private event ModelEventHandler gridCancel;
+
+
 
         private Dictionary<String, Form> formsByItemId;
 
@@ -77,7 +85,7 @@ namespace BL.Forms
                 if (this.itemSetInterface != null)
                 {
                     this.itemSetInterface.PropertyChanged -= this.itemSetInterfacePropertyChanged;
-                    this.itemSetInterface.FieldInterfaces.CollectionChanged -= this.collectionChanged;
+                    this.itemSetInterface.FieldInterfaces.CollectionChanged -= this.fieldInterfaceCollectionChanged;
                 }
 
                 this.itemSetInterface = value;
@@ -85,7 +93,7 @@ namespace BL.Forms
                 this.Update();
 
                 this.itemSetInterface.PropertyChanged += this.itemSetInterfacePropertyChanged;
-                this.itemSetInterface.FieldInterfaces.CollectionChanged += this.collectionChanged;
+                this.itemSetInterface.FieldInterfaces.CollectionChanged += this.fieldInterfaceCollectionChanged;
             }
         }
 
@@ -255,7 +263,14 @@ namespace BL.Forms
 
             this.itemSetInterfacePropertyChanged = itemSetOrFieldInterface_PropertyChanged;
             this.fieldPropertyChanged = itemSetOrFieldInterface_PropertyChanged;
-            this.collectionChanged = FieldSettingsCollection_CollectionChanged;
+            this.fieldInterfaceCollectionChanged = FieldInterfaceCollection_CollectionChanged;
+
+
+            this.gridSave = this.HandleSave;
+            this.gridEdit =  this.HandleEdit;
+            this.gridCancel = this.HandleCancel;
+            this.gridRemove = this.grid_Remove;
+
         }
 
         public void DisposeItemInterfaceItems()
@@ -297,11 +312,6 @@ namespace BL.Forms
                 this.exportButton.AddEventListener("mousedown", this.ExportButtonClick, true);
                 this.exportButton.AddEventListener("touchstart", this.ExportButtonClick, true);
             }
-
-            this.grid.Save += this.HandleSave;
-            this.grid.Edit += this.HandleEdit;
-            this.grid.Cancel += this.HandleCancel;
-            this.grid.Remove += grid_Remove;
         }
 
         private void grid_Remove(ModelEventArgs e)
@@ -404,7 +414,7 @@ namespace BL.Forms
         }
 
 
-        private void FieldSettingsCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void FieldInterfaceCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             this.Update();
         }
@@ -566,10 +576,32 @@ namespace BL.Forms
  
         protected override void OnUpdate()
         {
-            if (this.grid == null)
+            if (this.gridContainer == null)
             {
                 return;
             }
+
+            ElementUtilities.ClearChildElements(this.gridContainer);
+
+            if (this.grid != null)
+            {
+                this.grid.Save -= this.gridSave;
+                this.grid.Edit -= this.gridEdit;
+                this.grid.Cancel -= this.gridCancel;
+                this.grid.Remove -= this.gridRemove; 
+            }
+
+            this.grid = new BL.UI.KendoControls.Grid();
+
+            this.grid.Save += this.gridSave;
+            this.grid.Edit += this.gridEdit;
+            this.grid.Cancel += this.gridCancel;
+            this.grid.Remove += this.gridRemove; 
+
+            this.grid.EnsureElements();
+
+            this.gridContainer.AppendChild(this.grid.Element);
+
 
             if (this.addItemCta != null)
             {

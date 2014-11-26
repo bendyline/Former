@@ -40,6 +40,8 @@ namespace BL.Forms
                 return;
             }
 
+            ElementUtilities.ClearChildElements(this.Element);
+
             List<LabeledField> fieldsNotUsed = new List<LabeledField>();
 
             foreach (LabeledField lf in fields)
@@ -61,12 +63,7 @@ namespace BL.Forms
                 this.specialButtonsCell.AppendChild(this.deleteButton);
             }
             else if (this.specialButtonsCell != null && !this.ItemSetInterface.DisplayDeleteItemButton)
-            {
-                if (this.Element != null)
-                {
-                    this.Element.RemoveChild(this.specialButtonsCell);
-                }
-
+            {   
                 this.specialButtonsCell = null;
             }
 
@@ -77,7 +74,6 @@ namespace BL.Forms
                     this.Element.AppendChild(this.specialButtonsCell);
                 }
             }
-
 
             List<Field> sortedFields = new List<Field>();
 
@@ -113,10 +109,12 @@ namespace BL.Forms
                     {
                         fieldsNotUsed.Remove(ff);
                     }
+                    Element cellElement = null;
+
 
                     if (ff.Element == null || ff.Element.ParentNode == null)
                     {
-                        Element cellElement = this.CreateElement("cell");
+                        cellElement = this.CreateElement("cell");
 
                         ff.Form = this;
                         ff.FieldName = field.Name;
@@ -124,15 +122,19 @@ namespace BL.Forms
                         ff.EnsureElements();
 
                         cellElement.AppendChild(ff.Element);
+                    }
+                    else                       
+                    {
+                        cellElement = ff.Element.ParentNode;
+                    }
 
-                        if (this.specialButtonsCell != null)
-                        {
-                            this.Element.InsertBefore(cellElement, this.specialButtonsCell);
-                        }
-                        else
-                        {
-                            this.Element.AppendChild(cellElement);
-                        }
+                    if (this.specialButtonsCell != null)
+                    {
+                        this.Element.InsertBefore(cellElement, this.specialButtonsCell);
+                    }
+                    else
+                    {
+                        this.Element.AppendChild(cellElement);
                     }
 
                     FieldMode fm = this.GetFieldModeOverride(field.Name);
@@ -156,7 +158,14 @@ namespace BL.Forms
                 {
                     if (f.Element.ParentNode != null)
                     {
-                        this.Element.RemoveChild(f.Element.ParentNode);
+                        try
+                        {
+                            this.Element.RemoveChild(f.Element.ParentNode);
+                        }
+                        catch (Exception)
+                        { 
+                            ;
+                        }
                     }
                 }
 

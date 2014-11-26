@@ -18,6 +18,24 @@ namespace BL.Forms
         private String accentColor1;
         private String accentColor2;
 
+        public Nullable<int> MaxFieldOrder
+        {
+            get
+            {
+                int max = 0;
+
+                foreach (FieldInterface fi in this.FieldInterfaces)
+                {
+                    if (fi.Order != null && ((int)fi.Order) > max)
+                    {
+                        max = (int)fi.Order;
+                    }
+                }
+
+                return max;
+            }
+        }
+
         [ScriptName("s_accentColor1")]
         public String AccentColor1
         {
