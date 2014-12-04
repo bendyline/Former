@@ -49,6 +49,8 @@ namespace BL.Forms
         private InputElement exportButton;
 
         private bool displayAddButton = true;
+        private bool displayPersistButton = true;
+
         private bool isEditingRow = false;
         private String addItemCta;
 
@@ -196,6 +198,22 @@ namespace BL.Forms
                 this.addItemCta = value;
 
                 return;
+            }
+        }
+
+        [ScriptName("b_displayPersistButton")]
+        public bool DisplayPersistButton
+        {
+            get
+            {
+                return this.displayPersistButton;
+            }
+
+            set
+            {
+                this.displayPersistButton = value;
+
+                this.Update();
             }
         }
 
@@ -610,9 +628,19 @@ namespace BL.Forms
 
             if (this.persist != null)
             {
+                if (this.displayPersistButton)
+                {
+                    this.persist.Element.Style.Display = "";
+                }
+                else
+                {
+                    this.persist.Element.Style.Display = "none";
+                }
+
                 this.persist.ItemSet = this.ItemSet;
                 this.persist.ItemSetEditor = this;
             }
+
 
             if (this.itemSet != null)
             {

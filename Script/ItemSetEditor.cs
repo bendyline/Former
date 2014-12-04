@@ -624,11 +624,11 @@ namespace BL.Forms
             {
                 if (this.displayPersistButton)
                 {
-                    this.persist.Element.Style.Display = "";
+                    this.persist.Visible = true;
                 }
                 else
                 {
-                    this.persist.Element.Style.Display = "none";
+                    this.persist.Visible = false;
                 }
 
                 this.persist.ItemSet = this.ItemSet;

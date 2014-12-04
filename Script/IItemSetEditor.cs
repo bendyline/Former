@@ -34,7 +34,7 @@ namespace BL.Forms
 
         [ScriptName("b_visible")]
         bool Visible { get; set; }
-        
+
         [ScriptName("s_templateId")]
         String TemplateId { get; set; }
 

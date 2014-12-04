@@ -47,8 +47,21 @@ namespace BL.Forms
 
         private String GenerateOptionHash()
         {
-            String results = this.EffectiveMode.ToString();
+            String results = this.EffectiveMode.ToString() + "|";
 
+            if (this.Field.InterfaceTypeOptions.ScaleType != null)
+            {
+                results += (int)this.Field.InterfaceTypeOptions.ScaleType;
+            }
+
+            if (this.FieldInterface != null)
+            {
+                if (this.FieldInterface.InterfaceTypeOptionsOverride.ScaleType != null)
+                {
+                    results += (int)this.FieldInterface.InterfaceTypeOptionsOverride.ScaleType;
+                }
+
+            }
             return results;
         }
 
@@ -88,12 +101,18 @@ namespace BL.Forms
                 Nullable<ScaleType> scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
 
                 divOuterElement.AppendChild(divInnerElement);
+                int valueCount = 5;
 
-                for (int i = 0; i < 5; i++)
+                if (scaleType == ScaleType.SevenValues)
+                {
+                    valueCount = 7;
+                }
+
+                for (int i = 0; i < valueCount; i++)
                 {
                     Element divButtonElement = this.CreateElement("buttonItemCell");
 
-                    if (scaleType == ScaleType.FiveAgree || scaleType == ScaleType.FiveValues || scaleType == null)
+                    if (scaleType == ScaleType.FiveAgree || scaleType == ScaleType.FiveValues || scaleType == ScaleType.SevenValues || scaleType == null)
                     {
                         InputElement b = (InputElement)this.CreateElementWithType("scaleButton", "INPUT");
                         b.Type = "radio";
