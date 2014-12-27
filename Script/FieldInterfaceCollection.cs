@@ -158,6 +158,22 @@ namespace BL.Forms
             return fs;
         }
 
+        public bool MoveFieldInterface(String oldStorageFieldName, String newFieldStorageFieldName)
+        {
+            FieldInterface fi = this.GetByStorageFieldName(oldStorageFieldName);
+
+            if (fi == null)
+            {
+                return false;
+            }
+
+            this.fieldsByStorageFieldName[oldStorageFieldName] = null;
+            this.fieldsByStorageFieldName[newFieldStorageFieldName] = fi;
+            fi.Name = newFieldStorageFieldName;
+
+            return true;
+        }
+
         public FieldInterface GetByStorageFieldName(String storageFieldName)
         {
             return this.fieldsByStorageFieldName[storageFieldName];
