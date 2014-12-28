@@ -35,6 +35,10 @@ namespace BL.Forms
             {
                 this.textInput.AddEventListener("change", this.HandleTextInputChanged, true);
                 this.textInput.AddEventListener("keyup", this.HandleTextInputKeyPressed, true);
+
+                jQueryObject jqo = jQuery.FromObject(this.textInput);
+
+                Script.Literal("{0}.kendoValidator().data(\"kendoValidator\")", jqo);
             }
         }
 
