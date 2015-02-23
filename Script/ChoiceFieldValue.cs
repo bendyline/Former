@@ -42,7 +42,7 @@ namespace BL.Forms
 
             foreach (FieldChoice fc in fcc)
             {
-                results += "|" + fc.Id + "|";
+                results += "|" + fc.Id + "|" + fc.DisplayName + "|";
             }
 
             results += id;
