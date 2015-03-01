@@ -601,11 +601,11 @@ namespace BL.Forms
             this.formsByLocalId = new Dictionary<string, Form>();
         }
 
-        public override void Dispose()
+        protected override void OnTemplateDisposed()
         {
             this.DisposeItemInterfaceItems();
 
-            base.Dispose();
+            base.OnTemplateDisposed();
         }
 
         protected override void OnUpdate()

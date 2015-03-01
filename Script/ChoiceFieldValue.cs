@@ -50,6 +50,13 @@ namespace BL.Forms
             return results;
         }
 
+        protected override void OnItemChanged()
+        {
+            base.OnItemChanged();
+
+            this.Update();
+        }
+
         protected override void OnUpdate()
         {
             base.OnUpdate();

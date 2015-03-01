@@ -68,7 +68,12 @@ namespace BL.Forms
 
         private void item_ItemChanged(object sender, DataStoreItemEventArgs e)
         {
-            this.Update();
+            this.OnItemChanged();
+        }
+
+        protected virtual void OnItemChanged()
+        {
+
         }
     }
 }

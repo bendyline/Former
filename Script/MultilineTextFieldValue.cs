@@ -27,6 +27,13 @@ namespace BL.Forms
 
         }
 
+        protected override void OnItemChanged()
+        {
+            base.OnItemChanged();
+
+            this.Update();
+        }
+
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();

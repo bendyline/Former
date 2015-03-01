@@ -42,12 +42,19 @@ namespace BL.Forms
             }
         }
 
+        protected override void OnItemChanged()
+        {
+            base.OnItemChanged();
+
+            this.Update();
+        }
+
         private void HandleTextInputKeyPressed(ElementEvent e)
         {
             if (!this.commitPending)
             {
                 this.commitPending = true;
-
+              
                 Window.SetTimeout(this.SaveValue, 2000);
             }
         }
@@ -62,6 +69,8 @@ namespace BL.Forms
             this.commitPending = false;
 
             this.Item.SetStringValue(this.FieldName, this.textInput.Value);
+
+            this.textInput.Focus();
         }
 
         protected override void OnUpdate()

@@ -39,6 +39,13 @@ namespace BL.Forms
             this.TrackInteractionEvents = true;
         }
 
+        protected override void OnItemChanged()
+        {
+            base.OnItemChanged();
+
+            this.Update();
+        }
+
         protected override void OnClick(ElementEvent e)
         {
             base.OnClick(e);

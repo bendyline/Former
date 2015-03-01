@@ -130,18 +130,78 @@ namespace BL.Forms
                 d.MaxWidth = 500;
 
                 d.Show();
+
+                d.Closing += assignUserLogin_Closing;
             }
 
             if (Context.Current.User != null)
             {
-                this.textInput.Value = String.Empty;
+                if (String.IsNullOrEmpty(Context.Current.User.NickName))
+                {
+                    this.ShowUserSummaryDialog();
+                }
+                else
+                {
+                    this.AssignUserValue(false);
+                }
+            }
+        }
 
-                UserReference ur = new UserReference();
+        private void ShowUserSummaryDialog()
+        {
+            Dialog d = new Dialog();
 
-                ur.Id = Context.Current.User.Id;
-                ur.NickName = Context.Current.User.NickName;
+            Control c = Context.Current.ObjectProvider.CreateObject("editusermissingproperties") as Control;
 
-                this.Item.SetStringValue(this.FieldName, Json.Stringify(ur.GetObject()));
+            if (c is UserControl)
+            {
+                ((UserControl)c).User = Context.Current.User;
+            }
+
+            d.Content = c;
+            d.MaxHeight = 400;
+            d.MaxWidth = 500;
+            d.Closing += editUserSummary_Closing;
+
+            d.Show();
+        }
+
+        protected override void OnItemChanged()
+        {
+            base.OnItemChanged();
+
+            this.Update();
+        }
+
+        private void editUserSummary_Closing(object sender, EventArgs e)
+        {
+            this.AssignUserValue(false);
+        }
+
+        private void assignUserLogin_Closing(object sender, EventArgs e)
+        {
+            this.AssignUserValue(true);
+        }
+
+        private void AssignUserValue(bool showUserSummaryIfNeeded)
+        {
+            if (Context.Current.User != null)
+            {
+                if (!String.IsNullOrEmpty(Context.Current.User.NickName))
+                {
+                    this.textInput.Value = String.Empty;
+
+                    UserReference ur = new UserReference();
+
+                    ur.Id = Context.Current.User.Id;
+                    ur.NickName = Context.Current.User.NickName;
+
+                    this.Item.SetStringValue(this.FieldName, Json.Stringify(ur.GetObject()));
+                }
+                else if (showUserSummaryIfNeeded)
+                {
+                    this.ShowUserSummaryDialog();
+                }
             }
         }
 

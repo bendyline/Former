@@ -130,9 +130,9 @@ namespace BL.Forms
             }
         }
 
-        public override void Dispose()
+        protected override void OnTemplateDisposed()
         {
-            base.Dispose();
+            base.OnTemplateDisposed();
 
             if (this.fieldControl != null)
             {
