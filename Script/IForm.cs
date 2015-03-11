@@ -8,17 +8,21 @@ using System.Diagnostics;
 using jQueryApi;
 using BL.UI;
 using BL.Data;
+using Kendo.UI;
 
 namespace BL.Forms
 {
     public interface IForm
     {
+
+        ImageBrowserOptions DefaultImageBrowserOptions { get; set; }
+
         ItemSetInterface ItemSetInterface { get; set;  }
         FormMode Mode { get; set; }
         IItem Item { get; set; }
 
         bool IsFieldValidForItem(IDataStoreField field, IItem item);
-        String GetFieldTitleOverride(String fieldName);
+        String GetFieldDisplayNameOverride(String fieldName);
         bool? GetFieldRequiredOverride(String fieldName);
         FieldChoiceCollection GetFieldChoicesOverride(String fieldName);
         DisplayState GetAdjustedDisplayState(String fieldName);

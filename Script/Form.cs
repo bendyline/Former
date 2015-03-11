@@ -9,6 +9,7 @@ using jQueryApi;
 using BL.UI;
 using BL.Data;
 using System.Runtime.CompilerServices;
+using Kendo.UI;
 
 namespace BL.Forms
 {
@@ -44,6 +45,21 @@ namespace BL.Forms
         private PropertyChangedEventHandler formSettingsChangeHandler;
 
         public event DataStoreItemEventHandler ItemDeleted;
+
+        private ImageBrowserOptions defaultImageBrowserOptions;
+
+        public ImageBrowserOptions DefaultImageBrowserOptions
+        {
+            get
+            {
+                return this.defaultImageBrowserOptions;
+            }
+
+            set
+            {
+                this.defaultImageBrowserOptions = value;
+            }
+        }
 
         [ScriptName("s_iteratorFieldTemplateId")]
         public String IteratorFieldTemplateId
@@ -164,7 +180,7 @@ namespace BL.Forms
                     return false;
                 }
 
-                if ((field.Type == FieldType.ShortText || field.Type == FieldType.UnboundedText) && value == String.Empty)
+                if ((field.Type == FieldType.ShortText || field.Type == FieldType.UnboundedText || field.Type == FieldType.RichContent) && value == String.Empty)
                 {
                     return false;
                 }
@@ -185,7 +201,7 @@ namespace BL.Forms
             }
         }
 
-        public String GetFieldTitleOverride(String fieldName)
+        public String GetFieldDisplayNameOverride(String fieldName)
         {
             return this.ItemSetInterface.FieldInterfaces.GetFieldTitleOverride(fieldName);
         }

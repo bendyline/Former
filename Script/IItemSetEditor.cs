@@ -9,6 +9,7 @@ using jQueryApi;
 using BL.UI;
 using BL.Data;
 using System.Runtime.CompilerServices;
+using Kendo.UI;
 
 namespace BL.Forms
 {
@@ -16,6 +17,8 @@ namespace BL.Forms
     {
         event DataStoreItemEventHandler ItemAdded;
         event DataStoreItemEventHandler ItemDeleted;
+
+        ImageBrowserOptions DefaultImageBrowserOptions { get; set;}
 
         bool DisplayAddButton { get; set; }
 
@@ -26,6 +29,7 @@ namespace BL.Forms
         ItemSetEditorMode Mode { get; set; }
 
         String ItemFormTemplateId { get; set;  }
+
         String ItemFormTemplateIdSmall { get; set; }
 
         IDataStoreItemSet ItemSet { get; set; }

@@ -9,6 +9,7 @@ using jQueryApi;
 using BL.UI;
 using BL.Data;
 using System.Runtime.CompilerServices;
+using Kendo.UI;
 
 namespace BL.Forms
 {
@@ -91,6 +92,8 @@ namespace BL.Forms
         [ScriptName("e_item20")]
         private Element item20;
 
+        private ImageBrowserOptions defaultImageBrowserOptions;
+
         private String itemPlacementFieldName;
 
         private ItemSetEditorMode mode = ItemSetEditorMode.Rows;
@@ -117,6 +120,19 @@ namespace BL.Forms
         private event DataStoreItemSetEventHandler itemSetEventHandler;
         public event DataStoreItemEventHandler ItemAdded;
         public event DataStoreItemEventHandler ItemDeleted;
+
+        public ImageBrowserOptions DefaultImageBrowserOptions
+        {
+            get
+            {
+                return this.defaultImageBrowserOptions;
+            }
+
+            set
+            {
+                this.defaultImageBrowserOptions = value;
+            }
+        }
 
         [ScriptName("b_displayPersistButton")]
         public bool DisplayPersistButton
@@ -543,6 +559,7 @@ namespace BL.Forms
                 f.TemplateId = this.itemFormTemplateIdSmall;
             }
 
+            f.DefaultImageBrowserOptions = this.DefaultImageBrowserOptions;
             f.ItemSetInterface = this.ItemSetInterface;
             f.Item = item;
             

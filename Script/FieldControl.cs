@@ -68,6 +68,29 @@ namespace BL.Forms
             }
         }
 
+        public String EffectiveFieldDisplayName
+        {
+            get
+            {
+
+                String fieldTitle = this.Form.GetFieldDisplayNameOverride(this.FieldName);
+
+                if (fieldTitle != null)
+                {
+                    return fieldTitle;
+                }
+
+                IDataStoreField fieldToUse = this.Field;
+
+                if (fieldToUse != null)
+                {
+                    return fieldToUse.DisplayName;
+                }
+
+                return null;
+            }
+        }
+
         [ScriptName("i_mode")]
         public FieldMode Mode
         {

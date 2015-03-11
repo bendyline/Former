@@ -35,16 +35,7 @@ namespace BL.Forms
 
             if (this.IsReady)
             {
-                String fieldTitleOverride = this.Form.GetFieldTitleOverride(this.Field.Name);
-
-                if (fieldTitleOverride != null)
-                {
-                    ElementUtilities.SetText(this.titleElement, fieldTitleOverride);
-                }
-                else
-                {
-                    ElementUtilities.SetText(this.titleElement, this.Field.DisplayName);
-                }
+                ElementUtilities.SetText(this.titleElement, this.EffectiveFieldDisplayName);
             }
         }
     }

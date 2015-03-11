@@ -30,6 +30,8 @@ namespace BL.Forms
         private DataStoreItemEventHandler itemInSetChanged;
         private DataStoreItemSetEventHandler itemSetChanged;
 
+        private ImageBrowserOptions defaultImageBrowserOptions;
+
         private List<IItem> itemsShown;
 
         private List<Field> userListFields;
@@ -66,9 +68,20 @@ namespace BL.Forms
         private event ModelEventHandler gridRemove;
         private event ModelEventHandler gridCancel;
 
-
-
         private Dictionary<String, Form> formsByItemId;
+
+        public ImageBrowserOptions DefaultImageBrowserOptions
+        {
+            get
+            {
+                return this.defaultImageBrowserOptions;
+            }
+
+            set
+            {
+                this.defaultImageBrowserOptions = value;
+            }
+        }
 
         public ItemSetInterface ItemSetInterface
         {
