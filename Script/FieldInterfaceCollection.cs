@@ -169,6 +169,7 @@ namespace BL.Forms
 
             this.fieldsByStorageFieldName[oldStorageFieldName] = null;
             this.fieldsByStorageFieldName[newFieldStorageFieldName] = fi;
+
             fi.Name = newFieldStorageFieldName;
 
             return true;

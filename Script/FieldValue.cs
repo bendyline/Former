@@ -35,7 +35,7 @@ namespace BL.Forms
         {
             base.OnUpdate();
 
-            if (this.IsReady && this.fieldBin != null)
+            if (this.IsReady && this.fieldBin != null && this.Field != null)
             {
                 String fieldName = this.Field.Name;
 

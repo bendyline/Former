@@ -11,11 +11,11 @@
         <style>
             #addButton
             {
-                margin-top:20px;
             }
 
             #formBin
             {
+                margin-top:20px;
                 width:100%;
             }
 
@@ -67,20 +67,27 @@
                 width:100%;
             }
 
+            #buttonContainer
+            {
+                display:inline-block;
+            }
+
         </style>
 	</head>
 	<body>        
-        <div id="formBin"></div>
         <div id="toolbar">
             <div id="toolbarInner">
                 <div data-ctl-class="toolbarCell">
                     <input type="button" id="addButton" class="k-button" value="add item"/>
                 </div>       
                 <div id="persistCell" data-ctl-class="toolbarCell">
-                    <BL.Forms.PersistButton id="persist"/>
+                    <div id="buttonContainer">
+                        <BL.Forms.PersistButton id="persist"/>
+                    </div>
                 </div>
             </div>
         </div>
+        <div id="formBin"></div>
 
     </body>
 </html>

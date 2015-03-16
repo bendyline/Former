@@ -60,6 +60,15 @@ namespace BL.Forms
             {
                 this.editor.EditorOptions.ImageBrowser = this.Form.DefaultImageBrowserOptions;
             }
+
+            if (this.EffectiveMode == FieldMode.View)
+            {
+                this.editor.ReadOnly = true;
+            }
+            else
+            {
+                this.editor.ReadOnly = false;
+            }
             
             String val = this.Item.GetStringValue(this.FieldName);
 

@@ -142,12 +142,14 @@ namespace BL.Forms
         {
             get
             {
-                return this.ItemSetInterface.Mode;
+                return this.ItemSetInterface.FormMode;
             }
 
             set
             {
-                this.ItemSetInterface.Mode = value;
+                this.ItemSetInterface.FormMode = value;
+
+
             }
         }
 
@@ -306,7 +308,7 @@ namespace BL.Forms
                 this.ApplyToControl(this.fieldIterator);
             }
 
-            if (this.specialButtons != null && this.ItemSetInterface != null && this.ItemSetInterface.DisplayDeleteItemButton)
+            if (this.specialButtons != null && this.ItemSetInterface != null && this.ItemSetInterface.DisplayDeleteItemButton && this.Mode != FormMode.ViewForm)
             {
                 if (this.deleteButton == null)
                 {

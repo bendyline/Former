@@ -39,6 +39,8 @@ namespace BL.Forms
         private DataSource activeDataSource;
 
 
+        private FormMode formMode = FormMode.EditForm;
+
         private ItemSetInterface itemSetInterface;
         private String itemFormTemplateId;
         private String itemFormTemplateIdSmall;
@@ -69,6 +71,25 @@ namespace BL.Forms
         private event ModelEventHandler gridCancel;
 
         private Dictionary<String, Form> formsByItemId;
+
+        [ScriptName("i_formMode")]
+        public FormMode FormMode
+        {
+            get
+            {
+                return this.formMode;
+            }
+
+            set
+            {
+                if (this.formMode == value)
+                {
+                    return;
+                }
+
+                this.formMode = value;
+            }
+        }
 
         public ImageBrowserOptions DefaultImageBrowserOptions
         {

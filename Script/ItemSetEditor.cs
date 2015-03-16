@@ -16,8 +16,10 @@ namespace BL.Forms
     public enum ItemSetEditorMode
     {
         Rows = 0,
-        TemplatePlacedItems=1
+        TemplatePlacedItems=1,
+        Linear=2
     }
+
 
     public class ItemSetEditor : Control, IItemSetEditor
     {
@@ -92,6 +94,8 @@ namespace BL.Forms
         [ScriptName("e_item20")]
         private Element item20;
 
+        private FormMode formMode = FormMode.EditForm;
+
         private ImageBrowserOptions defaultImageBrowserOptions;
 
         private String itemPlacementFieldName;
@@ -120,6 +124,30 @@ namespace BL.Forms
         private event DataStoreItemSetEventHandler itemSetEventHandler;
         public event DataStoreItemEventHandler ItemAdded;
         public event DataStoreItemEventHandler ItemDeleted;
+
+        [ScriptName("i_formMode")]
+        public FormMode FormMode 
+        {
+            get
+            {
+                return this.formMode;
+            }
+
+            set
+            {
+                if (this.formMode == value)
+                {
+                    return;
+                }
+
+                this.formMode = value;
+
+                foreach (Form f in this.forms)
+                {
+                    f.Mode = this.formMode;
+                }
+            }
+        }
 
         public ImageBrowserOptions DefaultImageBrowserOptions
         {
@@ -450,7 +478,7 @@ namespace BL.Forms
                 return;
             }
 
-            if (this.ItemSetInterface != null && (!this.ItemSetInterface.DisplayColumns || Context.Current.IsSmallFormFactor))
+            if (this.ItemSetInterface != null && (!this.ItemSetInterface.DisplayColumns || Context.Current.IsSmallFormFactor || this.Mode == ItemSetEditorMode.Linear))
             {
                 if (this.headerRowElement != null && ElementUtilities.ElementIsChildOf(this.headerRowElement, this.formBin))
                 {
@@ -530,7 +558,7 @@ namespace BL.Forms
                     
                     this.itemsShown.Add(item);
 
-                    this.formBin.AppendChild(f.Element);
+                    this.InsertFormInOrder(f);
                 }
 
                 return;
@@ -562,6 +590,7 @@ namespace BL.Forms
             f.DefaultImageBrowserOptions = this.DefaultImageBrowserOptions;
             f.ItemSetInterface = this.ItemSetInterface;
             f.Item = item;
+            f.Mode = this.formMode;
             
             this.formsByLocalId[item.LocalOnlyUniqueId] = f;
             this.forms.Add(f);
@@ -569,9 +598,14 @@ namespace BL.Forms
 
             f.EnsureElements();
 
-            if (this.mode == ItemSetEditorMode.Rows || Context.Current.IsSmallFormFactor)
+            if (this.mode == ItemSetEditorMode.Rows || this.mode == ItemSetEditorMode.Linear || Context.Current.IsSmallFormFactor)
             {
-                this.formBin.AppendChild(f.Element);
+                if (this.mode == ItemSetEditorMode.Rows)
+                {
+                    this.formBin.Style.Display = "table";
+                }
+
+                this.InsertFormInOrder(f);
             }
             else
             {
@@ -587,6 +621,45 @@ namespace BL.Forms
                     itemBin.AppendChild(f.Element);
                 }
             }
+        }
+
+        private void InsertFormInOrder(Form form)
+        {
+            int index = 0;
+
+            if (this.ItemSetInterface.Sort != ItemSetSort.None)
+            {
+                for (int i=0; i<this.formBin.Children.Length; i++)
+                {
+                    Element e = this.formBin.Children[i];
+
+                    Form f = this.GetFormForElement(e);
+
+                    if (f != null)
+                    {
+                        if (f.Item.CompareTo(form.Item, this.ItemSetInterface.Sort, this.ItemSetInterface.SortField) >= 0)
+                        {
+                            this.formBin.InsertBefore(form.Element, e);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            this.formBin.AppendChild(form.Element);
+        }
+
+        private Form GetFormForElement(Element e)
+        {
+            foreach (Form f in this.forms)
+            {
+                if (f.Element == e)
+                {
+                    return f;
+                }
+            }
+
+            return null;
         }
 
         private void f_ItemDeleted(object sender, DataStoreItemEventArgs e)
@@ -636,6 +709,14 @@ namespace BL.Forms
             {
                 this.addButton.Value = this.addItemCta;
             }      
+            else if (this.ItemSetInterface != null && this.ItemSetInterface.AddItemCta != null)
+            {
+                this.addButton.Value = this.ItemSetInterface.AddItemCta;
+            }
+            else
+            {
+                this.addButton.Value = "add item";
+            }
 
             if (this.persist != null)
             {

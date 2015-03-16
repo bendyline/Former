@@ -25,7 +25,7 @@ namespace BL.Forms
     {
         private IDataStoreField field;
         private String fieldName;
-        private FieldMode mode = FieldMode.Edit;
+        private FieldMode mode = FieldMode.FormDefault;
         private PropertyChangedEventHandler propertyChanged;
 
         private IDataStoreField lastField;
@@ -109,7 +109,7 @@ namespace BL.Forms
         {
             get
             {
-                if (this.field == null && this.fieldName != null)
+                if (this.field == null && this.fieldName != null && this.Item != null)
                 {
                     this.field = this.Item.Type.GetField(this.fieldName);
                 }
@@ -118,11 +118,11 @@ namespace BL.Forms
             }
         }
 
-        public bool IsReady
+        public override bool IsReady
         {
             get
             {
-                return this.fieldName != null && this.Item != null;
+                return this.fieldName != null && base.IsReady;
             }
         }
 

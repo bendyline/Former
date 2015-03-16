@@ -13,7 +13,13 @@ namespace BL.Forms
         private FormMode formMode = FormMode.EditForm;
         private bool displayColumns = true;
         private bool displayDeleteItemButton = true;
+        private String addItemCta;
+        private String itemSetEditorTemplateId;
         private FieldInterfaceCollection fieldInterfaces;
+
+        private ItemSetSort sort = ItemSetSort.None;
+        private String sortField = null;
+
 
         private String accentColor1;
         private String accentColor2;
@@ -35,6 +41,63 @@ namespace BL.Forms
                 return max;
             }
         }
+
+        [ScriptName("i_sort")]
+        public ItemSetSort Sort
+        {
+            get
+            {
+                return this.sort;
+            }
+
+            set
+            {
+                this.sort = value;
+            }
+        }
+
+        [ScriptName("s_sortField")]
+        public String SortField
+        {
+            get
+            {
+                return this.sortField;
+            }
+
+            set
+            {
+                this.sortField = value;
+            }
+        }
+
+        [ScriptName("s_addItemCta")]
+        public String AddItemCta
+        {
+            get
+            {
+                return this.addItemCta;
+            }
+
+            set
+            {
+                this.addItemCta = value;
+            }
+        }
+
+        [ScriptName("s_itemSetEditorTemplateId")]
+        public String ItemSetEditorTemplateId
+        {
+            get
+            {
+                return this.itemSetEditorTemplateId;
+            }
+
+            set
+            {
+                this.itemSetEditorTemplateId = value;
+            }
+        }
+
 
         [ScriptName("s_accentColor1")]
         public String AccentColor1
@@ -65,7 +128,7 @@ namespace BL.Forms
         }
 
         [ScriptName("i_mode")]
-        public FormMode Mode
+        public FormMode FormMode
         {
             get
             {

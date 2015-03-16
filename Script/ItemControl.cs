@@ -61,6 +61,14 @@ namespace BL.Forms
             }
         }
 
+        public virtual bool IsReady
+        {
+            get
+            {
+                return this.Item != null;
+            }
+        }
+
         protected ItemControl() : base()
         {
             this.DelayApplyTemplate = true;

@@ -35,6 +35,15 @@ namespace BL.Forms
             }
         }
 
+        public override bool IsReady
+        {
+            get
+            {
+                return base.IsReady && this.Form != null;
+            }
+        }
+
+
         public virtual void PersistToItem()
         {
             

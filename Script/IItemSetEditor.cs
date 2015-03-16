@@ -28,6 +28,9 @@ namespace BL.Forms
         [ScriptName("i_mode")]
         ItemSetEditorMode Mode { get; set; }
 
+        [ScriptName("i_formMode")]
+        FormMode FormMode { get; set; }
+
         String ItemFormTemplateId { get; set;  }
 
         String ItemFormTemplateIdSmall { get; set; }
