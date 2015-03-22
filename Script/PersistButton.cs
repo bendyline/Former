@@ -70,7 +70,6 @@ namespace BL.Forms
             this.UpdateStatus();
         }
 
-
         private void UpdateStatus()
         {
             if (this.text == null || this.ItemSet == null)
@@ -85,6 +84,7 @@ namespace BL.Forms
                 ElementUtilities.SetText(this.text, "Saving");
                 this.savedBefore = true;
 
+                this.Element.Style.BorderWidth = "1px";
                 this.Element.Style.BorderColor = "#F0F0F0";
                 this.text.Style.BorderColor = "#A0A0A0";
             }
@@ -94,6 +94,7 @@ namespace BL.Forms
                 this.animatingIcon.Style.Display = "none";
                 ElementUtilities.SetText(this.text, "Save");
 
+                this.Element.Style.BorderWidth = "1px";
                 this.text.Style.BorderColor = "#303030";
                 this.Element.Style.BorderColor = "#B0B0B0";
             }
@@ -111,6 +112,7 @@ namespace BL.Forms
                     ElementUtilities.SetText(this.text, "");
                 }
 
+                this.Element.Style.BorderWidth = "0px";
                 this.Element.Style.BorderColor = "transparent";
                 this.text.Style.BorderColor = "#A0A0A0";
             }
