@@ -307,6 +307,9 @@ namespace BL.Forms
 
         public GridItemSetEditor()
         {
+            KendoControlFactory.EnsureKendoBaseUx(this);
+            KendoControlFactory.EnsureKendoData(this);
+
             this.itemsShown = new List<IItem>();
             this.formsByItemId = new Dictionary<string, Form>();
 
@@ -324,6 +327,17 @@ namespace BL.Forms
             this.gridRemove = this.grid_Remove;
 
         }
+
+        protected override void OnDimensionChanged()
+        {
+            base.OnDimensionChanged();
+
+            if (this.Height != null && this.grid != null)
+            {
+                this.grid.Height = ((int)this.Height) - 35;
+            }
+        }
+
 
         public void DisposeItemInterfaceItems()
         {
@@ -679,7 +693,6 @@ namespace BL.Forms
             if (this.itemSet != null)
             {
                 GridOptions go = new GridOptions();
-
                 go.Filterable = true;
                 go.Sortable = new GridSortableOptions();
                 go.Sortable.Mode = "single";
@@ -845,6 +858,8 @@ namespace BL.Forms
                 this.activeDataSource = ds;
 
                 this.grid.Options = go;
+
+                this.OnDimensionChanged();
 
                 ds.Read();
 

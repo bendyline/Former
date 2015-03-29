@@ -386,22 +386,22 @@ namespace BL.Forms
                 this.addButton.AddEventListener("touchstart", this.AddButtonClick, true);
 
                 this.ApplyAddButtonVisibility();
+            }
 
-                this.itemElements = new List<Element>();
+            this.itemElements = new List<Element>();
 
-                for (int i=0; i<20; i++)
+            for (int i=0; i<20; i++)
+            {
+                Element e = this.GetTemplateElementById("item" + i);
+
+                if (e != null)
                 {
-                    Element e = this.GetTemplateElementById("item" + i);
-
-                    if (e != null)
+                    while (this.itemElements.Count < i)
                     {
-                        while (this.itemElements.Count < i)
-                        {
-                            this.itemElements.Add(null);
-                        }
-
-                        this.itemElements[i] = e;
+                        this.itemElements.Add(null);
                     }
+
+                    this.itemElements[i] = e;
                 }
             }
         }
@@ -625,6 +625,11 @@ namespace BL.Forms
 
         private void InsertFormInOrder(Form form)
         {
+            if (this.formBin == null)
+            {
+                return;
+            }
+
             int index = 0;
 
             if (this.ItemSetInterface.Sort != ItemSetSort.None)
@@ -700,20 +705,20 @@ namespace BL.Forms
 
         protected override void OnUpdate()
         {
-            if (this.formBin == null)
+            if (!this.TemplateWasApplied)
             {
                 return;
             }
 
-            if (this.addItemCta != null)
+            if (this.addButton != null && this.addItemCta != null)
             {
                 this.addButton.Value = this.addItemCta;
-            }      
-            else if (this.ItemSetInterface != null && this.ItemSetInterface.AddItemCta != null)
+            }
+            else if (this.addButton != null && this.ItemSetInterface != null && this.ItemSetInterface.AddItemCta != null)
             {
                 this.addButton.Value = this.ItemSetInterface.AddItemCta;
             }
-            else
+            else if (this.addButton != null)
             {
                 this.addButton.Value = "add item";
             }
@@ -772,7 +777,7 @@ namespace BL.Forms
 
                 if (f != null)
                 {
-                    if (this.formBin.Contains(f.Element))
+                    if (this.formBin != null && this.formBin.Contains(f.Element))
                     {
                         this.formBin.RemoveChild(f.Element);
                     }

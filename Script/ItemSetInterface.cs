@@ -15,6 +15,7 @@ namespace BL.Forms
         private bool displayDeleteItemButton = true;
         private String addItemCta;
         private String itemSetEditorTemplateId;
+        private String itemSetEditorSmallTemplateId;
         private FieldInterfaceCollection fieldInterfaces;
 
         private ItemSetSort sort = ItemSetSort.None;
@@ -95,6 +96,21 @@ namespace BL.Forms
             set
             {
                 this.itemSetEditorTemplateId = value;
+            }
+        }
+
+
+        [ScriptName("s_itemSetEditorSmallTemplateId")]
+        public String ItemSetEditorSmallTemplateId
+        {
+            get
+            {
+                return this.itemSetEditorSmallTemplateId;
+            }
+
+            set
+            {
+                this.itemSetEditorSmallTemplateId = value;
             }
         }
 

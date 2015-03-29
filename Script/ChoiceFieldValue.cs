@@ -129,6 +129,7 @@ namespace BL.Forms
                                 if (id == fc.DisplayName)
                                 {
                                     b.Style.BackgroundColor = color;
+
                                 }
                                 else
                                 {
@@ -136,6 +137,17 @@ namespace BL.Forms
                                     color = ColorDefinition.CreateFromString(color).GetPrecentageAdjustedColor(.25).ToString();
 
                                     b.Style.BackgroundColor = color;
+                                }
+
+                                ColorDefinition cd = ColorDefinition.CreateFromString(b.Style.BackgroundColor);
+
+                                if (cd.IsPrimarilyLight)
+                                {
+                                    b.Style.Color = "#303030";
+                                }
+                                else
+                                {
+                                    b.Style.Color = "white";
                                 }
                             }
                         }
