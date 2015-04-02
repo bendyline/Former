@@ -52,6 +52,8 @@ namespace BL.Forms
 
                 this.item = value;
 
+                this.OnItemChanged();
+
                 if (this.item != null && this.monitorItemEvents)
                 {
                     this.item.ItemChanged += item_ItemChanged;

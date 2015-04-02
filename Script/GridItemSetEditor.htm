@@ -43,13 +43,21 @@
                 width:100%;
             }
 
+            #button
+            {
+                display:inline-block;
+                margin-right:10px;
+            }
         </style>
 	</head>
 	<body>      
         <div id="toolbar">
             <div id="toolbarInner">
                 <div data-ctl-class="toolbarCell">
-                    <input type="button" id="addButton" class="k-button" value="add item"/>
+                    <input type="button" id="addButton" data-ctl-class="button" class="k-button" value="add item"/>
+                </div>       
+                <div data-ctl-class="toolbarCell">
+                    <input type="button" id="deleteButton" data-ctl-class="button"  class="k-button" value="delete item"/>
                 </div>       
                 <div data-ctl-class="toolbarCell" id="spacerCell">&#160;</div>    
                 <div id="persistCell" data-ctl-class="toolbarCell">

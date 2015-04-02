@@ -20,7 +20,7 @@ namespace BL.Forms
 
         ImageBrowserOptions DefaultImageBrowserOptions { get; set;}
 
-        bool DisplayAddButton { get; set; }
+        bool DisplayAddAndDeleteButtons { get; set; }
 
         [ScriptName("s_itemPlacementFieldName")]
         String ItemPlacementFieldName { get; set; }
@@ -53,5 +53,8 @@ namespace BL.Forms
 
         void Dispose();
         void DisposeItemInterfaceItems();
+
+        void SetItemSetInterfaceAndItems(ItemSetInterface isi, IDataStoreItemSet newItemSet);
+
     }
 }

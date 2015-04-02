@@ -104,7 +104,7 @@ namespace BL.Forms
 
                 Element divOuterElement = this.CreateElement("buttonItemOuter");
                 Element divInnerElement = this.CreateElement("buttonItemInner");
-
+                Element labelRowElement = null;
                 Nullable<ScaleType> scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
 
                 divOuterElement.AppendChild(divInnerElement);
@@ -156,7 +156,13 @@ namespace BL.Forms
 
                     if (scaleType == ScaleType.FiveAgree)
                     {
-                        Element divLabelElement = this.CreateElement("buttonItemLabelCell");
+                        if (labelRowElement == null)
+                        {
+                            labelRowElement = this.CreateElement("labelInner");
+                            divOuterElement.InsertBefore(labelRowElement, divInnerElement);
+                        }
+
+                        Element divLabelElement = this.CreateElement("buttonHeaderCell");
 
                         switch (i)
                         {
@@ -177,7 +183,7 @@ namespace BL.Forms
                                 break;
                         }
 
-                        divInnerElement.AppendChild(divLabelElement);
+                        labelRowElement.AppendChild(divLabelElement);
                     }
                 }
 

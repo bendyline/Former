@@ -33,7 +33,7 @@ namespace BL.Forms
         {
             base.OnUpdate();
 
-            if (this.IsReady)
+            if (this.titleElement != null)
             {
                 ElementUtilities.SetText(this.titleElement, this.EffectiveFieldDisplayName);
             }

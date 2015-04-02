@@ -78,6 +78,9 @@
     <Compile Include="ItemSetEditor.cs" />
     <Compile Include="CheckboxFieldValue.cs" />
     <Compile Include="MultilineTextFieldValue.cs" />
+    <Compile Include="IntegerFIeldValue.cs" />
+    <Compile Include="UserList.cs" />
+    <Compile Include="UserListToken.cs" />
     <Compile Include="UserValue.cs" />
     <Compile Include="TextFieldValue.cs" />
     <Compile Include="LabeledField.cs" />
@@ -124,7 +127,10 @@
     <Content Include="PersistButton.htm" />
     <Content Include="FieldValidationIndicator.htm" />
     <Content Include="MultilineTextFieldValue.htm" />
+    <Content Include="IntegerFieldValue.htm" />
     <Content Include="UnlabeledForm.htm" />
+    <Content Include="UserList.htm" />
+    <Content Include="UserListToken.htm" />
     <Content Include="VerticalSmallForm.htm" />
     <Content Include="GridItemSetEditor.htm" />
     <Content Include="RowForm.htm" />

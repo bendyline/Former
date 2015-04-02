@@ -207,7 +207,6 @@ namespace BL.Forms
             this.fieldInterfaces = new FieldInterfaceCollection();
         }
 
-
         public int CompareFields(Field fieldA, Field fieldB)
         {
             FieldInterfaceCollection fsc = this.FieldInterfaces;

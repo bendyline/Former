@@ -56,6 +56,11 @@ namespace BL.Forms
             {
                 this.fields.Remove(fs);
                 this.fieldsByStorageFieldName[fieldName] = null;
+
+                if (this.CollectionChanged != null)
+                {
+                    this.CollectionChanged(this, NotifyCollectionChangedEventArgs.ItemRemoved(fs));
+                }
             }
         }
 

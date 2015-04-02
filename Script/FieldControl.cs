@@ -143,6 +143,7 @@ namespace BL.Forms
 
                 this.fieldName = value;
 
+                this.OnFieldChanged();
                 this.Update();
             }
         }
@@ -214,6 +215,11 @@ namespace BL.Forms
             }
 
             this.Update();
+        }
+
+        protected virtual void OnFieldChanged()
+        {
+
         }
 
         private void fs_PropertyChanged(object sender, PropertyChangedEventArgs e)

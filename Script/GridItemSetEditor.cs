@@ -13,6 +13,7 @@ using BL.UI.KendoControls;
 using Kendo.UI;
 using kendo.data;
 using System.Serialization;
+using kendo.ui;
 
 namespace BL.Forms
 {
@@ -21,6 +22,9 @@ namespace BL.Forms
     {
         [ScriptName("e_gridContainer")]
         private Element gridContainer;
+
+        [ScriptName("e_toolbar")]
+        private Element toolbar;
 
         [ScriptName("c_persist")]
         private PersistButton persist;
@@ -35,9 +39,12 @@ namespace BL.Forms
         private List<IItem> itemsShown;
 
         private List<Field> userListFields;
+        private List<Field> contentListFields;
+        private List<Field> userListListFields; 
+        
         private IDataStoreItemSet itemSet;
         private DataSource activeDataSource;
-
+        private String saveAsFileNameBase;
 
         private FormMode formMode = FormMode.EditForm;
 
@@ -49,13 +56,18 @@ namespace BL.Forms
         [ScriptName("e_addButton")]
         private InputElement addButton;
 
+        [ScriptName("e_deleteButton")]
+        private InputElement deleteButton;
+
         [ScriptName("e_exportButton")]
         private InputElement exportButton;
 
-        private bool displayAddButton = true;
+        private bool displayAddAndDeleteButtons = true;
         private bool displayPersistButton = true;
 
         private bool isEditingRow = false;
+        private bool isReadOnly = false;
+
         private String addItemCta;
 
         private ItemSetEditorMode mode;
@@ -67,8 +79,11 @@ namespace BL.Forms
 
         private event ModelEventHandler gridSave;
         private event ModelEventHandler gridEdit;
+        private event SelectionEventHandler gridChange;
         private event ModelEventHandler gridRemove;
         private event ModelEventHandler gridCancel;
+
+        private jQueryObject activeSelectedObject;
 
         private Dictionary<String, Form> formsByItemId;
 
@@ -130,6 +145,20 @@ namespace BL.Forms
 
                 this.itemSetInterface.PropertyChanged += this.itemSetInterfacePropertyChanged;
                 this.itemSetInterface.FieldInterfaces.CollectionChanged += this.fieldInterfaceCollectionChanged;
+            }
+        }
+
+        [ScriptName("b_isReadOnly")]
+        public bool IsReadOnly
+        {
+            get
+            {
+                return this.isReadOnly;
+            }
+
+            set
+            {
+                this.isReadOnly = value;
             }
         }
 
@@ -214,6 +243,18 @@ namespace BL.Forms
             }
         }
 
+        public String SaveAsFileNameBase
+        {
+            get
+            {
+                return this.saveAsFileNameBase;
+            }
+
+            set
+            {
+                this.saveAsFileNameBase = value;
+            }
+        }
 
         public String AddItemCta
         {
@@ -248,26 +289,29 @@ namespace BL.Forms
                 this.displayPersistButton = value;
 
                 this.Update();
+
+                this.ApplyToolbarVisibility();
             }
         }
 
-        public bool DisplayAddButton
+        public bool DisplayAddAndDeleteButtons
         {
             get
             {
-                return this.displayAddButton;
+                return this.displayAddAndDeleteButtons;
             }
 
             set
             {
-                if (this.displayAddButton == value)
+                if (this.displayAddAndDeleteButtons == value)
                 {
                     return;
                 }
 
-                this.displayAddButton = value;
+                this.displayAddAndDeleteButtons = value;
 
-                this.ApplyAddButtonVisibility();
+                this.ApplyAddAndDeleteButtonVisibility();
+                this.ApplyToolbarVisibility();
             }
         }
 
@@ -307,8 +351,8 @@ namespace BL.Forms
 
         public GridItemSetEditor()
         {
-            KendoControlFactory.EnsureKendoBaseUx(this);
-            KendoControlFactory.EnsureKendoData(this);
+            KendoUtilities.EnsureKendoBaseUx(this);
+            KendoUtilities.EnsureKendoData(this);
 
             this.itemsShown = new List<IItem>();
             this.formsByItemId = new Dictionary<string, Form>();
@@ -323,9 +367,9 @@ namespace BL.Forms
 
             this.gridSave = this.HandleSave;
             this.gridEdit =  this.HandleEdit;
+            this.gridChange = this.HandleChange;
             this.gridCancel = this.HandleCancel;
             this.gridRemove = this.grid_Remove;
-
         }
 
         protected override void OnDimensionChanged()
@@ -339,28 +383,83 @@ namespace BL.Forms
         }
 
 
+        public void SetItemSetInterfaceAndItems(ItemSetInterface isi, IDataStoreItemSet newItemSet)
+        {
+            if (this.itemSet == newItemSet && this.itemSetInterface == isi)
+            {
+                return;
+            }
+
+            if (this.itemSetInterface != null)
+            {
+                this.itemSetInterface.PropertyChanged -= this.itemSetInterfacePropertyChanged;
+                this.itemSetInterface.FieldInterfaces.CollectionChanged -= this.fieldInterfaceCollectionChanged;
+            }
+
+            this.itemSetInterface = isi;
+            this.itemSetInterface.PropertyChanged += this.itemSetInterfacePropertyChanged;
+            this.itemSetInterface.FieldInterfaces.CollectionChanged += this.fieldInterfaceCollectionChanged;
+
+            if (this.itemSet != null)
+            {
+                this.itemSet.ItemSetChanged -= this.itemSetChanged;
+            }
+
+            this.itemSet = newItemSet;
+
+            if (this.itemSet != null)
+            {
+                this.itemSet.ItemSetChanged += this.itemSetChanged;
+
+                this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
+            }
+            else
+            {
+                this.Update();
+            }
+        }
+
         public void DisposeItemInterfaceItems()
         {
 
         }
 
-        private void ApplyAddButtonVisibility()
+        private void ApplyAddAndDeleteButtonVisibility()
         {
             if (this.addButton == null)
             {
                 return;
             }
 
-            if (this.displayAddButton)
+            if (this.displayAddAndDeleteButtons)
             {
-                this.addButton.Style.Display = "block";
+                this.addButton.Style.Display = "";
+                this.deleteButton.Style.Display = "";
             }
             else
             {
                 this.addButton.Style.Display = "none";
+                this.deleteButton.Style.Display = "none";
             }
         }
 
+        private void ApplyToolbarVisibility()
+        {
+            if (this.toolbar == null)
+            {
+                return;
+
+            }
+
+            if (!this.displayAddAndDeleteButtons && !this.displayPersistButton)
+            {
+                this.toolbar.Style.Display = "none";
+            }
+            else
+            {
+                this.toolbar.Style.Display = String.Empty;
+            }
+        }
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -370,7 +469,7 @@ namespace BL.Forms
                 this.addButton.AddEventListener("mousedown", this.AddButtonClick, true);
                 this.addButton.AddEventListener("touchstart", this.AddButtonClick, true);
 
-                this.ApplyAddButtonVisibility();
+                this.ApplyAddAndDeleteButtonVisibility();
             }
 
             if (this.exportButton != null)
@@ -378,6 +477,13 @@ namespace BL.Forms
                 this.exportButton.AddEventListener("mousedown", this.ExportButtonClick, true);
                 this.exportButton.AddEventListener("touchstart", this.ExportButtonClick, true);
             }
+
+            if (this.deleteButton != null)
+            {
+                this.deleteButton.Disabled = true;
+            }
+
+            this.ApplyToolbarVisibility();
         }
 
         private void grid_Remove(ModelEventArgs e)
@@ -414,6 +520,45 @@ namespace BL.Forms
             this.UpdateIsEditing();
         }
 
+        private void HandleChange(SelectionEventArgs oe)
+        {
+            if (oe.Elements.Count > 0)
+            {
+                if (this.activeSelectedObject != null)
+                {
+                    this.grid.SaveRow();
+                }
+
+                ICollection<Element> selectedElts = (ICollection<Element>)this.grid.Select(null);
+
+                if (selectedElts.Count >= 1 && !this.isReadOnly)
+                {
+                    jQueryObject jqo = jQuery.FromElement(selectedElts[0]);
+
+                    this.activeSelectedObject = jqo;
+
+                    this.grid.EditRow(this.activeSelectedObject);
+                    if (this.deleteButton != null)
+                    {
+                        this.deleteButton.Disabled = false;
+                    }
+                }
+                else
+                {
+                    this.activeSelectedObject = null;
+                    if (this.deleteButton != null)
+                    {
+                        this.deleteButton.Disabled = true;
+                    }
+                }
+            }
+        }
+
+        private void EditActiveRow()
+        {
+            this.grid.EditRow(this.activeSelectedObject);
+        }
+
         private void HandleEdit(ModelEventArgs oe)
         {
             this.isEditingRow = true;
@@ -444,6 +589,16 @@ namespace BL.Forms
                     }
                 }
             }*/
+        }
+
+        public void SaveAsExcel()
+        {
+            this.grid.SaveAsExcel();
+        }
+
+        public void SaveAsPdf()
+        {
+            this.grid.SaveAsPdf();
         }
 
         private void HandleSave(ModelEventArgs oe)
@@ -505,6 +660,16 @@ namespace BL.Forms
         private void ExportButtonClick(ElementEvent e)
         {
             this.grid.SaveAsExcel();
+        }
+
+        [ScriptName("v_onDeleteButtonClick")]
+        private void DeleteButtonClick(ElementEvent e)
+        {
+            if (this.activeSelectedObject != null)
+            {
+                this.grid.RemoveRow(this.activeSelectedObject);
+                this.deleteButton.Disabled = true;
+            }
         }
 
         private void AddButtonClick(ElementEvent e)
@@ -653,6 +818,7 @@ namespace BL.Forms
             {
                 this.grid.Save -= this.gridSave;
                 this.grid.Edit -= this.gridEdit;
+                this.grid.Change -= this.gridChange;
                 this.grid.Cancel -= this.gridCancel;
                 this.grid.Remove -= this.gridRemove; 
             }
@@ -661,6 +827,7 @@ namespace BL.Forms
 
             this.grid.Save += this.gridSave;
             this.grid.Edit += this.gridEdit;
+            this.grid.Change += this.gridChange;
             this.grid.Cancel += this.gridCancel;
             this.grid.Remove += this.gridRemove; 
 
@@ -697,10 +864,24 @@ namespace BL.Forms
                 go.Sortable = new GridSortableOptions();
                 go.Sortable.Mode = "single";
                 go.Scrollable = true;
-    //            go.Toolbar = new String[] { "create" };
+
+                if (this.saveAsFileNameBase != null)
+                {
+                    String saveAsFileNameBaseSafe = KendoUtilities.SafeifyFileName(this.SaveAsFileNameBase);
+
+                    go.Excel = new ExportFileOptions();
+                    go.Excel.FileName = saveAsFileNameBaseSafe + ".xlsx";
+
+                    go.Pdf = new ExportFileOptions();
+                    go.Pdf.FileName = saveAsFileNameBaseSafe + ".pdf";
+                }
+
                 GridEditableOptions geo = new GridEditableOptions();
                 geo.Mode = "inline";
+                geo.Update = true;
                 go.Editable = geo;
+                go.Selectable = true;
+                go.Resizable = true;
 
                 List<GridColumn> columns = new List<GridColumn>();
 
@@ -815,9 +996,81 @@ namespace BL.Forms
 
                             userFieldCount++;
                         }
+                        else if (field.Type == FieldType.RichContent)
+                        {
+                            if (this.contentListFields == null)
+                            {
+                                this.contentListFields = new List<Field>();
+                            }
 
-                        
-                        if ((field.InterfaceType != FieldInterfaceType.TypeDefault && fs.InterfaceTypeOverride == null) || (fs.InterfaceTypeOverride != null && fs.InterfaceTypeOverride != FieldInterfaceType.TypeDefault))
+                            this.contentListFields.Add(field);
+
+                            // SUPER HACKY workaround: in a template display function, we don't know what field to pull to
+                            // display the content for an item.
+                            // so, use some pre-defined functions that will display using the appropriate field from the item
+                            // base on the ordinal of the content field we're processing here.
+                            switch (this.contentListFields.Count - 1)
+                            {
+                                case 0:
+                                    gc.Template = this.ContentItemTemplateDisplay0;
+                                    break;
+
+                                case 1:
+                                    gc.Template = this.ContentItemTemplateDisplay1;
+                                    break;
+
+
+                                case 2:
+                                    gc.Template = this.ContentItemTemplateDisplay2;
+                                    break;
+
+                                case 3:
+                                    gc.Template = this.ContentItemTemplateDisplay3;
+                                    break;
+
+                                default:
+                                    gc.Template = this.AmbiguousResponse;
+                                    break;
+                            }
+                        }
+                        else if ((field.InterfaceType == FieldInterfaceType.UserList && fs.InterfaceTypeOverride == null) || fs.InterfaceTypeOverride == FieldInterfaceType.UserList)
+                        {
+                            if (this.userListListFields == null)
+                            {
+                                this.userListListFields = new List<Field>();
+                            }
+
+                            this.userListListFields.Add(field);
+
+                            switch (this.userListListFields.Count - 1)
+                            {
+                                case 0:
+                                    gc.Template = this.UserListItemTemplateDisplay0;
+                                    break;
+
+                                case 1:
+                                    gc.Template = this.UserListItemTemplateDisplay1;
+                                    break;
+
+
+                                case 2:
+                                    gc.Template = this.UserListItemTemplateDisplay2;
+                                    break;
+
+                                case 3:
+                                    gc.Template = this.UserListItemTemplateDisplay3;
+                                    break;
+
+                                default:
+                                    gc.Template = this.AmbiguousResponse;
+                                    break;
+                            }
+                        }
+                       
+                        if (field.Type == FieldType.RichContent || 
+                                    (field.InterfaceType != FieldInterfaceType.TypeDefault && fs.InterfaceTypeOverride == null) || 
+                                    (fs.InterfaceTypeOverride != null && fs.InterfaceTypeOverride != FieldInterfaceType.TypeDefault)
+                            )
                         {
                             gc.Editor = this.ColumnChoiceCreator;
                         }
@@ -835,9 +1088,13 @@ namespace BL.Forms
                     }
                 }
 
-                GridColumn gcCommand = new GridColumn();
-                gcCommand.Command = new String[] { "edit", "destroy" };
-                go.Columns.Add(gcCommand);
+                if (!this.isReadOnly)
+                {
+             /*       GridColumn gcCommand = new GridColumn();
+
+                    gcCommand.Command = new String[] { "edit", "destroy" };
+                    go.Columns.Add(gcCommand);*/
+                }
 
                 List<object> objects = new List<object>();
 
@@ -887,9 +1144,105 @@ namespace BL.Forms
             return this.GetUserValueByIndex(item, 3);
         }
 
+        private String ContentItemTemplateDisplay0(object item)
+        {
+            return this.GetContentValueByIndex(item, 0);
+        }
+
+        private String ContentItemTemplateDisplay1(object item)
+        {
+            return this.GetContentValueByIndex(item, 1);
+        }
+
+        private String ContentItemTemplateDisplay2(object item)
+        {
+            return this.GetContentValueByIndex(item, 2);
+        }
+
+        private String ContentItemTemplateDisplay3(object item)
+        {
+            return this.GetContentValueByIndex(item, 3);
+        }
+
+        private String UserListItemTemplateDisplay0(object item)
+        {
+            return this.GetUserListValueByIndex(item, 0);
+        }
+
+        private String UserListItemTemplateDisplay1(object item)
+        {
+            return this.GetUserListValueByIndex(item, 1);
+        }
+
+        private String UserListItemTemplateDisplay2(object item)
+        {
+            return this.GetUserListValueByIndex(item, 2);
+        }
+
+        private String UserListItemTemplateDisplay3(object item)
+        {
+            return this.GetUserListValueByIndex(item, 3);
+        }
+
         private String AmbiguousResponse(object item)
         {
             return String.Empty;
+        }
+
+        private String GetUserListValueByIndex(object item, int index)
+        {
+            Field f = this.userListListFields[index];
+
+            String userListFieldValue = null;
+
+            Script.Literal("{0} = {1}[{2}]", userListFieldValue, item, f.Name);
+
+            if (String.IsNullOrEmpty(userListFieldValue))
+            {
+                return String.Empty;
+            }
+
+            String userList = String.Empty;
+
+            UserReferenceSet urs = new UserReferenceSet();
+
+            try
+            {
+                urs.LoadFromJson(userListFieldValue);
+            }
+            catch (Exception)
+            {
+                return String.Empty;
+            }
+
+            foreach (UserReference ur in urs.UserReferences)
+            {
+                if (userList != String.Empty)
+                {
+                    userList += ", ";
+                }
+
+                userList += ur.NickName;
+            }
+
+            return userList;
+        }
+
+
+        private String GetContentValueByIndex(object item, int index)
+        {
+            Field f = this.contentListFields[index];
+
+            String contentFieldValue = null;
+
+            Script.Literal("{0} = {1}[{2}]", contentFieldValue, item, f.Name);
+
+            if (contentFieldValue == null)
+            {
+                return String.Empty;
+            }
+ 
+            return contentFieldValue;
         }
 
         private String GetUserValueByIndex(object item, int index)
@@ -911,7 +1264,14 @@ namespace BL.Forms
             {
                 UserReference ur = new UserReference();
 
-                ur.ApplyString(userFieldValue);
+                try
+                {
+                    ur.ApplyString(userFieldValue);
+                }
+                catch (Exception)
+                {
+                    return String.Empty;
+                }
 
                 return ur.NickName;
             }

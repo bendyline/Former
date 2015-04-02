@@ -61,6 +61,7 @@ namespace BL.Forms
             }
 
             this.userSummaryArea.AddEventListener("mouseup", this.HandleSummaryTap, true);
+            this.userSummaryArea.AddEventListener("click", this.HandleSummaryTap, true);
 
             if (this.toggleButton != null)
             {
@@ -75,6 +76,10 @@ namespace BL.Forms
             this.ApplyDisplayMode();
 
             this.textInput.Focus();
+
+            e.CancelBubble = true;
+            e.StopImmediatePropagation();
+            e.StopPropagation();
         }
 
         private void HandleTextInputKeyPressed(ElementEvent e)

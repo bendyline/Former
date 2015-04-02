@@ -10,6 +10,12 @@
         <!-- end sample preview content -->
 
         <style>
+            body
+            {
+                margin:2px;
+                display:inline-block;
+            }
+
             #toggleButton
             {
                 margin-left:3px;
@@ -24,52 +30,53 @@
                 max-height:41px;
                 width:166px;
                 border:solid 1px #C0C0C0;
-            }  
-            
-            #userSummaryArea
-            {
-                padding-top:2px;
-                padding-bottom:1px;
-                padding-left:3px;
-                padding-right:3px;
-                min-height:41px;
-                max-height:41px;
-                width:166px;
-                border:solid 1px #C0C0C0;
-                vertical-align:top;
-                background-color:#FFFFFF;
-            }  
+            }       
 
             #inputOuter
             {
                 display:table;
+                background-color:#FAFAF4;
+                border:solid 1px #EAEAEA;
+                border-radius:3px;
             }
+
             #inputInner
             {
                 display:table-row;
             }
-            #inputCell
+
+            #cell
             {
                 display:table-cell;
+                vertical-align:middle;
             }
-            #assignCell
+
+            #deleteCell
             {
-                display:table-cell;
-                vertical-align:top;
-                padding-left:8px;
-                padding-right:8px;
+                padding:3px;
+                padding-left:6px;
+            }
+
+            #userSummaryText
+            {
+                padding-left:6px;
+                color:#303030;
+            }
+
+            #userSummaryArea
+            {
+                min-width:60px;
             }
         </style>
 	</head>
 	<body>        
         <div id="inputOuter">
             <div id="inputInner">
-                <div id="inputCell">
-                    <button id="userSummaryArea"></button>
-                    <input type="text" id="textInput" class="k-textbox" placeholder="name"/>
+                <div data-ctl-class="cell" id="summaryCell">
+                    <div id="userSummaryArea"></div>
                 </div>
-                <div id="assignCell">
-                    <input type="button" id="toggleButton" class="k-button" value="assign to me"/>
+                <div data-ctl-class="cell" id="deleteCell">
+                    <img src="qla/images/close.png" style="width:17px;height:17px;padding-bottom:2px;"/>
                 </div>
             </div>
         </div>

@@ -78,6 +78,14 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
+                    else if ((this.Field.Type == FieldType.ShortText || this.Field.Type == FieldType.UnboundedText) && interfaceType == FieldInterfaceType.UserList)
+                    {
+                        this.fieldControl = new UserList();
+                        this.ApplyToControl(this.fieldControl);
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
                     else if (this.Field.Type == FieldType.ShortText && interfaceType == FieldInterfaceType.Choice)
                     {
                         this.fieldControl = new ChoiceFieldValue();
@@ -95,6 +103,16 @@ namespace BL.Forms
                         {
                             this.fieldControl.TemplateId = "bl-forms-emailtextfieldvalue";
                         }
+
+                        this.ApplyToControl(this.fieldControl);
+
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
+                    else if (this.Field.Type == FieldType.Integer || this.Field.Type == FieldType.BigInteger)
+                    {
+                        this.fieldControl = new IntegerFieldValue();
 
                         this.ApplyToControl(this.fieldControl);
 

@@ -234,7 +234,7 @@ namespace BL.Forms
         }
 
         [ScriptName("b_displayAddButton")]
-        public bool DisplayAddButton
+        public bool DisplayAddAndDeleteButtons
         {
             get
             {
@@ -620,6 +620,39 @@ namespace BL.Forms
 
                     itemBin.AppendChild(f.Element);
                 }
+            }
+        }
+
+        public void SetItemSetInterfaceAndItems(ItemSetInterface isi, IDataStoreItemSet newItemSet)
+        {
+            if (this.itemSet == newItemSet && this.itemSetInterface == isi)
+            {
+                return;
+            }
+
+            this.itemSetInterface = isi;
+
+            foreach (Form f in this.forms)
+            {
+                f.ItemSetInterface = this.itemSetInterface;
+            }
+
+            if (this.itemSet != null)
+            {
+                this.itemSet.ItemSetChanged -= this.itemSetEventHandler;
+            }
+
+            this.itemSet = newItemSet;
+
+            if (this.itemSet != null)
+            {
+                this.itemSet.ItemSetChanged += this.itemSetEventHandler;
+
+                this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
+            }
+            else
+            {
+                this.Update();
             }
         }
 
