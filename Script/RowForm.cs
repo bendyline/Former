@@ -150,6 +150,12 @@ namespace BL.Forms
                 }
             }
 
+            // add a spacer
+            Element spacer = this.CreateElement("cell");
+            spacer.Style.Width = "50%";
+            ElementUtilities.SetHtml(spacer, "&#160;");
+            this.Element.AppendChild(spacer);
+
             foreach (LabeledField f in fieldsNotUsed)
             {
                 f.Dispose();

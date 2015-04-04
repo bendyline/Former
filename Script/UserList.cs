@@ -19,15 +19,20 @@ namespace BL.Forms
         [ScriptName("e_userSummaryBin")]
         private Element userSummaryBin;
 
+        [ScriptName("e_inputOuter")]
+        private Element inputOuter;
+
         [ScriptName("e_addMeButton")]
         private InputElement addMeButton;
 
         [ScriptName("e_addTextButton")]
         private InputElement addTextButton;
 
+        [ScriptName("e_updateMessage")]
+        private Element updateMessage;
+
         [ScriptName("e_addTextValue")]
         private InputElement addTextValue;
-
 
         private bool commitPending = false;
 
@@ -167,6 +172,39 @@ namespace BL.Forms
             this.ConsiderUpdate();
         }
 
+        private void UpdateAddVisibility()
+        {
+            String fieldName = this.EffectiveUserInterfaceOptions.RelatedField0;
+
+            if (fieldName != null)
+            {
+                Nullable<Int32> limit = this.Item.GetInt32Value(fieldName);
+
+                if (limit != null)
+                {
+                    if (this.userReferenceSet.UserReferences.UserReferences.Count >= (int)limit)
+                    {
+                        this.inputOuter.Style.Display = "none";
+                        this.updateMessage.Style.Display = "block";
+
+                        ElementUtilities.SetText(this.updateMessage, "(maximum of " + (int)limit + " people reached.)");
+                        return;
+                    }
+                }
+
+            }
+
+            if (this.EffectiveMode == FieldMode.View || this.EffectiveMode == FieldMode.Example)
+            {
+                this.inputOuter.Style.Display = "none";
+                this.updateMessage.Style.Display = "none";
+                return;
+            }
+
+
+            this.inputOuter.Style.Display = "";
+            this.updateMessage.Style.Display = "none";
+        }
 
         private void ConsiderUpdate()
         {
@@ -239,6 +277,8 @@ namespace BL.Forms
             {
                 return;
             }
+
+            this.UpdateAddVisibility();
             
             ElementUtilities.ClearChildElements(this.userSummaryBin);
 

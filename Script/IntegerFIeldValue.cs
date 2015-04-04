@@ -86,7 +86,15 @@ namespace BL.Forms
 
             if (val == null)
             {
-                val = 0;
+                if (this.EffectiveUserInterfaceOptions != null && this.EffectiveUserInterfaceOptions.IntDefaultValue != null)
+                {
+                    val = (int)this.EffectiveUserInterfaceOptions.IntDefaultValue;
+                    this.Item.SetInt32Value(this.FieldName, val);
+                }
+                else
+                {
+                    val = 0;
+                }
             }
 
             if (this.EffectiveMode == FieldMode.Example)

@@ -78,7 +78,7 @@
     <Compile Include="ItemSetEditor.cs" />
     <Compile Include="CheckboxFieldValue.cs" />
     <Compile Include="MultilineTextFieldValue.cs" />
-    <Compile Include="IntegerFIeldValue.cs" />
+    <Compile Include="IntegerFieldValue.cs" />
     <Compile Include="UserList.cs" />
     <Compile Include="UserListToken.cs" />
     <Compile Include="UserValue.cs" />

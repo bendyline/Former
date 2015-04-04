@@ -41,6 +41,8 @@ namespace BL.Forms
         private UserReference activeReference;
 
         private bool commitPending = false;
+        private Control activeUserLoginDialogControl = null;
+        private Control activeUserPropertyEditorDialogControl = null;
 
         private UserValueDisplayMode displayMode = UserValueDisplayMode.TextInput;
 
@@ -126,17 +128,22 @@ namespace BL.Forms
         {
             if (Context.Current.User == null)
             {
-                Dialog d = new Dialog();
+                if (this.activeUserLoginDialogControl == null)
+                {
+                    Dialog d = new Dialog();
 
-                Control c = Context.Current.ObjectProvider.CreateObject("assignuserlogin") as Control;
+                    Control c = Context.Current.ObjectProvider.CreateObject("assignuserlogin") as Control;
 
-                d.Content = c;
-                d.MaxHeight = 400;
-                d.MaxWidth = 500;
+                    this.activeUserLoginDialogControl = c;
 
-                d.Show();
+                    d.Content = c;
+                    d.MaxHeight = 400;
+                    d.MaxWidth = 500;
 
-                d.Closing += assignUserLogin_Closing;
+                    d.Show();
+
+                    d.Closing += assignUserLogin_Closing;
+                }
             }
 
             if (Context.Current.User != null)
@@ -154,21 +161,26 @@ namespace BL.Forms
 
         private void ShowUserSummaryDialog()
         {
-            Dialog d = new Dialog();
-
-            Control c = Context.Current.ObjectProvider.CreateObject("editusermissingproperties") as Control;
-
-            if (c is UserControl)
+            if (this.activeUserPropertyEditorDialogControl == null)
             {
-                ((UserControl)c).User = Context.Current.User;
+                Dialog d = new Dialog();
+
+                Control c = Context.Current.ObjectProvider.CreateObject("editusermissingproperties") as Control;
+
+                this.activeUserPropertyEditorDialogControl = c;
+
+                if (c is UserControl)
+                {
+                    ((UserControl)c).User = Context.Current.User;
+                }
+
+                d.Content = c;
+                d.MaxHeight = 400;
+                d.MaxWidth = 500;
+                d.Closing += editUserSummary_Closing;
+
+                d.Show();
             }
-
-            d.Content = c;
-            d.MaxHeight = 400;
-            d.MaxWidth = 500;
-            d.Closing += editUserSummary_Closing;
-
-            d.Show();
         }
 
         protected override void OnItemChanged()
@@ -180,11 +192,15 @@ namespace BL.Forms
 
         private void editUserSummary_Closing(object sender, EventArgs e)
         {
+            this.activeUserPropertyEditorDialogControl = null;
+
             this.AssignUserValue(false);
         }
 
         private void assignUserLogin_Closing(object sender, EventArgs e)
         {
+            this.activeUserLoginDialogControl = null;
+
             this.AssignUserValue(true);
         }
 

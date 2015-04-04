@@ -533,6 +533,11 @@ namespace BL.Forms
                     this.headerRowElement.AppendChild(cellElement);
                 }
             }
+
+            Element spacer = this.CreateElement("cell");
+            spacer.Style.Width = "50%";
+            ElementUtilities.SetHtml(spacer, "&#160;");
+            this.Element.AppendChild(spacer);
         }
 
         private DisplayState GetAdjustedDisplayState(String fieldName)

@@ -22,7 +22,7 @@
                 padding:2px;
                 min-height:41px;
                 max-height:41px;
-                width:186px;
+                width:136px;
                 border:solid 1px #C0C0C0;
             }  
             
@@ -32,45 +32,88 @@
                 padding-bottom:1px;
                 padding-left:3px;
                 padding-right:3px;
-                min-height:47px;
-                min-width:256px;
-                max-width:256px;
+                min-height:50px;
+                min-width:286px;
+                max-width:286px;
                 border:solid 1px #C0C0C0;
                 vertical-align:top;
                 background-color:#FFFFFF;
-                margin-bottom:3px;
             }  
 
             #inputOuter
             {
                 display:table;
+                background-color:#F4F4F4;
+
+                min-width:286px;
+                max-width:286px;
             }
             #inputInner
             {
                 display:table-row;
             }
+
             #inputCell
             {
                 display:table-cell;
+                background-color:#EAEAEA;
+                padding-left:4px;
+                padding-top:4px;
+                padding-bottom:4px;
             }
 
             #assignCell
             {
                 display:table-cell;
+                background-color:#EAEAEA;
+                border:solid 1px #EAEAEA;
+                border-bottom-right-radius:5px;
                 vertical-align:top;
-                padding-left:8px;
-                padding-right:8px;
+                padding-top:3px;
+                padding-right:6px;
+                padding-bottom:3px;
             }
+
+            #meCell
+            {
+                display:table-cell;
+                vertical-align:top;
+                padding-left:6px;
+                padding-right:6px;
+                padding-top:4px;
+                padding-bottom:4px;
+            }
+
 
             #button
             {
+                font-size: small;
+                text-align: right;
+                padding: 4px;
+                padding-left:10px;
+                padding-right:10px;
                 height:41px;
-                margin-right:3px;
+                min-width:60px;
+                vertical-align:middle;
+                text-align:center;   
+                background-color:white;
+                border-radius:3px;                             
+                color:#A0A0A0;
+                border:solid 1px #A0A0A0;
+                cursor:default;
             }
 
-            #addMeButton
+            #button:hover
             {
-                margin-top:3px;
+                background-color: #6AC5E8;
+                color: white;
+                border:solid 1px #6AC5E8;
+            }
+
+            #updateMessage
+            {
+                padding-top:4px;
+                padding-bottom:4px;
             }
         </style>
 	</head>
@@ -79,13 +122,16 @@
         <div id="inputOuter">
             <div id="inputInner">
                 <div id="inputCell">
-                    <input type="text" id="addTextValue" class="k-input"/>
+                    <input type="text" id="addTextValue" class="k-input" placeholder="name"/>
                 </div>
                 <div id="assignCell">
                     <input type="button" id="addTextButton" class="k-button" value="add" data-ctl-class="button"/>
                 </div>
+                <div id="meCell">
+                    <input type="button" id="addMeButton" class="k-button" value="+ me" data-ctl-class="button"/>
+                </div>
             </div>
         </div>
-        <input type="button" id="addMeButton" class="k-button" value="+ me" data-ctl-class="button"/>
+        <div id="updateMessage" style="display:none"></div>
     </body>
 </html>
