@@ -31,69 +31,6 @@ namespace BL.Forms
         [ScriptName("c_persist")]
         private PersistButton persist;
 
-        [ScriptName("e_item0")]
-        private Element item0;
-
-        [ScriptName("e_item1")]
-        private Element item1;
-
-        [ScriptName("e_item2")]
-        private Element item2;
-
-        [ScriptName("e_item3")]
-        private Element item3;
-
-        [ScriptName("e_item4")]
-        private Element item4;
-
-        [ScriptName("e_item5")]
-        private Element item5;
-
-        [ScriptName("e_item6")]
-        private Element item6;
-
-        [ScriptName("e_item7")]
-        private Element item7;
-
-        [ScriptName("e_item8")]
-        private Element item8;
-
-        [ScriptName("e_item9")]
-        private Element item9;
-
-        [ScriptName("e_item10")]
-        private Element item10;
-
-        [ScriptName("e_item11")]
-        private Element item11;
-
-        [ScriptName("e_item12")]
-        private Element item12;
-
-        [ScriptName("e_item13")]
-        private Element item13;
-
-        [ScriptName("e_item14")]
-        private Element item14;
-
-        [ScriptName("e_item15")]
-        private Element item15;
-
-        [ScriptName("e_item16")]
-        private Element item16;
-
-        [ScriptName("e_item17")]
-        private Element item17;
-
-        [ScriptName("e_item18")]
-        private Element item18;
-
-        [ScriptName("e_item19")]
-        private Element item19;
-
-        [ScriptName("e_item20")]
-        private Element item20;
-
         private FormMode formMode = FormMode.EditForm;
 
         private ImageBrowserOptions defaultImageBrowserOptions;
@@ -534,10 +471,10 @@ namespace BL.Forms
                 }
             }
 
-            Element spacer = this.CreateElement("cell");
-            spacer.Style.Width = "50%";
+            Element spacer = this.CreateElement("headerCell");
+            spacer.Style.Width = "100%";
             ElementUtilities.SetHtml(spacer, "&#160;");
-            this.Element.AppendChild(spacer);
+            this.headerRowElement.AppendChild(spacer);
         }
 
         private DisplayState GetAdjustedDisplayState(String fieldName)
@@ -667,8 +604,6 @@ namespace BL.Forms
             {
                 return;
             }
-
-            int index = 0;
 
             if (this.ItemSetInterface.Sort != ItemSetSort.None)
             {

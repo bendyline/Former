@@ -145,7 +145,14 @@ namespace BL.Forms
                     d.Closing += assignUserLogin_Closing;
                 }
             }
+            else if (Context.Current.User != null)
+            {
+                Context.Current.User.LoadUser(this.ConsiderMeContinue,null);
+            }
+        }
 
+        private void ConsiderMeContinue(IAsyncResult result)
+        {         
             if (Context.Current.User != null)
             {
                 if (String.IsNullOrEmpty(Context.Current.User.NickName))
@@ -208,21 +215,28 @@ namespace BL.Forms
         {
             if (Context.Current.User != null)
             {
-                if (!String.IsNullOrEmpty(Context.Current.User.NickName))
-                {
-                    this.textInput.Value = String.Empty;
+                Context.Current.User.LoadUser(this.AssignUserValueContinue, showUserSummaryIfNeeded);
+            }
+        }
 
-                    UserReference ur = new UserReference();
+        private void AssignUserValueContinue(IAsyncResult result)
+        {
+            bool showUserSummaryIfNeeded = (bool)result.AsyncState;
 
-                    ur.Id = Context.Current.User.Id;
-                    ur.NickName = Context.Current.User.NickName;
+            if (!String.IsNullOrEmpty(Context.Current.User.NickName))
+            {
+                this.textInput.Value = String.Empty;
 
-                    this.Item.SetStringValue(this.FieldName, Json.Stringify(ur.GetObject()));
-                }
-                else if (showUserSummaryIfNeeded)
-                {
-                    this.ShowUserSummaryDialog();
-                }
+                UserReference ur = new UserReference();
+
+                ur.Id = Context.Current.User.Id;
+                ur.NickName = Context.Current.User.NickName;
+
+                this.Item.SetStringValue(this.FieldName, Json.Stringify(ur.GetObject()));
+            }
+            else if (showUserSummaryIfNeeded)
+            {
+                this.ShowUserSummaryDialog();
             }
         }
 

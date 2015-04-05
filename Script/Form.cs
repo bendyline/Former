@@ -182,7 +182,7 @@ namespace BL.Forms
                     return false;
                 }
 
-                if ((field.Type == FieldType.ShortText || field.Type == FieldType.UnboundedText || field.Type == FieldType.RichContent) && value == String.Empty)
+                if ((field.Type == FieldType.ShortText || field.Type == FieldType.UnboundedText || field.Type == FieldType.RichContent) && (String)value == String.Empty)
                 {
                     return false;
                 }
@@ -255,7 +255,7 @@ namespace BL.Forms
             }
         }
 
-        public void Save(AsyncCallback callback, object state)
+        public virtual void Save(AsyncCallback callback, object state)
         {
             foreach (Control ic in this.TemplateControls)
             {
@@ -346,8 +346,7 @@ namespace BL.Forms
             if (c is FormControl)
             {
                 ((FormControl)c).Form = this;
-            }
-    
+            }    
         }
     }
 }

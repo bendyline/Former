@@ -22,12 +22,6 @@ namespace BL.Forms
         [ScriptName("e_inputOuter")]
         private Element inputOuter;
 
-        [ScriptName("e_addMeButton")]
-        private InputElement addMeButton;
-
-        [ScriptName("e_addTextButton")]
-        private InputElement addTextButton;
-
         [ScriptName("e_updateMessage")]
         private Element updateMessage;
 

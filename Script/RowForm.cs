@@ -152,7 +152,7 @@ namespace BL.Forms
 
             // add a spacer
             Element spacer = this.CreateElement("cell");
-            spacer.Style.Width = "50%";
+            spacer.Style.Width = "100%";
             ElementUtilities.SetHtml(spacer, "&#160;");
             this.Element.AppendChild(spacer);
 
@@ -205,59 +205,10 @@ namespace BL.Forms
             return this.ItemSetInterface.FieldInterfaces.GetFieldTitleOverride(fieldName);
         }
 
-        public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
-        {
-            FieldChoiceCollection fcc = this.ItemSetInterface.FieldInterfaces.GetFieldChoicesOverride(fieldName);
-
-            return fcc;
-        }
-
-        public DisplayState GetAdjustedDisplayState(String fieldName)
-        {
-            return this.ItemSetInterface.FieldInterfaces.GetAdjustedDisplayState(fieldName);
-        }
-
-        public Nullable<FieldInterfaceType> GetFieldInterfaceTypeOverride(String fieldName)
-        {
-            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOverride(fieldName);
-        }
-
-        public FieldMode GetFieldModeOverride(String fieldName)
-        {
-            return this.ItemSetInterface.FieldInterfaces.GetFieldModeOverride(fieldName);
-        }
 
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-        }
-
-        public void Save(AsyncCallback callback, object state)
-        {
-
-            foreach (Control ic in this.TemplateControls)
-            {
-                if (ic is FieldControl)
-                {
-                    ((FieldControl)ic).PersistToItem();
-                }
-            }
-
-            ((ODataEntity)this.Item).Save(callback, state);
-        }
-
-        public void ApplyToControl(Control c)
-        {
-            if (c is ItemControl)
-            {
-                ((ItemControl)c).Item = this.Item;
-            }
-
-            if (c is FormControl)
-            {
-                ((FormControl)c).Form = this;
-            }
-    
         }
     }
 }
