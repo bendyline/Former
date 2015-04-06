@@ -42,7 +42,7 @@ namespace BL.Forms
 
             foreach (FieldChoice fc in fcc)
             {
-                results += "|" + fc.Id + "|" + fc.DisplayName + "|";
+                results += "|" + fc.Id + "|" + fc.DisplayName + "|" + fc.ImageUrl;
             }
 
             results += id;
@@ -78,16 +78,14 @@ namespace BL.Forms
 
                 if (this.EffectiveMode == FieldMode.Example)
                 {
-                    InputElement b = (InputElement)this.CreateElementWithType("choiceButton example", "INPUT");
-                    b.Type = "button";
+                    InputElement b = (InputElement)this.CreateElementWithType("choiceButton example", "BUTTON");
 
-                    b.Value = "Example 1";
+                    ElementUtilities.SetText(b, "Example 1");
                     this.choiceBin.AppendChild(b);
 
-                    b = (InputElement)this.CreateElementWithType("choiceButton example", "INPUT");
-                    b.Type = "button";
+                    b = (InputElement)this.CreateElementWithType("choiceButton example", "BUTTON");
+                    ElementUtilities.SetText(b, "Example 2");
 
-                    b.Value = "Example 2";
                     this.choiceBin.AppendChild(b);
                 }
                 else
@@ -116,8 +114,7 @@ namespace BL.Forms
                             className = "choiceButton normal";
                         }
 
-                        InputElement b = (InputElement)this.CreateElementWithType(className, "INPUT");
-                        b.Type = "button";
+                        InputElement b = (InputElement)this.CreateElementWithType(className, "BUTTON");
 
                         if (this.Form.ItemSetInterface != null)
                         {
@@ -154,7 +151,33 @@ namespace BL.Forms
 
                         b.SetAttribute("choiceId", fc.DisplayName);
                         b.AddEventListener("click", this.HandleButtonClick, true);
-                        b.Value = fc.DisplayName;
+
+                        Element choiceOuterElement = this.CreateElement("choiceOuter");
+
+                        Element choiceInnerElement = this.CreateElement("choiceInner");
+
+                        b.AppendChild(choiceOuterElement);
+                        choiceOuterElement.AppendChild(choiceInnerElement);
+
+                        if (fc.ImageUrl != null)
+                        {
+                            Element imgElement = this.CreateElement("choiceImage");
+                            imgElement.Style.BackgroundImage = "url('" + fc.ImageUrl + "')";
+                            choiceInnerElement.AppendChild(imgElement);
+                        }
+
+                        Element spanElement = this.CreateElement("choiceText");
+
+                        String val = fc.DisplayName;
+
+                        if (val == null)
+                        {
+                            val = String.Empty;
+                        }
+
+                        ElementUtilities.SetText(spanElement, val);
+                        choiceInnerElement.AppendChild(spanElement);
+
 
                         this.choiceBin.AppendChild(b);
                     }

@@ -121,6 +121,23 @@ namespace BL.Forms
                 ElementUtilities.SetText(this.textDisplay, ((int)val).ToString());
             }
 
+
+            if (this.EffectiveUserInterfaceOptions != null)
+            {
+                Nullable<int> suggestedWidth = this.EffectiveUserInterfaceOptions.SuggestedWidth;
+
+                if (suggestedWidth != null)
+                {
+                    this.textDisplay.Style.MinWidth = (int)suggestedWidth + "px";
+                    this.textInput.Style.MinWidth = this.textDisplay.Style.MinWidth;
+                }
+                else
+                {
+                    this.textDisplay.Style.MinWidth = String.Empty;
+                    this.textInput.Style.MinWidth = String.Empty;
+                }
+            }
+
             if (this.FieldInterface != null && this.FieldInterface.InterfaceTypeOptionsOverride != null && this.FieldInterface.InterfaceTypeOptionsOverride.Placeholder != null)
             {
                 this.textInput.SetAttribute("placeholder", this.FieldInterface.InterfaceTypeOptionsOverride.Placeholder);

@@ -1066,6 +1066,12 @@ namespace BL.Forms
                                     break;
                             }
                         }
+                        else
+                        {
+                            // force the value of the column to have a nbsp at the end to force it to have a space.
+                            String template = "#if (" + field.Name + " == null) {# #=''# #} else {# #: " + field.Name + "# #}#&\\#160;";
+                            Script.Literal("{0}={1}", gc.Template, template);
+                        }
                        
                         if (field.Type == FieldType.RichContent || 
                                     (field.InterfaceType != FieldInterfaceType.TypeDefault && fs.InterfaceTypeOverride == null) || 
