@@ -370,6 +370,8 @@ namespace BL.Forms
             this.gridChange = this.HandleChange;
             this.gridCancel = this.HandleCancel;
             this.gridRemove = this.grid_Remove;
+
+            this.EnqueueUpdates = true;
         }
 
         protected override void OnDimensionChanged()

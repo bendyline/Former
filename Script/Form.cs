@@ -167,6 +167,8 @@ namespace BL.Forms
         {            
             this.fieldSettingsChangeHandler = this.FieldSettingsCollection_CollectionChanged;
             this.formSettingsChangeHandler = this.settings_PropertyChanged;
+
+            this.EnqueueUpdates = true;
         }
 
         public bool IsFieldValidForItem(IDataStoreField field, IItem item)

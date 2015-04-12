@@ -24,6 +24,8 @@ namespace BL.Forms
         {
             this.fields = new List<LabeledField>();
             this.fieldsByName = new Dictionary<string, LabeledField>();
+
+            this.EnqueueUpdates = true;
         }
         
         protected override void OnUpdate()

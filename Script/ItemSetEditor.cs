@@ -294,6 +294,8 @@ namespace BL.Forms
             this.forms = new List<Form>();
 
             this.itemSetEventHandler = this.itemSet_ItemSetChanged;
+
+            this.EnqueueUpdates = true;
         }
 
         private void ApplyAddButtonVisibility()
