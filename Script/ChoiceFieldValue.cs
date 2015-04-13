@@ -122,23 +122,38 @@ namespace BL.Forms
 
                             if (color != null)
                             {
+                                ColorDefinition originalColor = ColorDefinition.CreateFromString(color);
+
                                 // selected = natural (darker) accent color
                                 if (id == fc.DisplayName)
                                 {
-                                    b.Style.BackgroundColor = color;
-
+                                    if (originalColor.IsPrimarilyLight)
+                                    {
+                                        b.Style.BackgroundColor = originalColor.GetPercentageAdjustedColor(-0.35).ToString();
+                                     }
+                                    else
+                                    {
+                                        b.Style.BackgroundColor = color;
+                                    }
                                 }
                                 else
                                 {
+                                    if (originalColor.IsPrimarilyLight)
+                                    {
+                                        color = ColorDefinition.CreateFromString(color).GetPercentageAdjustedColor(-0.1).ToString();
+                                    }
+                                    else
+                                    {
+                                        color = ColorDefinition.CreateFromString(color).GetPercentageAdjustedColor(.25).ToString();
+                                    }
 
-                                    color = ColorDefinition.CreateFromString(color).GetPrecentageAdjustedColor(.25).ToString();
 
                                     b.Style.BackgroundColor = color;
                                 }
 
-                                ColorDefinition cd = ColorDefinition.CreateFromString(b.Style.BackgroundColor);
+                                ColorDefinition backgroundColor = ColorDefinition.CreateFromString(b.Style.BackgroundColor);
 
-                                if (cd.IsPrimarilyLight)
+                                if (backgroundColor.IsPrimarilyLight)
                                 {
                                     b.Style.Color = "#303030";
                                 }

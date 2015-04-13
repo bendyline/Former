@@ -124,8 +124,8 @@ namespace BL.Forms
                 }
                 else
                 {
-                    this.textDisplay.Style.MinWidth = String.Empty;
-                    this.textInput.Style.MinWidth = String.Empty;
+                    this.textDisplay.Style.MinWidth = "150px";
+                    this.textInput.Style.MinWidth = "150px";
                 }
             }
 
