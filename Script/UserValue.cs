@@ -229,7 +229,7 @@ namespace BL.Forms
 
                 UserReference ur = new UserReference();
 
-                ur.Id = Context.Current.User.Id;
+                ur.UniqueKey = Context.Current.User.UniqueKey;
                 ur.NickName = Context.Current.User.NickName;
 
                 this.Item.SetStringValue(this.FieldName, Json.Stringify(ur.GetObject()));
@@ -274,7 +274,7 @@ namespace BL.Forms
 
                         this.activeReference.ApplyString(value);
 
-                        if (this.activeReference.Id != null && this.activeReference.NickName != null)
+                        if (this.activeReference.UniqueKey != null && this.activeReference.NickName != null)
                         {
                             this.displayMode = UserValueDisplayMode.UserSummary;
                         }

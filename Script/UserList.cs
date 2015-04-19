@@ -90,7 +90,7 @@ namespace BL.Forms
             {
                 UserReference currentUserReference = new UserReference();
 
-                currentUserReference.Id = Utilities.CreateRandomId();
+                currentUserReference.UniqueKey = Utilities.CreateRandomId();
                 currentUserReference.Type = UserReferenceType.Adhoc;
                 currentUserReference.NickName = valu;
 
@@ -240,7 +240,7 @@ namespace BL.Forms
             {
                 foreach (UserReference ur in this.UserReferenceSet.UserReferences)
                 {
-                    if (ur.Type == UserReferenceType.StructuredUser && ur.Id == Context.Current.User.Id)
+                    if (ur.Type == UserReferenceType.StructuredUser && ur.UniqueKey == Context.Current.User.UniqueKey)
                     {
                         return;
                     }
@@ -248,7 +248,7 @@ namespace BL.Forms
 
                 UserReference currentUserReference = new UserReference();
 
-                currentUserReference.Id = Context.Current.User.Id;
+                currentUserReference.UniqueKey = Context.Current.User.UniqueKey;
                 currentUserReference.Type = UserReferenceType.StructuredUser;
                 currentUserReference.NickName = Context.Current.User.NickName;
 
@@ -286,9 +286,9 @@ namespace BL.Forms
             {
                 UserListToken ult = null;
 
-                if (this.tokensByReferenceId.ContainsKey(ur.Id) && this.tokensByReferenceId[ur.Id] != null)
+                if (this.tokensByReferenceId.ContainsKey(ur.UniqueKey) && this.tokensByReferenceId[ur.UniqueKey] != null)
                 {
-                    ult = this.tokensByReferenceId[ur.Id];
+                    ult = this.tokensByReferenceId[ur.UniqueKey];
                     usedTokens.Remove(ult);
                 }
                 else
@@ -299,7 +299,7 @@ namespace BL.Forms
 
                     ult.EnsureElements();
 
-                    this.tokensByReferenceId[ur.Id] = ult;
+                    this.tokensByReferenceId[ur.UniqueKey] = ult;
                 }
 
                 this.userSummaryBin.AppendChild(ult.Element);
@@ -309,7 +309,7 @@ namespace BL.Forms
             {
                 if (ult != null)
                 {
-                    this.tokensByReferenceId[ult.UserReference.Id] = null;
+                    this.tokensByReferenceId[ult.UserReference.UniqueKey] = null;
                     ult.Dispose();
                 }
             }

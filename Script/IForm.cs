@@ -24,6 +24,7 @@ namespace BL.Forms
         bool IsFieldValidForItem(IDataStoreField field, IItem item);
         String GetFieldDisplayNameOverride(String fieldName);
         bool? GetFieldRequiredOverride(String fieldName);
+        bool? GetFieldAllowNullOverride(String fieldName);
         FieldChoiceCollection GetFieldChoicesOverride(String fieldName);
         DisplayState GetAdjustedDisplayState(String fieldName);
         Nullable<FieldInterfaceType> GetFieldInterfaceTypeOverride(String fieldName);

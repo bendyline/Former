@@ -133,6 +133,7 @@ namespace BL.Forms
                     this.fieldIterator.OnInterfaceChange();
                 }
 
+
                 this.Update();
             }
         }
@@ -193,6 +194,22 @@ namespace BL.Forms
             return true;
         }
 
+        public bool ContainsTemplateFieldControl(String fieldName)
+        {
+            foreach (Control c in this.TemplateControls)
+            {
+                if (c is FieldControl)
+                {
+                    if ( ((FieldControl)c).FieldName == fieldName)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public void DeleteItem()
         {
             this.Item.DeleteItem();
@@ -213,6 +230,11 @@ namespace BL.Forms
         public bool? GetFieldRequiredOverride(String fieldName)
         {
             return this.ItemSetInterface.FieldInterfaces.GetFieldRequiredOverride(fieldName);
+        }
+
+        public bool? GetFieldAllowNullOverride(String fieldName)
+        {
+            return this.ItemSetInterface.FieldInterfaces.GetFieldAllowNullOverride(fieldName);
         }
 
         public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)

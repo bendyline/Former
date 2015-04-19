@@ -358,6 +358,26 @@ namespace BL.Forms
                 index = (int)item.GetValue(this.ItemPlacementFieldName);
             }
 
+
+            // set default data values, where applicable
+            foreach (IDataStoreField f in this.itemSet.Type.Fields)
+            {
+                FieldInterface fi = this.itemSetInterface.FieldInterfaces.GetFieldByName(f.Name);
+
+                if (f.Type == FieldType.Integer)
+                {
+                    if (fi != null && fi.InterfaceTypeOptionsOverride != null && fi.InterfaceTypeOptionsOverride.IntDefaultValue != null)
+                    {
+                        item.SetInt32Value(f.Name, (Int32)fi.InterfaceTypeOptionsOverride.IntDefaultValue);
+                    }
+                    else if (!Script.IsNullOrUndefined(f.InterfaceTypeOptions) && f.InterfaceTypeOptions.IntDefaultValue != null)
+                    {
+                        item.SetInt32Value(f.Name, (Int32)f.InterfaceTypeOptions.IntDefaultValue);
+
+                    }
+                }
+            }
+
             this.EnsureFormForItem(item, index);
 
             if (this.ItemAdded != null)

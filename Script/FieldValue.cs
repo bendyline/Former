@@ -86,7 +86,7 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
-                    else if (this.Field.Type == FieldType.ShortText && interfaceType == FieldInterfaceType.Choice)
+                    else if ((this.Field.Type == FieldType.ShortText || this.Field.Type == FieldType.Integer) && interfaceType == FieldInterfaceType.Choice)
                     {
                         this.fieldControl = new ChoiceFieldValue();
 

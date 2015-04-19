@@ -14,9 +14,6 @@ namespace BL.Forms
 {
     public class FieldLabel : FieldControl
     {
-        [ScriptName("e_title")]
-        private Element titleElement;
-
         public FieldLabel()
         {
 
@@ -33,10 +30,7 @@ namespace BL.Forms
         {
             base.OnUpdate();
 
-            if (this.titleElement != null)
-            {
-                ElementUtilities.SetText(this.titleElement, this.EffectiveFieldDisplayName);
-            }
+            ElementUtilities.SetText(this.Element, this.EffectiveFieldDisplayName);
         }
     }
 }

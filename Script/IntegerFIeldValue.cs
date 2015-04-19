@@ -68,7 +68,21 @@ namespace BL.Forms
         {
             this.commitPending = false;
 
-            this.Item.SetInt32Value(this.FieldName, Int32.Parse(this.textInput.Value));
+            if (this.textInput.Value == String.Empty)
+            {
+                if (AllowNull)
+                {
+                    this.Item.SetInt32Value(this.FieldName, null);
+                }
+                else
+                {
+                    this.Item.SetInt32Value(this.FieldName, 0);
+                }
+            }
+            else
+            {
+                this.Item.SetInt32Value(this.FieldName, Int32.Parse(this.textInput.Value));
+            }
 
             this.textInput.Focus();
         }
@@ -84,16 +98,25 @@ namespace BL.Forms
 
             int? val = this.Item.GetInt32Value(this.FieldName);
 
+            bool allowNull = this.AllowNull;
+
             if (val == null)
             {
                 if (this.EffectiveUserInterfaceOptions != null && this.EffectiveUserInterfaceOptions.IntDefaultValue != null)
                 {
                     val = (int)this.EffectiveUserInterfaceOptions.IntDefaultValue;
+
                     this.Item.SetInt32Value(this.FieldName, val);
+                }
+                else if (allowNull)
+                {
+                    this.Item.SetInt32Value(this.FieldName, null);
                 }
                 else
                 {
-                    val = 0;
+                    val = 0; 
+                    this.Item.SetInt32Value(this.FieldName, val);
+
                 }
             }
 
@@ -103,7 +126,14 @@ namespace BL.Forms
                 this.textInput.Disabled = true;
                 this.textDisplay.Style.Display = "none";
                 this.textInput.Style.Display = "block";
-                this.textInput.Value = ((int)val).ToString();
+                if (val == null)
+                {
+                    this.textInput.Value =String.Empty;
+                }
+                else
+                {
+                    this.textInput.Value = ((int)val).ToString();
+                }
             }
             else if (this.EffectiveMode == FieldMode.Edit)
             {
@@ -111,14 +141,28 @@ namespace BL.Forms
                 this.textDisplay.Style.Display = "none";
                 this.textInput.Style.Display = "block";
 
-                this.textInput.Value = ((int)val).ToString();
+                if (val == null)
+                {
+                    this.textInput.Value = String.Empty;
+                }
+                else
+                {
+                    this.textInput.Value = ((int)val).ToString();
+                }
             }
             else
             {
                 this.textDisplay.Style.Display = "block";
                 this.textInput.Style.Display = "none";
 
-                ElementUtilities.SetText(this.textDisplay, ((int)val).ToString());
+                if (val == null)
+                {
+                    ElementUtilities.SetText(this.textDisplay, String.Empty);
+                }
+                else
+                {
+                    ElementUtilities.SetText(this.textDisplay, ((int)val).ToString());
+                }
             }
 
 

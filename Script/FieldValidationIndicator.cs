@@ -33,7 +33,7 @@ namespace BL.Forms
         {
             base.OnUpdate();
 
-            if (this.IsReady)
+            if (this.IsReady && this.asteriskElement != null)
             {
                 if (this.Form.IsFieldValidForItem(this.Field, this.Item))
                 {

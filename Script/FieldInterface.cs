@@ -12,6 +12,7 @@ namespace BL.Forms
     {
         private String titleOverride;
         private bool? requiredOverride;
+        private bool? allowNullOverride;
         private DisplayState display;
         private FieldChoiceCollection choicesOverride;
         private String name;
@@ -81,6 +82,26 @@ namespace BL.Forms
                 this.titleOverride = value;
 
                 this.NotifyPropertyChanged("TitleOverride");
+            }
+        }
+        [ScriptName("b_allowNullOverride")]
+        public bool? AllowNullOverride
+        {
+            get
+            {
+                return this.allowNullOverride;
+            }
+
+            set
+            {
+                if (this.allowNullOverride == value)
+                {
+                    return;
+                }
+
+                this.allowNullOverride = value;
+
+                this.NotifyPropertyChanged("AllowNullOverride");
             }
         }
 
@@ -231,20 +252,6 @@ namespace BL.Forms
             this.NotifyPropertyChanged("InterfaceTypeOptionsOverride");
         }
 
-        public bool IsEqualTo(FieldInterface settings)
-        {
-            if (this.Display != settings.Display)
-            {
-                return false;
-            }
-
-            if (this.Display != settings.Display)
-            {
-                return false;
-            }
-
-            return true;
-        }
 
     }
 }

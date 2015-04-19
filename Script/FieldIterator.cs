@@ -93,61 +93,65 @@ namespace BL.Forms
 
             foreach (Field field in sortedFields)
             {
-                FieldInterface fs = this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
-
-                if (fs != null && !this.usedFieldInterfaces.ContainsKey(fs))
+                // only add the field if it's not part of the uber form template.
+                if (!((Form)this.Form).ContainsTemplateFieldControl(field.Name))
                 {
-                    this.usedFieldInterfaces[fs] = field;
+                    FieldInterface fs = this.Form.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
 
-                    fs.PropertyChanged -= this.propertyChanged;
-                    fs.PropertyChanged += this.propertyChanged;
-                }
-
-                DisplayState afs = this.Form.GetAdjustedDisplayState(field.Name);
-
-                if (afs == DisplayState.Show)
-                {
-                    LabeledField ff = this.fieldsByName[field.Name];
-
-                    if (ff == null)
+                    if (fs != null && !this.usedFieldInterfaces.ContainsKey(fs))
                     {
-                        ff = new LabeledField();
+                        this.usedFieldInterfaces[fs] = field;
 
-                        ff.Form = this.Form;
-                        ff.FieldName = field.Name;
+                        fs.PropertyChanged -= this.propertyChanged;
+                        fs.PropertyChanged += this.propertyChanged;
+                    }
 
-                        if (this.fieldTemplateId != null)
+                    DisplayState afs = this.Form.GetAdjustedDisplayState(field.Name);
+
+                    if (afs == DisplayState.Show)
+                    {
+                        LabeledField ff = this.fieldsByName[field.Name];
+
+                        if (ff == null)
                         {
-                            ff.TemplateId = this.fieldTemplateId;
+                            ff = new LabeledField();
+
+                            ff.Form = this.Form;
+                            ff.FieldName = field.Name;
+
+                            if (this.fieldTemplateId != null)
+                            {
+                                ff.TemplateId = this.fieldTemplateId;
+                            }
+
+                            ff.EnsureElements();
+
+                            this.fields.Add(ff);
+
+                            this.fieldsByName[field.Name] = ff;
+
+                        }
+                        else
+                        {
+                            if (fs != ff.FieldInterface)
+                            {
+                                ff.Update();
+                            }
+
+                            fieldsNotUsed.Remove(ff);
                         }
 
-                        ff.EnsureElements();
+                        this.fieldBin.AppendChild(ff.Element);
 
-                        this.fields.Add(ff);
+                        FieldMode fm = this.Form.GetFieldModeOverride(field.Name);
 
-                        this.fieldsByName[field.Name] = ff;
-
-                    }
-                    else
-                    {
-                        if (fs != ff.FieldInterface)
+                        if (fm != FieldMode.FormDefault)
                         {
-                            ff.Update();
+                            ff.Mode = fm;
                         }
 
-                        fieldsNotUsed.Remove(ff);
+                        ff.Item = this.Item;
                     }
-
-                    this.fieldBin.AppendChild(ff.Element);
-
-                    FieldMode fm = this.Form.GetFieldModeOverride(field.Name);
-
-                    if (fm != FieldMode.FormDefault)
-                    {
-                        ff.Mode = fm;
-                    }
-
-                    ff.Item = this.Item;
                 }
             }
 

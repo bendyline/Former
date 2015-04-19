@@ -88,6 +88,20 @@ namespace BL.Forms
             return fs.RequiredOverride;
         }
 
+
+        public bool? GetFieldAllowNullOverride(String fieldName)
+        {
+            FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
+
+            if (fs == null)
+            {
+                return null;
+            }
+
+            return fs.AllowNullOverride;
+        }
+
+
         public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
         {
             FieldInterface fs = this.fieldsByStorageFieldName[fieldName];

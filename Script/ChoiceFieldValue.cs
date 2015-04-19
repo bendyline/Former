@@ -57,6 +57,13 @@ namespace BL.Forms
             this.Update();
         }
 
+        protected override void OnFieldChanged()
+        {
+            base.OnFieldChanged();
+
+            this.Update();
+        }
+
         protected override void OnUpdate()
         {
             base.OnUpdate();
@@ -65,6 +72,7 @@ namespace BL.Forms
             {
                 return;
             }
+
             String newHash = this.GetOptionsHash();
 
             if (this.lastOptionsHash != newHash)
@@ -99,13 +107,32 @@ namespace BL.Forms
                         fcc = alternateChoices;
                     }
 
-                    String id = this.Item.GetStringValue(this.FieldName);
+                    object selectedVal= this.Item.GetValue(this.FieldName);
+
+                    if (selectedVal == null)
+                    {
+                        selectedVal = "null";
+                    }
 
                     foreach (FieldChoice fc in fcc)
                     {
                         String className;
 
-                        if (id == fc.DisplayName)
+                        bool isSelected = false;
+
+                        object abstractedId = fc.Id;
+
+                        if (abstractedId == null)
+                        {
+                            abstractedId = fc.DisplayName;
+                        }
+
+                        if (selectedVal == abstractedId)
+                        {
+                            isSelected = true;
+                        }
+
+                        if (isSelected)
                         {
                             className = "choiceButton selected";
                         }
@@ -113,6 +140,7 @@ namespace BL.Forms
                         {
                             className = "choiceButton normal";
                         }
+
 
                         InputElement b = (InputElement)this.CreateElementWithType(className, "BUTTON");
 
@@ -125,7 +153,7 @@ namespace BL.Forms
                                 ColorDefinition originalColor = ColorDefinition.CreateFromString(color);
 
                                 // selected = natural (darker) accent color
-                                if (id == fc.DisplayName)
+                                if (isSelected)
                                 {
                                     if (originalColor.IsPrimarilyLight)
                                     {
@@ -164,7 +192,7 @@ namespace BL.Forms
                             }
                         }
 
-                        b.SetAttribute("choiceId", fc.DisplayName);
+                        b.SetAttribute("data-choiceId", abstractedId);
                         b.AddEventListener("click", this.HandleButtonClick, true);
 
                         Element choiceOuterElement = this.CreateElement("choiceOuter");
@@ -193,7 +221,6 @@ namespace BL.Forms
                         ElementUtilities.SetText(spanElement, val);
                         choiceInnerElement.AppendChild(spanElement);
 
-
                         this.choiceBin.AppendChild(b);
                     }
                 }
@@ -202,6 +229,13 @@ namespace BL.Forms
 
         private void HandleButtonClick(ElementEvent e)
         {
+            if (this.EffectiveMode == FieldMode.View)
+            {
+                e.CancelBubble = true;
+                e.PreventDefault();
+                return;
+            }
+
             InputElement element = (InputElement)ElementUtilities.GetEventTarget(e);
 
             if (selectedElement != null)
@@ -209,13 +243,66 @@ namespace BL.Forms
                 selectedElement.ClassName = this.GetElementClass("choiceButton normal");
             }
 
-            String val = (String)element.GetAttribute("choiceId");
+            object val = element.GetAttribute("data-choiceId");
 
-            this.Item.SetStringValue(this.FieldName, val);
+            FieldChoiceCollection fcc = this.Field.Choices;
+
+            FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
+
+            if (alternateChoices != null)
+            {
+                fcc = alternateChoices;
+            }
+
+            // convert val, which is a string, back into the native data type.
+            foreach (FieldChoice fc in fcc)
+            {
+                if (!(fc.Id is String) && fc.Id.ToString() == val)
+                {
+                    val = fc.Id;
+                }
+            }
+
+            if (this.Field.Type == FieldType.Integer)
+            {
+                if (val == "null")
+                {
+                    this.Item.SetInt32Value(this.FieldName, null);
+                }
+                else
+                {
+                    if (val is String)
+                    {
+                        this.Item.SetStringValue(this.FieldName, (String)val);
+                    }
+                    else if (val is Int32)
+                    {
+                        this.Item.SetInt32Value(this.FieldName, (Int32)val);
+                    }
+                    else
+                    {
+                        this.Item.SetStringValue(this.FieldName, val.ToString());
+                    }
+                }
+            }
+            else
+            {
+                if (val == "null")
+                {
+                    this.Item.SetStringValue(this.FieldName, null);
+                }
+                else
+                {
+                    this.Item.SetStringValue(this.FieldName, (String)val);
+                }
+            }
 
             selectedElement = element;
 
             selectedElement.ClassName = this.GetElementClass("choiceButton selected");
+
+            e.CancelBubble = true;
+            e.PreventDefault();
         }
 
         public override void PersistToItem()

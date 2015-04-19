@@ -68,6 +68,23 @@ namespace BL.Forms
             }
         }
 
+        public bool AllowNull
+        {
+            get
+            {
+                bool allowNull = this.Field.AllowNull;
+
+                bool? allowNullOverride = this.Form.GetFieldAllowNullOverride(this.FieldName);
+
+                if (allowNullOverride != null)
+                {
+                    allowNull = (bool)allowNullOverride;
+                }
+
+                return allowNull;
+            }
+        }
+
         public String EffectiveFieldDisplayName
         {
             get
