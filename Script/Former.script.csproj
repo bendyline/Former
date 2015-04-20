@@ -60,6 +60,8 @@
   <ItemGroup>
     <None Include="Properties\FxCop.ruleset" />
     <None Include="Properties\Script.template" />
+    <Compile Include="BooleanFieldControl.cs" />
+    <Compile Include="SwitchToggleFieldValue.cs" />
     <Compile Include="ItemLastModifiedDate.cs" />
     <Compile Include="ItemSetControl.cs" />
     <Compile Include="RichContentFieldValue.cs" />
@@ -121,6 +123,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SwitchToggleFieldValue.htm" />
     <Content Include="ItemLastModifiedDate.htm" />
     <Content Include="ItemSetEditorTopToolbar.htm" />
     <Content Include="RichContentFieldValue.htm" />

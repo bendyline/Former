@@ -257,7 +257,7 @@ namespace BL.Forms
             // convert val, which is a string, back into the native data type.
             foreach (FieldChoice fc in fcc)
             {
-                if (!(fc.Id is String) && fc.Id.ToString() == val)
+                if ( fc.Id != null && !(fc.Id is String) && val is String && fc.Id.ToString() == (String)val)
                 {
                     val = fc.Id;
                 }
@@ -265,7 +265,7 @@ namespace BL.Forms
 
             if (this.Field.Type == FieldType.Integer)
             {
-                if (val == "null")
+                if (val is String && (String)val == "null")
                 {
                     this.Item.SetInt32Value(this.FieldName, null);
                 }

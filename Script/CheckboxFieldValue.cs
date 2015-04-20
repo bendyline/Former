@@ -12,28 +12,13 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
-    public class CheckboxFieldValue : FieldControl
+    public class CheckboxFieldValue : BooleanFieldControl
     {
         [ScriptName("e_checkboxText")]
         private Element checkboxText;
 
         private long lastClickTime = -1;
 
-        public Boolean CurrentValue
-        {
-            get
-            {
-               
-                String val = this.Item.GetStringValue(this.FieldName);
-
-                if (val == null)
-                {
-                    return false;
-                }
-
-                return Boolean.Parse(val);
-            }
-        }
         public CheckboxFieldValue()
         {
             this.TrackInteractionEvents = true;
