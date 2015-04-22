@@ -117,6 +117,7 @@ namespace BL.Forms
             {
                 Nullable<int> suggestedWidth = this.EffectiveUserInterfaceOptions.SuggestedWidth;
 
+
                 if (suggestedWidth != null)
                 {
                     this.textDisplay.Style.MinWidth = (int)suggestedWidth + "px";
@@ -126,6 +127,23 @@ namespace BL.Forms
                 {
                     this.textDisplay.Style.MinWidth = "150px";
                     this.textInput.Style.MinWidth = "150px";
+                }
+
+                Nullable<int> fontSize= this.EffectiveUserInterfaceOptions.FontSize;
+
+                if (fontSize != null)
+                {
+                    this.textDisplay.Style.FontSize = (int)fontSize + "pt";
+                    this.textInput.Style.FontSize = (int)fontSize + "pt";
+                    this.textInput.Style.MaxHeight = "1.8em";
+                    this.textInput.Style.TextIndent = "0.1em";
+                }
+                else
+                {
+                    this.textDisplay.Style.FontSize = String.Empty;
+                    this.textInput.Style.FontSize = String.Empty;
+                    this.textInput.Style.MaxHeight = String.Empty;
+                    this.textInput.Style.TextIndent = String.Empty;
                 }
             }
 

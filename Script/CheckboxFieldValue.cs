@@ -42,14 +42,7 @@ namespace BL.Forms
             {
                 lastClickTime = nowTime;
 
-                if (CurrentValue)
-                {
-                    this.Item.SetBooleanValue(this.FieldName, false);
-                }
-                else
-                {
-                    this.Item.SetBooleanValue(this.FieldName, true);
-                }
+                this.CurrentValue = !this.CurrentValue;
             }
         }
 

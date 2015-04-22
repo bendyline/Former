@@ -21,24 +21,51 @@ namespace BL.Forms
             {
                 object val = this.Item.GetValue(this.FieldName);
 
-                if (val == null)
+                if (this.Field.Type == FieldType.BoolChoice)
                 {
-                    return false;
-                }
+                    if (val == null)
+                    {
+                        return false;
+                    }
 
-                if (val is Boolean)
-                {
                     return (Boolean)val;
                 }
-
-                if (val is String)
+                else if (this.Field.Type == FieldType.ShortText || this.Field.Type == FieldType.UnboundedText)
                 {
+                    if (this.EffectiveUserInterfaceOptions != null && (this.EffectiveUserInterfaceOptions.StringFalseValue != null || this.EffectiveUserInterfaceOptions.StringTrueValue != null))
+                    {
+                        if ((String)val == this.EffectiveUserInterfaceOptions.StringTrueValue)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+
+                    if (val == null)
+                    {
+                        return false;
+                    }
+
                     return Boolean.Parse((String)val);
                 }
-
-                if (val is Int32)
+                else if (this.Field.Type == FieldType.Integer)
                 {
-                    if ((Int32)val == 0)
+                    if (this.EffectiveUserInterfaceOptions != null && (this.EffectiveUserInterfaceOptions.IntFalseValue != null || this.EffectiveUserInterfaceOptions.IntTrueValue != null))
+                    {
+                        if ((Nullable<Int32>)val == this.EffectiveUserInterfaceOptions.IntTrueValue)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+
+                    if ((Nullable<Int32>)val == 0)
                     {
                         return false;
                     }

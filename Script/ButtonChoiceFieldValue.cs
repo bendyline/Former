@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
-    public class ChoiceFieldValue : FieldControl
+    public class ButtonChoiceFieldValue : ChoiceFieldControl
     {
         [ScriptName("e_choiceBin")]
         private Element choiceBin;
@@ -20,50 +20,12 @@ namespace BL.Forms
         private InputElement selectedElement;
 
         private String lastOptionsHash = null;
-        public ChoiceFieldValue()
+
+        public ButtonChoiceFieldValue()
         {
 
         }
-
-        private String GetOptionsHash()
-        {
-            String results = this.EffectiveMode.ToString();
-
-            FieldChoiceCollection fcc = this.Field.Choices;
-
-            FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
-
-            if (alternateChoices != null)
-            {
-                fcc = alternateChoices;
-            }
-
-            String id = this.Item.GetStringValue(this.FieldName);
-
-            foreach (FieldChoice fc in fcc)
-            {
-                results += "|" + fc.Id + "|" + fc.DisplayName + "|" + fc.ImageUrl;
-            }
-
-            results += id;
-
-            return results;
-        }
-
-        protected override void OnItemChanged()
-        {
-            base.OnItemChanged();
-
-            this.Update();
-        }
-
-        protected override void OnFieldChanged()
-        {
-            base.OnFieldChanged();
-
-            this.Update();
-        }
-
+        
         protected override void OnUpdate()
         {
             base.OnUpdate();

@@ -18,6 +18,7 @@ namespace BL.Forms
         private Element fieldBin;
 
         private FieldInterfaceType previousInterfaceType = FieldInterfaceType.NoValue;
+        private Nullable<int> previousStyleId = null;
 
         private FieldControl fieldControl;
 
@@ -47,9 +48,20 @@ namespace BL.Forms
                     interfaceType = (FieldInterfaceType)altInterfaceType;
                 }
 
-                if (interfaceType != previousInterfaceType || this.fieldControl == null)
+
+                Nullable<int> styleId = null;
+                
+                FieldInterfaceTypeOptions fito = this.EffectiveUserInterfaceOptions;
+
+                if (fito != null)
+                {
+                    styleId = fito.StyleId;
+                }
+
+                if (interfaceType != previousInterfaceType || previousStyleId != styleId || this.fieldControl == null)
                 {
                     previousInterfaceType = interfaceType;
+                    previousStyleId = styleId;
 
                     if (this.fieldControl != null)
                     {
@@ -88,9 +100,36 @@ namespace BL.Forms
                     }
                     else if ((this.Field.Type == FieldType.ShortText || this.Field.Type == FieldType.Integer) && interfaceType == FieldInterfaceType.Choice)
                     {
-                        this.fieldControl = new ChoiceFieldValue();
+                        if (styleId == 1)
+                        {
+                            this.fieldControl = new RadioChoiceFieldValue();
+                        }
+                        else
+                        {
+                            this.fieldControl = new ButtonChoiceFieldValue();
+                        }
 
                         this.ApplyToControl(this.fieldControl);
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
+                    else if (this.Field.Type == FieldType.BoolChoice || interfaceType == FieldInterfaceType.Checkbox)
+                    {
+                        this.fieldControl = new CheckboxFieldValue();
+
+                        this.ApplyToControl(this.fieldControl);
+
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
+                    else if (interfaceType == FieldInterfaceType.SwitchToggle)
+                    {
+                        this.fieldControl = new SwitchToggleFieldValue();
+
+                        this.ApplyToControl(this.fieldControl);
+
                         this.fieldControl.EnsureElements();
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
@@ -133,16 +172,6 @@ namespace BL.Forms
                     else if (this.Field.Type == FieldType.RichContent)
                     {
                         this.fieldControl = new RichContentFieldValue();
-
-                        this.ApplyToControl(this.fieldControl);
-
-                        this.fieldControl.EnsureElements();
-
-                        this.fieldBin.AppendChild(this.fieldControl.Element);
-                    }
-                    else if (this.Field.Type == FieldType.BoolChoice)
-                    {
-                        this.fieldControl = new CheckboxFieldValue();
 
                         this.ApplyToControl(this.fieldControl);
 

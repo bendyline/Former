@@ -61,6 +61,8 @@
     <None Include="Properties\FxCop.ruleset" />
     <None Include="Properties\Script.template" />
     <Compile Include="BooleanFieldControl.cs" />
+    <Compile Include="RadioChoiceFieldValue.cs" />
+    <Compile Include="ChoiceFieldControl.cs" />
     <Compile Include="SwitchToggleFieldValue.cs" />
     <Compile Include="ItemLastModifiedDate.cs" />
     <Compile Include="ItemSetControl.cs" />
@@ -73,7 +75,7 @@
     <Compile Include="RowForm.cs" />
     <Compile Include="ScaleFieldValue.cs" />
     <Compile Include="FieldInterfaceCollection.cs" />
-    <Compile Include="ChoiceFieldValue.cs" />
+    <Compile Include="ButtonChoiceFieldValue.cs" />
     <Compile Include="FormControl.cs" />
     <Compile Include="FieldInterface.cs" />
     <Compile Include="ItemSetInterface.cs" />
@@ -123,6 +125,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="RadioChoiceFieldValue.htm" />
     <Content Include="SwitchToggleFieldValue.htm" />
     <Content Include="ItemLastModifiedDate.htm" />
     <Content Include="ItemSetEditorTopToolbar.htm" />
@@ -141,7 +144,7 @@
     <Content Include="CheckboxFieldValue.htm" />
     <Content Include="VerticalLabeledField.htm" />
     <Content Include="ScaleFieldValue.htm" />
-    <Content Include="ChoiceFieldValue.htm" />
+    <Content Include="ButtonChoiceFieldValue.htm" />
     <Content Include="FormGrid.htm" />
     <Content Include="CompactForm.htm" />
     <Content Include="HorizontalUnlabeledField.htm" />
