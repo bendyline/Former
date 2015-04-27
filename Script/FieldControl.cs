@@ -44,6 +44,21 @@ namespace BL.Forms
             }
         }
 
+        public FieldDataFormat EffectiveDataFormat
+        {
+            get
+            {
+                FieldInterface fi = this.FieldInterface;
+
+                if (fi == null)
+                {
+                    return FieldDataFormat.DefaultFormat;
+                }
+
+                return fi.DataFormatOverride;
+            }
+        }
+
         public FieldMode EffectiveMode
         {
             get

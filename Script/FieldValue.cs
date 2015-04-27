@@ -85,6 +85,12 @@ namespace BL.Forms
                     else if (this.Field.Type == FieldType.ShortText && interfaceType == FieldInterfaceType.User)
                     {
                         this.fieldControl = new UserValue();
+
+                        if (this.FieldInterface.Mode == FieldMode.View)
+                        {
+                            this.fieldControl.TemplateId = "bl-forms-uservaluedisplay";
+                        }
+
                         this.ApplyToControl(this.fieldControl);
                         this.fieldControl.EnsureElements();
 
@@ -127,6 +133,16 @@ namespace BL.Forms
                     else if (interfaceType == FieldInterfaceType.SwitchToggle)
                     {
                         this.fieldControl = new SwitchToggleFieldValue();
+
+                        this.ApplyToControl(this.fieldControl);
+
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
+                    else if (this.Field.Type == FieldType.DateTime)
+                    {
+                        this.fieldControl = new DateTimeFieldValue();
 
                         this.ApplyToControl(this.fieldControl);
 

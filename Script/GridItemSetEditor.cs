@@ -895,7 +895,7 @@ namespace BL.Forms
                 {
                     DisplayState afs = this.GetAdjustedDisplayState(field.Name);
 
-                    if (afs == DisplayState.Show)
+                    if (afs == DisplayState.Show || afs == DisplayState.ShowInListHideInDetail)
                     {
                         sortedFields.Add(field);
                     }
@@ -925,7 +925,7 @@ namespace BL.Forms
 
                     DisplayState afs = this.GetAdjustedDisplayState(field.Name);
 
-                    if (afs == DisplayState.Show)
+                    if (afs == DisplayState.Show || afs == DisplayState.ShowInListHideInDetail)
                     {
                         ModelField mf = new ModelField();
 

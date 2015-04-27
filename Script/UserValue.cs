@@ -30,7 +30,10 @@ namespace BL.Forms
     {
         [ScriptName("e_textInput")]
         private InputElement textInput;
-        
+
+        [ScriptName("e_textDisplay")]
+        private Element textDisplay;
+
         [ScriptName("e_userSummaryArea")]
         private Element userSummaryArea;
 
@@ -73,6 +76,11 @@ namespace BL.Forms
 
         private void HandleSummaryTap(ElementEvent e)
         {
+            if (this.EffectiveMode == FieldMode.View)
+            {
+                return;
+            }
+
             this.displayMode = UserValueDisplayMode.TextInput;
             
             this.ApplyDisplayMode();
@@ -244,19 +252,22 @@ namespace BL.Forms
         {
             base.OnUpdate();
 
-            if (this.textInput == null)
+            if (this.userSummaryArea == null)
             {
                 return;
             }
 
-            if (this.EffectiveMode == FieldMode.Example)
+            if (this.textInput != null)
             {
-                this.textInput.Value = "(signed up name)";
-                this.textInput.Disabled = true;
-            }
-            else
-            {
-                this.textInput.Disabled = false;
+                if (this.EffectiveMode == FieldMode.Example)
+                {
+                    this.textInput.Value = "(signed up name)";
+                    this.textInput.Disabled = true;
+                }
+                else
+                {
+                    this.textInput.Disabled = false;
+                }
             }
 
             if (this.IsReady)
@@ -268,7 +279,14 @@ namespace BL.Forms
                 {
                     value = value.Trim();
 
-                    if (value.StartsWith("{") && value.EndsWith("}"))
+                    if (this.EffectiveDataFormat == FieldDataFormat.IdentifierOnly)
+                    {
+                        this.activeReference = new UserReference();
+                        this.activeReference.UniqueKey = value;
+
+                        this.displayMode = UserValueDisplayMode.UserSummary;
+                    }
+                    else if (value.StartsWith("{") && value.EndsWith("}"))
                     {
                         this.activeReference = new UserReference();
 
@@ -285,7 +303,15 @@ namespace BL.Forms
                     }
                     else
                     {
-                        this.textInput.Value = value;
+                        if (this.textInput != null)
+                        {
+                            this.textInput.Value = value;
+                        }
+                        
+                        if (this.textDisplay != null)
+                        {
+                            ElementUtilities.SetText(this.textDisplay, value);
+                        }
                     }
                 }
 
@@ -295,15 +321,17 @@ namespace BL.Forms
 
         private void ApplyDisplayMode()
         {
-            if (this.displayMode == UserValueDisplayMode.TextInput)
+            if (this.textInput != null)
             {
-                this.textInput.Style.Display = "";
+                if (this.displayMode == UserValueDisplayMode.TextInput)
+                {
+                    this.textInput.Style.Display = "";
+                }
+                else
+                {
+                    this.textInput.Style.Display = "none";
+                }
             }
-            else
-            {
-                this.textInput.Style.Display = "none";
-            }
-
 
             if (this.displayMode == UserValueDisplayMode.UserSummary)
             {

@@ -46,8 +46,23 @@ namespace BL.Forms
                     this.choiceBin.RemoveChild(this.choiceBin.ChildNodes[0]);
                 }
 
+                if (this.EffectiveMode == FieldMode.View)
+                {
+                    FieldChoiceCollection fcc = this.EffectiveFieldChoices;
 
-                if (this.EffectiveMode == FieldMode.Example)
+                    foreach (FieldChoice fc in fcc)
+                    {
+                        if (IsFieldChoiceSelected(fc))
+                        {
+                            Element displayTextElement = this.CreateElement("textDisplay");
+
+                            ElementUtilities.SetText(displayTextElement, fc.DisplayName);
+
+                            this.choiceBin.AppendChild(displayTextElement);
+                        }
+                    }
+                }
+                else if (this.EffectiveMode == FieldMode.Example)
                 {
                     Element row = this.CreateChoiceRow("Example 1",null, null, false);
                     this.choiceBin.AppendChild(row);
@@ -57,39 +72,11 @@ namespace BL.Forms
                 }
                 else
                 {
-                    FieldChoiceCollection fcc = this.Field.Choices;
-
-                    FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
-
-                    if (alternateChoices != null)
-                    {
-                        fcc = alternateChoices;
-                    }
-
-                    object selectedVal= this.Item.GetValue(this.FieldName);
-
-                    if (selectedVal == null)
-                    {
-                        selectedVal = "null";
-                    }
+                    FieldChoiceCollection fcc = this.EffectiveFieldChoices;
 
                     foreach (FieldChoice fc in fcc)
                     {
-                        String className;
-
-                        bool isSelected = false;
-
-                        object abstractedId = fc.Id;
-
-                        if (abstractedId == null)
-                        {
-                            abstractedId = fc.DisplayName;
-                        }
-
-                        if (selectedVal == abstractedId)
-                        {
-                            isSelected = true;
-                        }
+                        bool isSelected = IsFieldChoiceSelected(fc);
 
                         String val = fc.DisplayName;
 
@@ -98,11 +85,8 @@ namespace BL.Forms
                             val = String.Empty;
                         }
 
-                        Element row = this.CreateChoiceRow(val, fc.ImageUrl, abstractedId, isSelected);
-
-                        
-                    
-
+                        Element row = this.CreateChoiceRow(val, fc.ImageUrl, fc.EffectiveId, isSelected);
+     
                         this.choiceBin.AppendChild(row);
                     }
                 }

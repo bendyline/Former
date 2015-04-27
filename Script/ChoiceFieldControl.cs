@@ -15,9 +15,50 @@ namespace BL.Forms
     public class ChoiceFieldControl : FieldControl
     {
 
+        
+        public FieldChoiceCollection EffectiveFieldChoices
+        {
+            get
+            {
+                FieldChoiceCollection fcc = this.Field.Choices;
+
+                FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
+
+                if (alternateChoices != null)
+                {
+                    fcc = alternateChoices;
+                }
+
+                return fcc;
+            }
+        }
         public ChoiceFieldControl()
         {
 
+        }
+
+        public bool IsFieldChoiceSelected(FieldChoice fieldChoice)
+        {
+            object selectedVal= this.Item.GetValue(this.FieldName);
+            
+            object effectiveId = fieldChoice.EffectiveId;
+
+            if (selectedVal == null)
+            {
+                if (selectedVal == effectiveId)
+                {
+                    return true;
+                }
+
+                selectedVal = "null";
+            }
+
+            if (selectedVal == effectiveId)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         protected String GetOptionsHash()

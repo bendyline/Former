@@ -25,7 +25,9 @@ namespace BL.Forms
     {
         DefaultState = 0,
         Hide = 1,
-        Show = 2
+        Show = 2,
+        ShowInDetailHideInList = 3,
+        ShowInListHideInDetail = 4
     }
 
     public class Form : ItemControl, IForm

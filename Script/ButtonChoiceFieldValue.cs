@@ -46,7 +46,23 @@ namespace BL.Forms
                     this.choiceBin.RemoveChild(this.choiceBin.ChildNodes[0]);
                 }
 
-                if (this.EffectiveMode == FieldMode.Example)
+                if (this.EffectiveMode == FieldMode.View)
+                {
+                    FieldChoiceCollection fcc = this.EffectiveFieldChoices;
+
+                    foreach (FieldChoice fc in fcc)
+                    {
+                        if (IsFieldChoiceSelected(fc))
+                        {
+                            Element displayTextElement = this.CreateElement("textDisplay");
+
+                            ElementUtilities.SetText(displayTextElement, fc.DisplayName);
+
+                            this.choiceBin.AppendChild(displayTextElement);
+                        }
+                    }
+                }
+                else if (this.EffectiveMode == FieldMode.Example)
                 {
                     InputElement b = (InputElement)this.CreateElementWithType("choiceButton example", "BUTTON");
 
@@ -60,40 +76,14 @@ namespace BL.Forms
                 }
                 else
                 {
-                    FieldChoiceCollection fcc = this.Field.Choices;
-
-                    FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
-
-                    if (alternateChoices != null)
-                    {
-                        fcc = alternateChoices;
-                    }
-
-                    object selectedVal= this.Item.GetValue(this.FieldName);
-
-                    if (selectedVal == null)
-                    {
-                        selectedVal = "null";
-                    }
+                    FieldChoiceCollection fcc = this.EffectiveFieldChoices;
 
                     foreach (FieldChoice fc in fcc)
                     {
                         String className;
 
-                        bool isSelected = false;
-
-                        object abstractedId = fc.Id;
-
-                        if (abstractedId == null)
-                        {
-                            abstractedId = fc.DisplayName;
-                        }
-
-                        if (selectedVal == abstractedId)
-                        {
-                            isSelected = true;
-                        }
-
+                        bool isSelected = IsFieldChoiceSelected(fc);
+              
                         if (isSelected)
                         {
                             className = "choiceButton selected";
@@ -102,7 +92,6 @@ namespace BL.Forms
                         {
                             className = "choiceButton normal";
                         }
-
 
                         InputElement b = (InputElement)this.CreateElementWithType(className, "BUTTON");
 
@@ -154,7 +143,7 @@ namespace BL.Forms
                             }
                         }
 
-                        b.SetAttribute("data-choiceId", abstractedId);
+                        b.SetAttribute("data-choiceId", fc.EffectiveId);
                         b.AddEventListener("click", this.HandleButtonClick, true);
 
                         Element choiceOuterElement = this.CreateElement("choiceOuter");
@@ -198,7 +187,17 @@ namespace BL.Forms
                 return;
             }
 
-            InputElement element = (InputElement)ElementUtilities.GetEventTarget(e);
+            Element element = (InputElement)ElementUtilities.GetEventTarget(e);
+
+            while (element != null && element.ClassName.IndexOf("choiceButton") <= 0)
+            {
+                element = element.ParentNode;
+            }
+
+            if (element == null)
+            {
+                return;
+            }
 
             if (selectedElement != null)
             {
@@ -259,7 +258,7 @@ namespace BL.Forms
                 }
             }
 
-            selectedElement = element;
+            selectedElement = (InputElement)element;
 
             selectedElement.ClassName = this.GetElementClass("choiceButton selected");
 

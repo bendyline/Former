@@ -60,9 +60,11 @@
   <ItemGroup>
     <None Include="Properties\FxCop.ruleset" />
     <None Include="Properties\Script.template" />
+    <Compile Include="DateTimeFieldControl.cs" />
     <Compile Include="BooleanFieldControl.cs" />
     <Compile Include="RadioChoiceFieldValue.cs" />
     <Compile Include="ChoiceFieldControl.cs" />
+    <Compile Include="DateTimeFieldValue.cs" />
     <Compile Include="SwitchToggleFieldValue.cs" />
     <Compile Include="ItemLastModifiedDate.cs" />
     <Compile Include="ItemSetControl.cs" />
@@ -126,6 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="RadioChoiceFieldValue.htm" />
+    <Content Include="DateTimeFieldValue.htm" />
     <Content Include="SwitchToggleFieldValue.htm" />
     <Content Include="ItemLastModifiedDate.htm" />
     <Content Include="ItemSetEditorTopToolbar.htm" />
@@ -137,6 +140,7 @@
     <Content Include="UnlabeledForm.htm" />
     <Content Include="UserList.htm" />
     <Content Include="UserListToken.htm" />
+    <Content Include="UserValueDisplay.htm" />
     <Content Include="VerticalSmallForm.htm" />
     <Content Include="GridItemSetEditor.htm" />
     <Content Include="RowForm.htm" />

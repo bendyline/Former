@@ -108,7 +108,7 @@ namespace BL.Forms
 
                     DisplayState afs = this.Form.GetAdjustedDisplayState(field.Name);
 
-                    if (afs == DisplayState.Show)
+                    if (afs == DisplayState.Show || afs == DisplayState.ShowInDetailHideInList)
                     {
                         LabeledField ff = this.fieldsByName[field.Name];
 

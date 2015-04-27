@@ -476,7 +476,7 @@ namespace BL.Forms
             {
                 DisplayState afs = this.GetAdjustedDisplayState(field.Name);
 
-                if (afs == DisplayState.Show)
+                if (afs == DisplayState.Show || afs == DisplayState.ShowInListHideInDetail)
                 {
                     Element cellElement = this.CreateElement("headerCell");
 

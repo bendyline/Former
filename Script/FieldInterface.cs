@@ -8,8 +8,17 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
+    public enum FieldDataFormat
+    {
+        DefaultFormat = 0,
+        Literal = 1,
+        JSONStructure = 2,
+        IdentifierOnly = 3
+    }
+
     public class FieldInterface : SerializableObject
     {
+        private FieldDataFormat dataFormatOverride = FieldDataFormat.DefaultFormat;
         private String titleOverride;
         private bool? requiredOverride;
         private bool? allowNullOverride;
@@ -21,6 +30,27 @@ namespace BL.Forms
         private Nullable<FieldInterfaceType> interfaceTypeOverride;
         private FieldInterfaceTypeOptions interfaceTypeOptionsOverride;
         private PropertyChangedEventHandler interfaceTypeOptionsOverridePropertyChanged;
+
+        [ScriptName("i_dataFormatOverride")]
+        public FieldDataFormat DataFormatOverride
+        {
+            get
+            {
+                return this.dataFormatOverride;
+            }
+
+            set
+            {
+                if (this.dataFormatOverride == value)
+                {
+                    return;
+                }
+
+                this.dataFormatOverride = value;
+
+                this.NotifyPropertyChanged("DataFormatOverride");
+            }
+        }
 
         [ScriptName("s_name")]
         public String Name
