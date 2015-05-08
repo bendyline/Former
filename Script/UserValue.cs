@@ -268,6 +268,16 @@ namespace BL.Forms
                 {
                     this.textInput.Disabled = false;
                 }
+
+
+                if (this.EffectiveUserInterfaceOptions != null && this.EffectiveUserInterfaceOptions.Placeholder != null)
+                {
+                    this.textInput.SetAttribute("placeholder", this.EffectiveUserInterfaceOptions.Placeholder);
+                }
+                else
+                {
+                    this.textInput.SetAttribute("placeholder", "name");
+                }
             }
 
             if (this.IsReady)

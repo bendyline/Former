@@ -20,6 +20,9 @@ namespace BL.Forms
         [ScriptName("e_icon")]
         private Element icon;
 
+        [ScriptName("e_iconCell")]
+        private Element iconCell;
+
         [ScriptName("e_animatingIcon")]
         private Element animatingIcon;
 
@@ -79,6 +82,8 @@ namespace BL.Forms
 
             if (this.ItemSet.IsSaving)
             {
+
+                this.iconCell.Style.Display = "";
                 this.icon.Style.Display = "none";
                 this.animatingIcon.Style.Display = "";
                 ElementUtilities.SetText(this.text, "Saving");
@@ -91,6 +96,7 @@ namespace BL.Forms
             else if (this.ItemSet.NeedsSaving)
             {
                 this.icon.Style.Display = "";
+                this.iconCell.Style.Display = "";
                 this.animatingIcon.Style.Display = "none";
                 ElementUtilities.SetText(this.text, "Save");
 
@@ -105,11 +111,13 @@ namespace BL.Forms
 
                 if (this.savedBefore)
                 {
+                    this.iconCell.Style.Display = "none";
                     ElementUtilities.SetText(this.text, "Saved");
                 }
                 else
                 {
                     ElementUtilities.SetText(this.text, "");
+                    this.iconCell.Style.Display = "";
                 }
 
                 this.Element.Style.BorderWidth = "0px";

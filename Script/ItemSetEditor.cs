@@ -351,11 +351,13 @@ namespace BL.Forms
 
             this.itemSet.Add(item);
 
-            int index = this.itemSet.Items.Count - 1;
+            int placementIndex = this.itemSet.Items.Count - 1;
  
             if (this.ItemPlacementFieldName != null)
             {
-                index = (int)item.GetValue(this.ItemPlacementFieldName);
+                //IDataStoreField f = this.ItemSet.Type.GetField(this.ItemPlacementFieldName);
+
+                placementIndex = (int)item.GetInt32Value(this.ItemPlacementFieldName);                
             }
 
 
@@ -378,7 +380,7 @@ namespace BL.Forms
                 }
             }
 
-            this.EnsureFormForItem(item, index);
+            this.EnsureFormForItem(item, placementIndex);
 
             if (this.ItemAdded != null)
             {
@@ -531,6 +533,7 @@ namespace BL.Forms
             if (this.mode == ItemSetEditorMode.Rows && !Context.Current.IsSmallFormFactor && this.useRowFormsIfPossible)
             {
                 f = new RowForm();
+
                 Debug.WriteLine("(ItemSetEditor::EnsureFormForItem) - Creating new rowform for item " + item.LocalOnlyUniqueId);
                 f.IteratorFieldTemplateId = "bl-forms-horizontalunlabeledfield";
             }
@@ -561,6 +564,20 @@ namespace BL.Forms
             this.itemsShown.Add(item);
 
             f.EnsureElements();
+
+            /*
+            // Banding effect for Row Forms
+            if (f is RowForm)
+            {
+                if (index % 2 == 1)
+                {
+                    f.Element.Style.BackgroundColor = "#F8F8F8";
+                }
+                else
+                {
+                    f.Element.Style.BackgroundColor = "";
+                }
+            }*/
 
             if (this.mode == ItemSetEditorMode.Rows || this.mode == ItemSetEditorMode.Linear || Context.Current.IsSmallFormFactor)
             {
@@ -627,7 +644,7 @@ namespace BL.Forms
                 return;
             }
 
-            if (this.ItemSetInterface.Sort != ItemSetSort.None)
+            if (this.ItemSetInterface.Sort != ItemSetSort.DefaultState)
             {
                 for (int i=0; i<this.formBin.Children.Length; i++)
                 {

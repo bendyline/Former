@@ -83,8 +83,6 @@ namespace BL.Forms
             {
                 this.Item.SetInt32Value(this.FieldName, Int32.Parse(this.textInput.Value));
             }
-
-            this.textInput.Focus();
         }
 
         protected override void OnUpdate()

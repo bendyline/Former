@@ -62,6 +62,7 @@
     <None Include="Properties\Script.template" />
     <Compile Include="DateTimeFieldControl.cs" />
     <Compile Include="BooleanFieldControl.cs" />
+    <Compile Include="DateFieldValue.cs" />
     <Compile Include="RadioChoiceFieldValue.cs" />
     <Compile Include="ChoiceFieldControl.cs" />
     <Compile Include="DateTimeFieldValue.cs" />
@@ -127,6 +128,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DateFieldValue.htm" />
+    <Content Include="PhoneTextFieldValue.htm" />
+    <Content Include="TableFieldIterator.htm" />
     <Content Include="RadioChoiceFieldValue.htm" />
     <Content Include="DateTimeFieldValue.htm" />
     <Content Include="SwitchToggleFieldValue.htm" />

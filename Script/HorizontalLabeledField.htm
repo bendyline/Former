@@ -10,17 +10,34 @@
         <!-- end sample preview content -->
 
         <style>
+            body
+            {
+                display:table-row;
+            }
    
+
+            #label
+            {
+                display:table-cell;
+                vertical-align:top;
+                min-height:41px;
+            }
+
+            #value
+            {
+                display:table-cell;
+                vertical-align:top;
+                padding-bottom: 20px;
+                min-height:41px;
+            }
         </style>
 	</head>
 	<body>        
-            <div class="row">
-                <div class="col-md-6 col-xs-6">
-                    <BL.Forms.FieldLabel id="fieldLabel"/>
-                </div>
-                <div class="col-md-6 col-xs-6">
-                   <BL.Forms.FieldValue id="fieldValue"/>
-                </div>
-            </div>
+        <div id="label">
+            <BL.Forms.FieldLabel id="fieldLabel"/>
+        </div>
+        <div id="value">
+            <BL.Forms.FieldValue id="fieldValue"/>
+        </div>
     </body>
 </html>

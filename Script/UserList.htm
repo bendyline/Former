@@ -35,7 +35,7 @@
                 min-height:50px;
                 min-width:286px;
                 max-width:286px;
-                border:solid 1px #EAEAEA;
+                border:solid 1px #C0C0C0;
                 vertical-align:top;
                 background-color:#FFFFFF;
             }  
@@ -43,8 +43,6 @@
             #inputOuter
             {
                 display:table;
-                background-color:#FFFFFF;
-
                 min-width:286px;
                 max-width:286px;
             }
@@ -56,8 +54,6 @@
             #inputCell
             {
                 display:table-cell;
-                background-color:#EAEAEA;
-                padding-left:4px;
                 padding-top:4px;
                 padding-bottom:4px;
             }
@@ -65,11 +61,8 @@
             #assignCell
             {
                 display:table-cell;
-                background-color:#EAEAEA;
-                border:solid 1px #EAEAEA;
-                border-bottom-right-radius:5px;
                 vertical-align:top;
-                padding-top:3px;
+                padding-top:4px;
                 padding-right:6px;
                 padding-bottom:3px;
             }
@@ -78,12 +71,17 @@
             {
                 display:table-cell;
                 vertical-align:top;
+                text-align:right;
                 padding-left:6px;
-                padding-right:6px;
                 padding-top:4px;
                 padding-bottom:4px;
             }
 
+            #addTextButton
+            {
+                opacity:0;
+                transition: all .2s ease-out; 
+            }
 
             #button
             {
@@ -122,7 +120,7 @@
         <div id="inputOuter">
             <div id="inputInner">
                 <div id="inputCell">
-                    <input type="text" id="addTextValue" class="k-input" placeholder="name"/>
+                    <input type="text" id="addTextValue" class="k-input" placeholder="add name"/>
                 </div>
                 <div id="assignCell">
                     <input type="button" id="addTextButton" class="k-button" value="add" data-ctl-class="button"/>

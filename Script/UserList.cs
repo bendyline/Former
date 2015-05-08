@@ -28,7 +28,13 @@ namespace BL.Forms
         [ScriptName("e_addTextValue")]
         private InputElement addTextValue;
 
+        [ScriptName("e_addTextButton")]
+        private InputElement addTextButton;
+
         private bool commitPending = false;
+
+        private Date addUserFocusLoss;
+        private String lastAddUserValue;
 
         private UserReferenceSet userReferenceSet;
 
@@ -61,7 +67,42 @@ namespace BL.Forms
             base.OnApplyTemplate();
 
             this.addTextValue.AddEventListener("keypress", this.KeyPressCheck, true);
+            this.addTextValue.AddEventListener("focus", this.AddTextFocus, true);
+            this.addTextValue.AddEventListener("blur", this.AddTextBlur, true);
+            this.addTextButton.AddEventListener("focus", this.AddTextButtonFocus, true);
         }
+
+        private void AddTextFocus(ElementEvent e)
+        {
+            this.addTextButton.Style.Opacity = "1";
+        }
+
+        private void AddTextBlur(ElementEvent e)
+        {
+            this.addUserFocusLoss = Date.Now;
+
+            this.lastAddUserValue = this.addTextValue.Value;
+            this.addTextValue.Value = String.Empty;
+
+            this.addTextButton.Style.Opacity = "0";
+        }
+
+        // If the user jumped from the text box to the add text button, e.g., via tab, add that value in.
+        private void AddTextButtonFocus(ElementEvent e)
+        {
+            if (this.addUserFocusLoss == null || String.IsNullOrEmpty(this.lastAddUserValue))
+            {
+                return;
+            }
+
+            if (Date.Now.GetTime() - this.addUserFocusLoss.GetTime() < 100)
+            {
+                this.CommitAddUser(this.lastAddUserValue);
+                this.lastAddUserValue = null;
+                this.addTextValue.Focus();
+            }
+        }
+
 
         private void referenceList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -86,6 +127,11 @@ namespace BL.Forms
         {
             String valu = this.addTextValue.Value;
 
+            this.CommitAddUser(valu);
+        }
+
+        private void CommitAddUser(String valu)
+        {
             if (!String.IsNullOrEmpty(valu))
             {
                 UserReference currentUserReference = new UserReference();

@@ -70,7 +70,7 @@ namespace BL.Forms
 
             this.Item.SetStringValue(this.FieldName, this.textInput.Value);
 
-            this.textInput.Focus();
+  //          this.textInput.Focus();
         }
 
         protected override void OnUpdate()

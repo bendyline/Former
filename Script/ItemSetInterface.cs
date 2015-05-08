@@ -18,7 +18,7 @@ namespace BL.Forms
         private String itemSetEditorSmallTemplateId;
         private FieldInterfaceCollection fieldInterfaces;
 
-        private ItemSetSort sort = ItemSetSort.None;
+        private ItemSetSort sort = ItemSetSort.DefaultState;
         private String sortField = null;
 
 

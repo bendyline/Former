@@ -9,16 +9,13 @@
         <!-- end sample preview content -->
 
         <style>
-
             BODY
             {
-                font-size: medium;
-                margin-right:20px;
-                min-width:80px;
-                margin-top:8px;
             }
-   
         </style>
 	</head>
-	<body></body>
+	<body>        
+        <input type="text" id="textInput" class="k-textbox" pattern="\d{10}" data-role='maskedtextbox' data-mask="(999) 000-0000"  placeholder="phone number"  data-pattern-msg="please enter a phone number (at least 10 digits.)" required="true" />
+        <div id="textDisplay"/>
+    </body>
 </html>

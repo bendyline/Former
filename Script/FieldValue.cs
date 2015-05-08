@@ -140,7 +140,17 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
-                    else if (this.Field.Type == FieldType.DateTime)
+                    else if (interfaceType == FieldInterfaceType.DatePicker)
+                    {
+                        this.fieldControl = new DateFieldValue();
+
+                        this.ApplyToControl(this.fieldControl);
+
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
+                    else if (this.Field.Type == FieldType.DateTime || interfaceType == FieldInterfaceType.DateTimePicker)
                     {
                         this.fieldControl = new DateTimeFieldValue();
 
@@ -157,6 +167,10 @@ namespace BL.Forms
                         if (interfaceType == FieldInterfaceType.Email)
                         {
                             this.fieldControl.TemplateId = "bl-forms-emailtextfieldvalue";
+                        }
+                        else if (interfaceType == FieldInterfaceType.Phone)
+                        {
+                            this.fieldControl.TemplateId = "bl-forms-phonetextfieldvalue";
                         }
 
                         this.ApplyToControl(this.fieldControl);

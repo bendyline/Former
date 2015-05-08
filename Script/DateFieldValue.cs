@@ -13,15 +13,15 @@ using BL.UI.KendoControls;
 
 namespace BL.Forms
 {
-    public class DateTimeFieldValue : DateTimeFieldControl
+    public class DateFieldValue : DateTimeFieldControl
     {
-        [ScriptName("c_dateTimePicker")]
-        private DateTimePicker dateTimePicker;
+        [ScriptName("c_datePicker")]
+        private DatePicker datePicker;
 
-        [ScriptName("e_dateTimePickerValue")]
-        private Element dateTimePickerValue;
+        [ScriptName("e_datePickerValue")]
+        private Element datePickerValue;
 
-        public DateTimeFieldValue()
+        public DateFieldValue()
         {
 
         }
@@ -37,19 +37,19 @@ namespace BL.Forms
         {
             base.OnApplyTemplate();
 
-            this.dateTimePicker.Changed += mobileSwitch_Changed;
+            this.datePicker.Changed += date_Changed;
         }
 
-        private void mobileSwitch_Changed(object sender, EventArgs e)
+        private void date_Changed(object sender, EventArgs e)
         {
-            this.CurrentValue = this.dateTimePicker.Value;
+            this.CurrentValue = this.datePicker.Value;
         }
 
         protected override void OnUpdate()
         {
             base.OnUpdate();
 
-            if (this.dateTimePicker == null)
+            if (this.datePicker == null)
             {
                 return;
             }
@@ -61,20 +61,20 @@ namespace BL.Forms
 
                 if (this.CurrentValue != null)
                 {
-                    result = Utilities.GetStaticDateTimeValue(this.CurrentValue);
+                    result = Utilities.GetStaticDateValue(this.CurrentValue);
                 }
 
-                ElementUtilities.SetText(this.dateTimePickerValue, result);
+                ElementUtilities.SetText(this.datePickerValue, result);
 
-                this.dateTimePickerValue.Style.Display = "";
-                this.dateTimePicker.Visible = false;
+                this.datePickerValue.Style.Display = "";
+                this.datePicker.Visible = false;
             }
             else
             {
-                this.dateTimePickerValue.Style.Display = "none";
-                this.dateTimePicker.Visible = true;
+                this.datePickerValue.Style.Display = "none";
+                this.datePicker.Visible = true;
 
-                this.dateTimePicker.Value = this.CurrentValue;
+                this.datePicker.Value = this.CurrentValue;
             }
         }
     }
