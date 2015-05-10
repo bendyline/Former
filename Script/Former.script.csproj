@@ -129,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DateFieldValue.htm" />
+    <Content Include="HorizontalForm.htm" />
     <Content Include="PhoneTextFieldValue.htm" />
     <Content Include="TableFieldIterator.htm" />
     <Content Include="RadioChoiceFieldValue.htm" />
