@@ -81,15 +81,18 @@ namespace BL.Forms
                 return;
             }
 
-            this.displayMode = UserValueDisplayMode.TextInput;
-            
-            this.ApplyDisplayMode();
+            if (this.displayMode != UserValueDisplayMode.TextInput)
+            {
+                this.displayMode = UserValueDisplayMode.TextInput;
 
-            this.textInput.Focus();
+                this.ApplyDisplayMode();
 
-            e.CancelBubble = true;
-            e.StopImmediatePropagation();
-            e.StopPropagation();
+                this.textInput.Focus();
+
+                e.CancelBubble = true;
+                e.StopImmediatePropagation();
+                e.StopPropagation();
+            }
         }
 
         private void HandleTextInputKeyPressed(ElementEvent e)
@@ -190,7 +193,7 @@ namespace BL.Forms
                 }
 
                 d.Content = c;
-                d.MaxHeight = 400;
+                d.MaxHeight = 450;
                 d.MaxWidth = 500;
                 d.Closing += editUserSummary_Closing;
 

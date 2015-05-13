@@ -191,7 +191,7 @@ namespace BL.Forms
             }
 
             d.Content = c;
-            d.MaxHeight = 400;
+            d.MaxHeight = 450;
             d.MaxWidth = 500;
             d.Closing += editUserSummary_Closing;
 
