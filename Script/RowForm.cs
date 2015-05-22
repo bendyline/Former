@@ -144,8 +144,8 @@ namespace BL.Forms
                     }
 
                     ff.Item = null;
+                    ff.ItemSet = this.ItemSet;
                     ff.Item = this.Item;
-
                 }
             }
 

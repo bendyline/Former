@@ -150,6 +150,7 @@ namespace BL.Forms
                             ff.Mode = fm;
                         }
 
+                        ff.ItemSet = this.ItemSet;
                         ff.Item = this.Item;
                     }
                 }

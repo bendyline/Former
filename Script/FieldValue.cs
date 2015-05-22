@@ -82,6 +82,15 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
+                    else if (this.Field.Type == FieldType.Integer && interfaceType == FieldInterfaceType.Order)
+                    {
+                        this.fieldControl = new OrderFieldValue();
+
+                        this.ApplyToControl(this.fieldControl);
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
                     else if (this.Field.Type == FieldType.ShortText && interfaceType == FieldInterfaceType.User)
                     {
                         this.fieldControl = new UserValue();

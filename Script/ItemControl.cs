@@ -14,6 +14,7 @@ namespace BL.Forms
     public class ItemControl : Control 
     {
         private IItem item;
+        private IDataStoreItemSet itemSet;
         private bool monitorItemEvents = true;
 
         protected bool MonitorItemEvents
@@ -26,6 +27,19 @@ namespace BL.Forms
             set
             {
                 this.monitorItemEvents = value;
+            }
+        }
+
+        public IDataStoreItemSet ItemSet
+        {
+            get
+            {
+                return this.itemSet;
+            }
+
+            set
+            {
+                this.itemSet = value;
             }
         }
 
@@ -76,7 +90,7 @@ namespace BL.Forms
             this.DelayApplyTemplate = true;
         }
 
-        private void item_ItemChanged(object sender, DataStoreItemEventArgs e)
+        private void item_ItemChanged(object sender, DataStoreItemChangedEventArgs e)
         {
             this.OnItemChanged();
         }
@@ -84,6 +98,19 @@ namespace BL.Forms
         protected virtual void OnItemChanged()
         {
 
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            if (this.item != null && this.monitorItemEvents)
+            {
+                this.item.ItemChanged -= item_ItemChanged;
+            }
+
+            this.item = null;
+            this.itemSet = null;
         }
     }
 }

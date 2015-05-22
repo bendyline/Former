@@ -63,6 +63,7 @@
     <Compile Include="DateTimeFieldControl.cs" />
     <Compile Include="BooleanFieldControl.cs" />
     <Compile Include="DateFieldValue.cs" />
+    <Compile Include="OrderFieldValue.cs" />
     <Compile Include="RadioChoiceFieldValue.cs" />
     <Compile Include="ChoiceFieldControl.cs" />
     <Compile Include="DateTimeFieldValue.cs" />
@@ -130,6 +131,7 @@
   <ItemGroup>
     <Content Include="DateFieldValue.htm" />
     <Content Include="HorizontalForm.htm" />
+    <Content Include="OrderFieldValue.htm" />
     <Content Include="PhoneTextFieldValue.htm" />
     <Content Include="TableFieldIterator.htm" />
     <Content Include="RadioChoiceFieldValue.htm" />

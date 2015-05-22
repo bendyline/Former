@@ -88,7 +88,7 @@ namespace BL.Forms
             {
                 foreach (IDataStoreField f in this.Item.Type.Fields)
                 {
-                    if (this.IsFieldValidForItem(f, this.Item))
+                    if (!this.IsFieldValidForItem(f, this.Item))
                     {
                         return false;
                     }
@@ -190,6 +190,33 @@ namespace BL.Forms
                 if ((field.Type == FieldType.ShortText || field.Type == FieldType.UnboundedText || field.Type == FieldType.RichContent) && (String)value == String.Empty)
                 {
                     return false;
+                }
+            }
+
+            FieldInterface fi = this.itemSetInterface[field.Name];
+
+            if (fi != null)
+            {
+                FieldInterfaceTypeOptions fito = this.GetFieldInterfaceTypeOptionsOverride(field.Name);
+                Nullable<FieldInterfaceType> fit = this.GetFieldInterfaceTypeOverride(field.Name);
+                
+                if (fito == null)
+                {
+                    fito = fi.InterfaceTypeOptionsOverride;
+                }
+
+
+                if (fit == FieldInterfaceType.Email)
+                {
+                    String email = item.GetStringValue(field.Name);
+
+                    if (!String.IsNullOrEmpty(email))
+                    {
+                        if (!Utilities.IsValidEmail(email))
+                        {
+                            return false;
+                        }
+                    }
                 }
             }
 
@@ -364,6 +391,7 @@ namespace BL.Forms
         {
             if (c is ItemControl)
             {
+                ((ItemControl)c).ItemSet = this.ItemSet;
                 ((ItemControl)c).Item = this.Item;
             }
 

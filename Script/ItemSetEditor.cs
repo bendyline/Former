@@ -52,6 +52,7 @@ namespace BL.Forms
         [ScriptName("e_addButton")]
         private InputElement addButton;
 
+        private bool reorderItemsOnNextUpdate = false;
         private bool useRowFormsIfPossible = true;
         private bool displayAddButton = true;
         private bool displayPersistButton = true;
@@ -59,6 +60,7 @@ namespace BL.Forms
 
         private Element headerRowElement;
         private event DataStoreItemSetEventHandler itemSetEventHandler;
+        private event DataStoreItemChangedEventHandler itemChangedEventHandler;
         public event DataStoreItemEventHandler ItemAdded;
         public event DataStoreItemEventHandler ItemDeleted;
 
@@ -270,6 +272,7 @@ namespace BL.Forms
                 if (this.itemSet != null)
                 {
                     this.itemSet.ItemSetChanged -= this.itemSetEventHandler;
+                    this.itemSet.ItemInSetChanged -= this.itemChangedEventHandler;
                 }
 
                 this.itemSet = value;
@@ -277,6 +280,7 @@ namespace BL.Forms
                 if (this.itemSet != null)
                 {
                     this.itemSet.ItemSetChanged += this.itemSetEventHandler;
+                    this.itemSet.ItemInSetChanged += this.itemChangedEventHandler;
 
                     this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
                 }
@@ -294,6 +298,7 @@ namespace BL.Forms
             this.forms = new List<Form>();
 
             this.itemSetEventHandler = this.itemSet_ItemSetChanged;
+            this.itemChangedEventHandler = this.item_ItemChanged;
 
             this.EnqueueUpdates = true;
         }
@@ -415,14 +420,10 @@ namespace BL.Forms
 
                     if (f != null)
                     {
-                        if (ElementUtilities.ElementIsChildOf(f.Element, this.formBin))
-                        {
-                            this.formBin.RemoveChild(f.Element);
-                        }
+                        this.RemoveFormFromDisplay(f);
 
                         this.formsByLocalId[item.LocalOnlyUniqueId] = null;
                         this.forms.Remove(f);
-                        this.itemsShown.Remove(item);
 
                         f.Dispose();
                     }
@@ -430,6 +431,16 @@ namespace BL.Forms
             }
 
             this.Update();
+        }
+
+        private void RemoveFormFromDisplay(Form f)
+        {
+            if (ElementUtilities.ElementIsChildOf(f.Element, this.formBin))
+            {
+                this.formBin.RemoveChild(f.Element);
+            }
+
+            this.itemsShown.Remove(f.Item);
         }
         
         private void EnsureHeaderRow()
@@ -520,6 +531,7 @@ namespace BL.Forms
                 if (!this.itemsShown.Contains(item))
                 {
                     f.ItemSetInterface = this.ItemSetInterface;
+                    f.ItemSet = this.itemSet;
                     f.Item = item;
                     
                     this.itemsShown.Add(item);
@@ -556,6 +568,7 @@ namespace BL.Forms
 
             f.DefaultImageBrowserOptions = this.DefaultImageBrowserOptions;
             f.ItemSetInterface = this.ItemSetInterface;
+            f.ItemSet = this.itemSet;
             f.Item = item;
             f.Mode = this.formMode;
             
@@ -604,6 +617,25 @@ namespace BL.Forms
             }
         }
 
+        private void item_ItemChanged(object sender, DataStoreItemChangedEventArgs e)
+        {
+            if (this.ItemSetInterface != null)
+            {
+                if ((this.ItemSetInterface.Sort == ItemSetSort.FieldAscending || this.ItemSetInterface.Sort == ItemSetSort.FieldDescending) && this.ItemSetInterface.SortField != null)
+                {
+                    foreach (String changedFieldName in e.ChangedProperties)
+                    {
+                        if (changedFieldName == this.ItemSetInterface.SortField)
+                        {
+                            this.reorderItemsOnNextUpdate = true;
+                            this.Update();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         public void SetItemSetInterfaceAndItems(ItemSetInterface isi, IDataStoreItemSet newItemSet)
         {
             if (this.itemSet == newItemSet && this.itemSetInterface == isi)
@@ -621,6 +653,7 @@ namespace BL.Forms
             if (this.itemSet != null)
             {
                 this.itemSet.ItemSetChanged -= this.itemSetEventHandler;
+                this.itemSet.ItemInSetChanged -= this.itemChangedEventHandler;
             }
 
             this.itemSet = newItemSet;
@@ -628,6 +661,7 @@ namespace BL.Forms
             if (this.itemSet != null)
             {
                 this.itemSet.ItemSetChanged += this.itemSetEventHandler;
+                this.itemSet.ItemInSetChanged += this.itemChangedEventHandler;
 
                 this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
             }
@@ -755,6 +789,25 @@ namespace BL.Forms
             foreach (IItem item in this.itemsShown)
             {
                 itemsNotSeen.Add(item);
+            }
+
+            if (this.reorderItemsOnNextUpdate)
+            {
+                List<IItem> tempShownItems = new List<IItem>();
+
+                foreach (IItem item in this.itemsShown)
+                {
+                    tempShownItems.Add(item);
+                }
+
+                foreach (IItem item in tempShownItems)
+                {
+                    Form f = formsByLocalId[item.LocalOnlyUniqueId];
+
+                    this.RemoveFormFromDisplay(f);
+                }
+
+                this.reorderItemsOnNextUpdate = false;
             }
 
             this.EnsureHeaderRow();

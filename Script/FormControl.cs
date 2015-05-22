@@ -15,6 +15,97 @@ namespace BL.Forms
     {
         private IForm form;
 
+        public List<IItem> EffectiveItemList
+        {
+            get
+            {
+                if (this.ItemSet == null)
+                {
+                    return null;
+                }
+
+                ItemSetSort sort = ItemSetSort.None;
+                String sortField = null;
+
+                if (this.form.ItemSetInterface != null)
+                {
+                    sort = this.form.ItemSetInterface.Sort;
+                    sortField = this.form.ItemSetInterface.SortField;
+                }
+
+                List<IItem> items = null;
+
+                if (sort == ItemSetSort.None)
+                {
+                    items = this.ItemSet.Items;
+                }
+                else
+                {
+                    items = this.ItemSet.GetSortedItems(sort, sortField);
+                }
+
+                return items;
+            }
+        }
+
+        public IItem PreviousItem
+        {
+            get
+            {
+                if (this.ItemSet == null)
+                {
+                    return null;
+                }
+
+                List<IItem> items = this.EffectiveItemList;
+                
+                IItem previousItem = null;
+
+                foreach (IItem item in items)
+                {
+                    if (item == this.Item)
+                    {
+                        return previousItem;
+                    }
+
+                    previousItem = item;
+                }
+
+                Debug.Fail("Couldn't find a form item in the collection it is in.");
+                return null;
+            }
+        }
+
+        public IItem NextItem
+        {
+            get
+            {
+                if (this.ItemSet == null)
+                {
+                    return null;
+                }
+
+                List<IItem> items = this.EffectiveItemList;
+
+                bool foundThisItem = false;
+
+                foreach (IItem item in items)
+                {
+                    if (item == this.Item)
+                    {
+                        foundThisItem = true;
+                    }
+                    else if (foundThisItem)
+                    {
+                        return item;
+                    }
+                }
+
+                Debug.Assert(foundThisItem, "Couldn't find a form item in the collection it is in.");
+                return null;
+            }
+        }
+
         public IForm Form
         {
             get

@@ -303,6 +303,7 @@ namespace BL.Forms
         protected void ApplyToControl(FieldControl fc)
         {
             fc.Form = this.Form;
+            fc.ItemSet = this.ItemSet;
             fc.Item = this.Item;
             fc.Mode = this.Mode;
             fc.FieldName = this.FieldName;

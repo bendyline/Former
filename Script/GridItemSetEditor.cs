@@ -1304,11 +1304,11 @@ namespace BL.Forms
 
                     Form f = this.EnsureForm(item);
                     f.ItemSetInterface = this.ItemSetInterface;
+                    f.ItemSet = this.itemSet;
                     f.Item = objectItem;
 
                     FieldValue chfe = new FieldValue();
 
-                  
                     chfe.Item = objectItem;
                     chfe.Form = f;
                     chfe.FieldName = options.Field;
