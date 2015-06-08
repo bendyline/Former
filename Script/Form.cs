@@ -43,12 +43,39 @@ namespace BL.Forms
 
         private Element deleteButton;
 
+        [ScriptName("e_grippie")]
+        private Element grippieElement;
+
         private NotifyCollectionChangedEventHandler fieldSettingsChangeHandler;
         private PropertyChangedEventHandler formSettingsChangeHandler;
 
         public event DataStoreItemEventHandler ItemDeleted;
-
+        public event EventHandler GrippieElementChanged;
+        
         private ImageBrowserOptions defaultImageBrowserOptions;
+
+        public Element GrippieElement
+        {
+            get
+            {
+                return this.grippieElement;
+            }
+
+            set
+            {
+                if (this.grippieElement == value)
+                {
+                    return;
+                }
+
+                this.grippieElement = value;
+
+                if (this.GrippieElementChanged != null)
+                {
+                    this.GrippieElementChanged(this, EventArgs.Empty);
+                }
+            }
+        }
 
         public ImageBrowserOptions DefaultImageBrowserOptions
         {

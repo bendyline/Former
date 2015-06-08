@@ -10,6 +10,7 @@ using BL.UI;
 using BL.Data;
 using System.Runtime.CompilerServices;
 using Kendo.UI;
+using BL.UI.KendoControls;
 
 namespace BL.Forms
 {
@@ -52,6 +53,8 @@ namespace BL.Forms
         [ScriptName("e_addButton")]
         private InputElement addButton;
 
+        private Dictionary<String, DropZoneTarget> dropZoneTargetsByItemId;
+
         private bool reorderItemsOnNextUpdate = false;
         private bool useRowFormsIfPossible = true;
         private bool displayAddButton = true;
@@ -63,6 +66,9 @@ namespace BL.Forms
         private event DataStoreItemChangedEventHandler itemChangedEventHandler;
         public event DataStoreItemEventHandler ItemAdded;
         public event DataStoreItemEventHandler ItemDeleted;
+
+        private Form draggingForm;
+        private Element draggingElement;
 
         [ScriptName("i_formMode")]
         public FormMode FormMode 
@@ -141,6 +147,14 @@ namespace BL.Forms
             set
             {
                 this.useRowFormsIfPossible = value;
+            }
+        }
+
+        public bool IsReorderable
+        {
+            get
+            {
+                return this.ItemSetInterface != null && this.ItemSetInterface.IsReorderable;
             }
         }
 
@@ -293,9 +307,12 @@ namespace BL.Forms
 
         public ItemSetEditor()
         {
+            KendoUtilities.EnsureKendoBaseUx(this);
+
             this.itemsShown = new List<IItem>();
             this.formsByLocalId = new Dictionary<String, Form>();
             this.forms = new List<Form>();
+            this.dropZoneTargetsByItemId = new Dictionary<string, DropZoneTarget>();
 
             this.itemSetEventHandler = this.itemSet_ItemSetChanged;
             this.itemChangedEventHandler = this.item_ItemChanged;
@@ -380,7 +397,6 @@ namespace BL.Forms
                     else if (!Script.IsNullOrUndefined(f.InterfaceTypeOptions) && f.InterfaceTypeOptions.IntDefaultValue != null)
                     {
                         item.SetInt32Value(f.Name, (Int32)f.InterfaceTypeOptions.IntDefaultValue);
-
                     }
                 }
             }
@@ -485,6 +501,16 @@ namespace BL.Forms
 
             sortedFields.Sort(this.ItemSetInterface.CompareFields);
 
+            // add a placeholder cell for the drag-and-drop grippie column
+            if (this.IsReorderable)
+            {
+                Element cellElement = this.CreateElement("headerCell");
+
+                ElementUtilities.SetHtml(cellElement, "&#160;");
+
+                this.headerRowElement.AppendChild(cellElement);
+            }
+
             foreach (Field field in sortedFields)
             {
                 DisplayState afs = this.GetAdjustedDisplayState(field.Name);
@@ -556,6 +582,7 @@ namespace BL.Forms
             }
 
             f.ItemDeleted += f_ItemDeleted;
+            f.GrippieElementChanged += f_GrippieChanged;
 
             if (this.itemFormTemplateId != null && (!Context.Current.IsSmallFormFactor || this.itemFormTemplateIdSmall == null))
             {
@@ -572,6 +599,7 @@ namespace BL.Forms
             f.Item = item;
             f.Mode = this.formMode;
             
+
             this.formsByLocalId[item.LocalOnlyUniqueId] = f;
             this.forms.Add(f);
             this.itemsShown.Add(item);
@@ -615,6 +643,92 @@ namespace BL.Forms
                     itemBin.AppendChild(f.Element);
                 }
             }
+        }
+
+        private void f_GrippieChanged(object sender, EventArgs e)
+        {
+            if (this.IsReorderable && ((Form)sender).GrippieElement != null)
+            {
+                DraggableOptions options = new DraggableOptions();
+
+                options.Hint = this.CreateDragElement;
+                options.Axis = "y";
+                options.DragStart = this.HandleDragStart;
+                options.DragEnd = this.HandleDragEnd;
+                options.DragCancel = this.HandleDragEnd;
+
+                KendoUtilities.CreateDraggable(((Form)sender).GrippieElement, options);
+            }
+        }
+
+        
+        private void HandleDragStart(jQueryEvent eventData)
+        {
+            Element targetElt = eventData.CurrentTarget;
+
+            // the jqueryevent definition says that this is an element, but it looks like it's coming in as a collection of elements.
+            Script.Literal("{0}={0}[0]", targetElt);
+
+            this.draggingForm = null;
+
+            while (targetElt != null && this.draggingForm == null)
+            {
+                foreach (Form f in this.forms)
+                {
+                    if (f.Element == targetElt)
+                    {
+                        this.draggingForm = f;
+                        break;
+                    }
+                }
+
+                targetElt = targetElt.ParentNode;
+            }
+
+            this.draggingForm.Element.Style.Opacity = ".1";
+
+            ElementUtilities.SetText(this.draggingElement, this.draggingForm.Item.Title);
+
+            ClientRect rect = ElementUtilities.GetBoundingRect(this.draggingForm.Element);
+
+            this.draggingElement.Style.MinWidth = (rect.Right - rect.Left) + "px";
+
+            this.draggingElement.Style.MaxWidth = this.draggingElement.Style.MinWidth;
+
+            foreach (String targetItemId in this.dropZoneTargetsByItemId.Keys)
+            {
+                DropZoneTarget zoneTarget = this.dropZoneTargetsByItemId[targetItemId];
+
+                zoneTarget.ExpandedHeight = (int)(rect.Bottom - rect.Top);
+                if (zoneTarget.CurrentControl != this.draggingForm && zoneTarget.PreviousControl != this.draggingForm)
+                {
+                    zoneTarget.IsActive = true;
+                }
+                else
+                {
+                    zoneTarget.IsActive = false;
+                }
+            }
+        }
+
+        private void HandleDragEnd(jQueryEvent eventData)
+        {
+            this.draggingForm.Element.Style.Opacity = "1";
+
+            foreach (String targetItemId in this.dropZoneTargetsByItemId.Keys)
+            {
+                DropZoneTarget zoneTarget = this.dropZoneTargetsByItemId[targetItemId];
+
+                zoneTarget.IsActive = false;
+            }
+        }
+
+        private Element CreateDragElement(Element[] elements)
+        {
+            this.draggingElement = this.CreateElement("draggableBar");
+
+
+            return this.draggingElement;
         }
 
         private void item_ItemChanged(object sender, DataStoreItemChangedEventArgs e)
@@ -671,12 +785,35 @@ namespace BL.Forms
             }
         }
 
-        private void InsertFormInOrder(Form form)
+        private DropZoneTarget EnsureDropZoneTargetForForm(Form form)
+        {
+            DropZoneTarget dropZoneTarget = this.dropZoneTargetsByItemId[form.Item.LocalOnlyUniqueId];
+
+            if (dropZoneTarget == null)
+            {
+                dropZoneTarget = new DropZoneTarget();
+
+                dropZoneTarget.TemplateId = "bl-forms-rowdropzonetarget";
+
+                dropZoneTarget.EnsureElements();
+                dropZoneTarget.DroppedOn += dropZoneTarget_DroppedOn;
+
+                this.dropZoneTargetsByItemId[form.Item.LocalOnlyUniqueId] = dropZoneTarget;
+            }
+
+            return dropZoneTarget;
+        }
+
+        private void InsertFormInOrder(Form formToInsert)
         {
             if (this.formBin == null)
             {
                 return;
             }
+
+            DropZoneTarget dropZoneTarget = this.EnsureDropZoneTargetForForm(formToInsert);
+
+            Form previousForm = null;
 
             if (this.ItemSetInterface.Sort != ItemSetSort.DefaultState)
             {
@@ -684,20 +821,121 @@ namespace BL.Forms
                 {
                     Element e = this.formBin.Children[i];
 
-                    Form f = this.GetFormForElement(e);
+                    Form existingFormInList = this.GetFormForElement(e);
 
-                    if (f != null)
+                    if (existingFormInList != null)
                     {
-                        if (f.Item.CompareTo(form.Item, this.ItemSetInterface.Sort, this.ItemSetInterface.SortField) >= 0)
+                        if (existingFormInList.Item.CompareTo(formToInsert.Item, this.ItemSetInterface.Sort, this.ItemSetInterface.SortField) >= 0)
                         {
-                            this.formBin.InsertBefore(form.Element, e);
+                            dropZoneTarget.PreviousControl = previousForm;
+                            dropZoneTarget.NextControl = existingFormInList;
+                            dropZoneTarget.CurrentControl = formToInsert;
+
+                            Element targetToInsertBefore = null;
+
+                            if (previousForm != null)
+                            {
+                                DropZoneTarget previousFormZoneTarget = this.EnsureDropZoneTargetForForm(previousForm);
+                                previousFormZoneTarget.NextControl = formToInsert;
+                            }
+
+                            DropZoneTarget nextFormZoneTarget = this.EnsureDropZoneTargetForForm(existingFormInList);
+                            nextFormZoneTarget.PreviousControl = formToInsert;
+
+                            targetToInsertBefore = nextFormZoneTarget.Element;
+
+                            this.formBin.InsertBefore(formToInsert.Element, targetToInsertBefore);
+                            this.formBin.InsertBefore(dropZoneTarget.Element, formToInsert.Element);
                             return;
                         }
+
+                        previousForm = existingFormInList;
                     }
                 }
             }
 
-            this.formBin.AppendChild(form.Element);
+            dropZoneTarget.NextControl = null;
+            dropZoneTarget.CurrentControl = formToInsert;
+            dropZoneTarget.PreviousControl = previousForm;
+
+            this.formBin.AppendChild(dropZoneTarget.Element);
+            this.formBin.AppendChild(formToInsert.Element);
+        }
+
+
+        private void dropZoneTarget_DroppedOn(object sender, EventArgs e)
+        {
+            DropZoneTarget droppedOnTarget = (DropZoneTarget)sender;
+
+            Form targetNextForm= droppedOnTarget.CurrentControl as Form;
+            Form targetPreviousForm = droppedOnTarget.PreviousControl as Form;
+
+            List<IItem> items= this.ItemSet.GetSortedItems(this.ItemSetInterface.Sort, this.ItemSetInterface.SortField);
+
+            int targetNextIndex = 0;
+
+            if (targetNextForm != null)
+            {
+                targetNextIndex = items.IndexOf(targetNextForm.Item);
+            }
+
+            int targetPreviousIndex = 0;
+
+            if (targetPreviousForm!= null)
+            {
+                targetPreviousIndex = items.IndexOf(targetPreviousForm.Item);
+            }
+
+            int sourceIndex = items.IndexOf(draggingForm.Item);
+
+            if (sourceIndex < Math.Max(targetNextIndex, targetPreviousIndex)) // we're dragging an element lower in the list (down)
+            {
+                 int? fieldTargetOrder = 0;
+
+                IItem targetItem = targetPreviousForm.Item;
+                fieldTargetOrder = targetItem.GetInt32Value(this.ItemSetInterface.SortField);
+
+                for (int i = targetPreviousIndex; i > sourceIndex; i--)
+                {
+                    IItem currentItem= items[i];
+                    IItem previousItem = items[i - 1];
+
+                    currentItem.SetInt32Value(this.ItemSetInterface.SortField, previousItem.GetInt32Value(this.ItemSetInterface.SortField));
+                }
+
+                this.draggingForm.Item.SetInt32Value(this.ItemSetInterface.SortField, fieldTargetOrder);
+            }
+            else // we're dragging an element higher in the list (up)
+            {
+                int? fieldTargetOrder = 0;
+
+                IItem targetItem = targetNextForm.Item;
+                fieldTargetOrder = targetItem.GetInt32Value(this.ItemSetInterface.SortField);
+
+                for (int i = targetNextIndex; i < sourceIndex; i++)
+                {
+                    IItem currentItem = items[i];
+
+                    int nextOrder = 0;
+
+                    if (i + 1 < items.Count)
+                    {
+                        IItem nextItem = items[i + 1];
+
+                        if (nextItem.GetInt32Value(this.ItemSetInterface.SortField) != null)
+                        {
+                            nextOrder = (int)nextItem.GetInt32Value(this.ItemSetInterface.SortField);
+                        }
+                    }
+
+                    currentItem.SetInt32Value(this.ItemSetInterface.SortField, nextOrder);
+                }
+
+                this.draggingForm.Item.SetInt32Value(this.ItemSetInterface.SortField, fieldTargetOrder);
+            }
+
+            this.reorderItemsOnNextUpdate = true;
+            this.Update();
         }
 
         private Form GetFormForElement(Element e)

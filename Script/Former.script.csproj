@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DateFieldValue.htm" />
+    <Content Include="RowDropZoneTarget.htm" />
     <Content Include="HorizontalForm.htm" />
     <Content Include="OrderFieldValue.htm" />
     <Content Include="PhoneTextFieldValue.htm" />

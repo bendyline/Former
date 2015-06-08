@@ -25,6 +25,17 @@ namespace BL.Forms
         private String accentColor1;
         private String accentColor2;
 
+
+        public bool IsReorderable
+        {
+            get
+            {
+                return   (this.Sort == ItemSetSort.FieldAscending || this.Sort == ItemSetSort.FieldDescending) &&
+                            this.SortField != null;
+            }
+        }
+
+
         public Nullable<int> MaxFieldOrder
         {
             get

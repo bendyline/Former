@@ -19,6 +19,8 @@ namespace BL.Forms
         private Dictionary<String, LabeledField> fieldsByName;
         private Element specialButtonsCell;
         private InputElement deleteButton;
+
+        private Element grippieCell;
    
         public RowForm()
         {
@@ -32,7 +34,7 @@ namespace BL.Forms
         {
             base.OnUpdate();
 
-            if (this.Item == null )
+            if (this.Item == null)
             {
                 return;
             }
@@ -49,6 +51,29 @@ namespace BL.Forms
             foreach (LabeledField lf in fields)
             {
                 fieldsNotUsed.Add(lf);
+            }
+
+            if (this.grippieCell == null && this.ItemSetInterface.IsReorderable)
+            {
+                this.grippieCell = this.CreateElement("cell");
+
+                this.GrippieElement = this.CreateElement("grippieElement");
+
+                ElementUtilities.SetText(this.GrippieElement, "");
+
+                this.grippieCell.AppendChild(this.GrippieElement);
+            }
+            else if (this.grippieCell != null && !this.ItemSetInterface.IsReorderable)
+            {
+                this.grippieCell = null;
+            }
+
+            if (this.ItemSetInterface.IsReorderable)
+            {
+                if (!ElementUtilities.ElementIsChildOf(this.grippieCell, this.Element))
+                {
+                    this.Element.AppendChild(this.grippieCell);
+                }
             }
 
             if (this.specialButtonsCell == null && this.ItemSetInterface.DisplayDeleteItemButton)
