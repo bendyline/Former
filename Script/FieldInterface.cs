@@ -277,6 +277,28 @@ namespace BL.Forms
             this.interfaceTypeOptionsOverride.PropertyChanged += interfaceTypeOptionsOverridePropertyChanged;
         }
 
+        public int EnsureOrderDefaultToLast(ItemSetInterface itemSetInterface)
+        {
+            if (this.order != null)
+            {
+                return (int)this.order;
+            }
+            
+            int maxOrder = 0;
+
+            foreach (FieldInterface fi in itemSetInterface.FieldInterfaces)
+            {
+                if (fi.Order != null && (int)fi.Order > maxOrder)
+                {
+                    maxOrder = (int)fi.Order;
+                }
+            }
+
+            this.order = maxOrder + 10;
+
+            return maxOrder + 10;
+        }
+
         private void interfaceTypeOptionsOverride_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             this.NotifyPropertyChanged("InterfaceTypeOptionsOverride");

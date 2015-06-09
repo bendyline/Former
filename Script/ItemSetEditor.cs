@@ -53,7 +53,7 @@ namespace BL.Forms
         [ScriptName("e_addButton")]
         private InputElement addButton;
 
-        private Dictionary<String, DropZoneTarget> dropZoneTargetsByItemId;
+        private Dictionary<String, DropZoneTarget> dropZoneTargetsByLocalId;
 
         private bool reorderItemsOnNextUpdate = false;
         private bool useRowFormsIfPossible = true;
@@ -312,7 +312,7 @@ namespace BL.Forms
             this.itemsShown = new List<IItem>();
             this.formsByLocalId = new Dictionary<String, Form>();
             this.forms = new List<Form>();
-            this.dropZoneTargetsByItemId = new Dictionary<string, DropZoneTarget>();
+            this.dropZoneTargetsByLocalId = new Dictionary<string, DropZoneTarget>();
 
             this.itemSetEventHandler = this.itemSet_ItemSetChanged;
             this.itemChangedEventHandler = this.item_ItemChanged;
@@ -695,9 +695,9 @@ namespace BL.Forms
 
             this.draggingElement.Style.MaxWidth = this.draggingElement.Style.MinWidth;
 
-            foreach (String targetItemId in this.dropZoneTargetsByItemId.Keys)
+            foreach (String targetItemId in this.dropZoneTargetsByLocalId.Keys)
             {
-                DropZoneTarget zoneTarget = this.dropZoneTargetsByItemId[targetItemId];
+                DropZoneTarget zoneTarget = this.dropZoneTargetsByLocalId[targetItemId];
 
                 zoneTarget.ExpandedHeight = (int)(rect.Bottom - rect.Top);
                 if (zoneTarget.CurrentControl != this.draggingForm && zoneTarget.PreviousControl != this.draggingForm)
@@ -715,9 +715,9 @@ namespace BL.Forms
         {
             this.draggingForm.Element.Style.Opacity = "1";
 
-            foreach (String targetItemId in this.dropZoneTargetsByItemId.Keys)
+            foreach (String targetItemId in this.dropZoneTargetsByLocalId.Keys)
             {
-                DropZoneTarget zoneTarget = this.dropZoneTargetsByItemId[targetItemId];
+                DropZoneTarget zoneTarget = this.dropZoneTargetsByLocalId[targetItemId];
 
                 zoneTarget.IsActive = false;
             }
@@ -787,7 +787,7 @@ namespace BL.Forms
 
         private DropZoneTarget EnsureDropZoneTargetForForm(Form form)
         {
-            DropZoneTarget dropZoneTarget = this.dropZoneTargetsByItemId[form.Item.LocalOnlyUniqueId];
+            DropZoneTarget dropZoneTarget = this.dropZoneTargetsByLocalId[form.Item.LocalOnlyUniqueId];
 
             if (dropZoneTarget == null)
             {
@@ -798,7 +798,7 @@ namespace BL.Forms
                 dropZoneTarget.EnsureElements();
                 dropZoneTarget.DroppedOn += dropZoneTarget_DroppedOn;
 
-                this.dropZoneTargetsByItemId[form.Item.LocalOnlyUniqueId] = dropZoneTarget;
+                this.dropZoneTargetsByLocalId[form.Item.LocalOnlyUniqueId] = dropZoneTarget;
             }
 
             return dropZoneTarget;
@@ -1083,6 +1083,16 @@ namespace BL.Forms
                     if (this.formBin != null && this.formBin.Contains(f.Element))
                     {
                         this.formBin.RemoveChild(f.Element);
+                    }
+                }
+
+                DropZoneTarget dtz = this.dropZoneTargetsByLocalId[item.LocalOnlyUniqueId];
+
+                if (dtz != null)
+                {
+                    if (this.formBin != null && this.formBin.Contains(dtz.Element))
+                    {
+                        this.formBin.RemoveChild(dtz.Element);
                     }
                 }
 

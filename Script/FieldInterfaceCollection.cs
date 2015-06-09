@@ -47,6 +47,20 @@ namespace BL.Forms
         {
             return this.fieldsByStorageFieldName[fieldName];
         }
+
+        public FieldInterface EnsureFieldByName(String fieldName)
+        {
+            if (this.fieldsByStorageFieldName.ContainsKey(fieldName))
+            {
+                return this.fieldsByStorageFieldName[fieldName]; 
+            }
+
+            FieldInterface fi = new FieldInterface();
+            fi.Name = fieldName;
+            this.Add(fi);
+
+            return fi;
+        }
         
         public void RemoveByName(String fieldName)
         {

@@ -41,6 +41,9 @@ namespace BL.Forms
         [ScriptName("e_specialButtons")]
         private Element specialButtons;
 
+        [ScriptName("e_grippieArea")]
+        private Element grippieArea;
+
         private Element deleteButton;
 
         [ScriptName("e_grippie")]
@@ -53,6 +56,9 @@ namespace BL.Forms
         public event EventHandler GrippieElementChanged;
         
         private ImageBrowserOptions defaultImageBrowserOptions;
+
+        private Element grippieCell;
+
 
         public Element GrippieElement
         {
@@ -386,6 +392,22 @@ namespace BL.Forms
             if (this.fieldIterator != null)
             {
                 this.ApplyToControl(this.fieldIterator);
+            }
+
+            if (this.grippieArea != null)
+            {
+                if (this.grippieCell == null && this.ItemSetInterface.IsReorderable)
+                {
+                    this.GrippieElement = this.CreateElement("grippieElement");
+
+                    ElementUtilities.SetText(this.GrippieElement, "");
+
+                    this.grippieArea.AppendChild(this.GrippieElement);
+                }
+                else if (this.grippieCell != null && !this.ItemSetInterface.IsReorderable)
+                {
+                    this.GrippieElement = null;
+                }
             }
 
             if (this.specialButtons != null && this.ItemSetInterface != null && this.ItemSetInterface.DisplayDeleteItemButton && this.Mode != FormMode.ViewForm)

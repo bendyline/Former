@@ -623,13 +623,97 @@ namespace BL.Forms
                 {
                     item = this.ItemSet.GetItemByLocalOnlyUniqueId(id.ToString());
 
-                    if (item != null)
+                    if (item != null && ModelIsValid(item.Type, model))
                     {
                         Item.SetDataObject(this.ItemSet, item, model);
                     }
                 }
             }
         }
+
+        private bool ModelIsValid(IDataStoreType itemType, Model model)
+        {
+   
+            foreach (IDataStoreField f in itemType.Fields)
+            {
+                if (!this.IsModelFieldValidForItem(f, model))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        
+        }
+
+
+        public bool IsModelFieldValidForItem(IDataStoreField field, Model model)
+        {
+            bool? requiredOverride = this.GetFieldRequiredOverride(field.Name);
+
+            object value = null;
+
+            Script.Literal("{0}={1}[{2}]", value, model, field.Name);
+
+            if (requiredOverride == true || (requiredOverride == null && field.Required))
+            {
+
+                if (value == null)
+                {
+                    return false;
+                }
+
+                if ((field.Type == FieldType.ShortText || field.Type == FieldType.UnboundedText || field.Type == FieldType.RichContent) && (String)value == String.Empty)
+                {
+                    return false;
+                }
+            }
+
+            FieldInterface fi = this.itemSetInterface[field.Name];
+
+            if (fi != null)
+            {
+                FieldInterfaceTypeOptions fito = this.GetFieldInterfaceTypeOptionsOverride(field.Name);
+                Nullable<FieldInterfaceType> fit = this.GetFieldInterfaceTypeOverride(field.Name);
+
+                if (fito == null)
+                {
+                    fito = fi.InterfaceTypeOptionsOverride;
+                }
+
+
+                if (fit == FieldInterfaceType.Email)
+                {
+                    String email = (String)value;
+
+                    if (!String.IsNullOrEmpty(email))
+                    {
+                        if (!Utilities.IsValidEmail(email))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public bool? GetFieldRequiredOverride(String fieldName)
+        {
+            return this.ItemSetInterface.FieldInterfaces.GetFieldRequiredOverride(fieldName);
+        }
+
+        public Nullable<FieldInterfaceType> GetFieldInterfaceTypeOverride(String fieldName)
+        {
+            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOverride(fieldName);
+        }
+
+        public FieldInterfaceTypeOptions GetFieldInterfaceTypeOptionsOverride(String fieldName)
+        {
+            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOptionsOverride(fieldName);
+        }
+
 
         private void itemSetOrFieldInterface_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -955,6 +1039,12 @@ namespace BL.Forms
                         else
                         {
                             mf.Type = "string";
+                        }
+
+                        if (this.GetFieldRequiredOverride(field.Name) == true)
+                        {
+                            mf.Validation = new ModelFieldValidation();
+                            mf.Validation.Required = true;
                         }
 
                         if ((field.InterfaceType == FieldInterfaceType.User && fs.InterfaceTypeOverride == null) || fs.InterfaceTypeOverride == FieldInterfaceType.User)
