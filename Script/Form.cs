@@ -41,6 +41,9 @@ namespace BL.Forms
         [ScriptName("e_specialButtons")]
         private Element specialButtons;
 
+        [ScriptName("e_form")]
+        private Element form;
+
         [ScriptName("e_grippieArea")]
         private Element grippieArea;
 
@@ -330,6 +333,11 @@ namespace BL.Forms
         {
             base.OnApplyTemplate();
 
+            if (this.form != null)
+            {
+                this.form.AddEventListener("submit", this.HandleFormSubmit, true);
+            }
+
             if (this.fieldIterator != null)
             {
                 if (this.iteratorFieldTemplateId != null)
@@ -339,6 +347,13 @@ namespace BL.Forms
 
                 this.ApplyToControl(this.fieldIterator);
             }
+        }
+
+        private void HandleFormSubmit(ElementEvent e)
+        {
+            e.CancelBubble = true;
+            e.StopPropagation();
+            e.PreventDefault();
         }
 
         public virtual void Save(AsyncCallback callback, object state)

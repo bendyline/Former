@@ -25,10 +25,8 @@
 
             #deleteButton
             {
-                background:#FFFFFF;
                 vertical-align:middle;
-                text-align:center;
-                color: #C0C0C0;
+                text-align:right;
                 padding-left:8px;
                 padding-right:8px;
                 padding-top:4px;
@@ -36,17 +34,66 @@
                 border-radius:3px;
                 border:solid 0px;     
                 height:41px;     
+                background-color:transparent;
                 font-family:'Kendo UI';
+                float:right;
                 font-size:12pt;
                 color:#D0D0D0;  
+            }
+
+            #grippieElement
+            {
+                vertical-align:middle;
+                text-align:left;
+
+                padding-top:2px;
+                padding-bottom:4px;    
+                border:solid 0px;     
+                cursor:default;
+                height:41px;     
+                float:left;
+                font-family:'Kendo UI';
+                font-size:18pt;
+                color:#D0D0D0;  
+                position:relative;
+                left:-8px;
+            }
+
+            #specialArea
+            {
+                display:table;
+                width:100%;
+            }
+
+            #specialRow
+            {
+                display:table-row;
+            }
+
+            #specialCell
+            {
+                display:table-cell;
             }
         </style>
 	</head>
 	<body> 
-        <form action="">       
+        <form action="">  
+
             <BL.Forms.FieldIterator id="fieldIterator" FieldTemplateId="bl-forms-unlabeledfield"/>
-            <div id="specialButtons">
+
+            <div id="specialArea">
+                <div id="specialRow">     
+                    <div data-ctl-class="specialCell">
+                        <div id="grippieArea">
+                        </div>
+                    </div>
+                    <div data-ctl-class="specialCell">
+                        <div id="specialButtons">
+                        </div>
+                    </div>
+                </div>
             </div>
+
 
         </form> 
     </body>

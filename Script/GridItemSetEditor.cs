@@ -294,6 +294,7 @@ namespace BL.Forms
             }
         }
 
+        [ScriptName("b_displayAddAndDeleteButtons")]
         public bool DisplayAddAndDeleteButtons
         {
             get

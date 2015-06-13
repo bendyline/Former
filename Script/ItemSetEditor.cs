@@ -186,7 +186,7 @@ namespace BL.Forms
             }
         }
 
-        [ScriptName("b_displayAddButton")]
+        [ScriptName("b_displayAddAndDeleteButtons")]
         public bool DisplayAddAndDeleteButtons
         {
             get
@@ -455,6 +455,17 @@ namespace BL.Forms
             {
                 this.formBin.RemoveChild(f.Element);
             }
+
+            DropZoneTarget dtz = this.dropZoneTargetsByLocalId[f.Item.LocalOnlyUniqueId];
+
+            if (dtz != null)
+            {
+                if (this.formBin != null && this.formBin.Contains(dtz.Element))
+                {
+                    this.formBin.RemoveChild(dtz.Element);
+                }
+            }
+
 
             this.itemsShown.Remove(f.Item);
         }

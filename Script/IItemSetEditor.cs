@@ -20,6 +20,7 @@ namespace BL.Forms
 
         ImageBrowserOptions DefaultImageBrowserOptions { get; set;}
 
+        [ScriptName("b_displayAddAndDeleteButtons")]
         bool DisplayAddAndDeleteButtons { get; set; }
 
         [ScriptName("s_itemPlacementFieldName")]

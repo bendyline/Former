@@ -13,6 +13,7 @@ namespace BL.Forms
         private FormMode formMode = FormMode.EditForm;
         private bool displayColumns = true;
         private bool displayDeleteItemButton = true;
+        private bool displayReorderItemButton = true;
         private String addItemCta;
         private String itemSetEditorTemplateId;
         private String itemSetEditorSmallTemplateId;
@@ -26,11 +27,13 @@ namespace BL.Forms
         private String accentColor2;
 
 
+
         public bool IsReorderable
         {
             get
             {
-                return   (this.Sort == ItemSetSort.FieldAscending || this.Sort == ItemSetSort.FieldDescending) &&
+                return   displayReorderItemButton&& 
+                            (this.Sort == ItemSetSort.FieldAscending || this.Sort == ItemSetSort.FieldDescending) &&
                             this.SortField != null;
             }
         }
@@ -51,6 +54,20 @@ namespace BL.Forms
                 }
 
                 return max;
+            }
+        }
+
+        [ScriptName("b_displayReorderItemButton")]
+        public bool DisplayReorderItemButton
+        {
+            get
+            {
+                return this.displayReorderItemButton;
+            }
+
+            set
+            {
+                this.displayReorderItemButton = value;
             }
         }
 
