@@ -24,7 +24,7 @@ namespace BL.Forms
 
         public IntegerFieldValue()
         {
-            this.EnsurePrerequisite("kendo.ui.Validator", "js/kendo/kendo.validator.min.js");
+            this.EnsureScript("kendo.ui.Validator", "js/kendo/kendo.validator.min.js");
         }
 
         protected override void OnApplyTemplate()
