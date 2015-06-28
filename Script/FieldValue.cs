@@ -113,6 +113,14 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
+                    else if ((this.Field.Type == FieldType.ShortText || this.Field.Type == FieldType.UnboundedText) && interfaceType == FieldInterfaceType.Image)
+                    {
+                        this.fieldControl = new ImageFieldValue();
+                        this.ApplyToControl(this.fieldControl);
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
                     else if ((this.Field.Type == FieldType.ShortText || this.Field.Type == FieldType.Integer) && interfaceType == FieldInterfaceType.Choice)
                     {
                         if (styleId == 1)

@@ -63,6 +63,7 @@
     <Compile Include="DateTimeFieldControl.cs" />
     <Compile Include="BooleanFieldControl.cs" />
     <Compile Include="DateFieldValue.cs" />
+    <Compile Include="IImageEditor.cs" />
     <Compile Include="OrderFieldValue.cs" />
     <Compile Include="RadioChoiceFieldValue.cs" />
     <Compile Include="ChoiceFieldControl.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="CheckboxFieldValue.cs" />
     <Compile Include="MultilineTextFieldValue.cs" />
     <Compile Include="IntegerFieldValue.cs" />
+    <Compile Include="ImageFieldValue.cs" />
     <Compile Include="UserList.cs" />
     <Compile Include="UserListToken.cs" />
     <Compile Include="UserValue.cs" />
@@ -145,6 +147,7 @@
     <Content Include="FieldValidationIndicator.htm" />
     <Content Include="MultilineTextFieldValue.htm" />
     <Content Include="IntegerFieldValue.htm" />
+    <Content Include="ImageFieldValue.htm" />
     <Content Include="UnlabeledForm.htm" />
     <Content Include="UserList.htm" />
     <Content Include="UserListToken.htm" />
