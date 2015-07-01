@@ -60,8 +60,6 @@ namespace BL.Forms
         
         private ImageBrowserOptions defaultImageBrowserOptions;
 
-        private Element grippieCell;
-
 
         public Element GrippieElement
         {
@@ -277,11 +275,13 @@ namespace BL.Forms
 
         public void DeleteItem()
         {
-            this.Item.DeleteItem();
+            IItem item = this.Item;
+
+            item.DeleteItem();
 
             if (this.ItemDeleted != null)
             {
-                DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(this.Item);
+                DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
 
                 this.ItemDeleted(this, dsiea);
             }
@@ -411,7 +411,7 @@ namespace BL.Forms
 
             if (this.grippieArea != null)
             {
-                if (this.grippieCell == null && this.ItemSetInterface.IsReorderable)
+                if (this.grippieElement== null && this.ItemSetInterface.IsReorderable)
                 {
                     this.GrippieElement = this.CreateElement("grippieElement");
 
@@ -419,7 +419,7 @@ namespace BL.Forms
 
                     this.grippieArea.AppendChild(this.GrippieElement);
                 }
-                else if (this.grippieCell != null && !this.ItemSetInterface.IsReorderable)
+                else if (this.grippieElement != null && !this.ItemSetInterface.IsReorderable)
                 {
                     this.GrippieElement = null;
                 }

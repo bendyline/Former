@@ -238,7 +238,7 @@ namespace BL.Forms
                 {
                     foreach (Form f in this.forms)
                     {
-                        f.TemplateId = this.itemFormTemplateId;
+                        f.TemplateId = this.itemFormTemplateIdSmall;
                     }
                 }
             }
@@ -1055,6 +1055,7 @@ namespace BL.Forms
 
                     this.RemoveFormFromDisplay(f);
                 }
+                this.itemsShown = new List<IItem>();
 
                 this.reorderItemsOnNextUpdate = false;
             }
