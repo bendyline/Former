@@ -20,6 +20,8 @@ namespace BL.Forms
         [ScriptName("e_textDisplay")]
         private Element textDisplay;
 
+        private String lastPersistedValue = String.Empty;
+
         private bool commitPending = false;
 
         public TextFieldValue()
@@ -81,6 +83,7 @@ namespace BL.Forms
         {
             this.commitPending = false;
 
+            this.lastPersistedValue = this.textInput.Value;
             this.Item.SetStringValue(this.FieldName, this.textInput.Value);
 
   //          this.textInput.Focus();
@@ -108,7 +111,12 @@ namespace BL.Forms
                 this.textInput.Disabled = true;
                 this.textDisplay.Style.Display = "none";
                 this.textInput.Style.Display = "block";
-                this.textInput.Value = val;
+
+                if ((String.IsNullOrEmpty(this.textInput.Value) || this.textInput.Value == lastPersistedValue) && !commitPending)
+                {
+                    this.lastPersistedValue = val;
+                    this.textInput.Value = val;
+                }
             }
             else if (this.EffectiveMode == FieldMode.Edit)
             {
@@ -116,7 +124,11 @@ namespace BL.Forms
                 this.textDisplay.Style.Display = "none";
                 this.textInput.Style.Display = "block";
 
-                this.textInput.Value = val;
+                if ((String.IsNullOrEmpty(this.textInput.Value) || this.textInput.Value == lastPersistedValue) && !commitPending)
+                {
+                    this.lastPersistedValue = val;
+                    this.textInput.Value = val;
+                }
             }
             else
             {
