@@ -371,6 +371,27 @@ namespace BL.Forms
         {
             IItem item = this.itemSet.Type.CreateItem();
 
+            // if the type has an order field, make sure that this new item is at the bottom of the list.
+            foreach (FieldInterface fieldInterface in this.itemSetInterface.FieldInterfaces)
+            {
+                if (fieldInterface.InterfaceTypeOverride == FieldInterfaceType.Order)
+                {
+                    int maxOrder = 0;
+
+                    foreach (IItem existingItem in this.itemSet.Items)
+                    {
+                        int? itemOrder = existingItem.GetInt32Value(fieldInterface.Name);
+
+                        if (itemOrder != null && itemOrder > maxOrder)
+                        {
+                            maxOrder = (int)itemOrder;
+                        }
+                    }
+
+                    item.SetInt32Value(fieldInterface.Name, maxOrder + 10);
+                }
+            }
+
             this.itemSet.Add(item);
 
             int placementIndex = this.itemSet.Items.Count - 1;

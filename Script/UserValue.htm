@@ -13,10 +13,35 @@
             #toggleButton
             {
                 margin-left:3px;
+                font-size: small;
+                text-align: right;
+                padding: 4px;
+                padding-left:10px;
+                padding-right:10px;
                 height:44px;
-                padding-bottom:10px;
-                border-radius:3px;
-            }   
+                min-width:60px;
+                vertical-align:middle;
+                text-align:center;   
+                background-color:white;
+                border-radius:3px;                             
+                color:#A0A0A0;
+                border:solid 1px #A0A0A0;
+                cursor:default;
+                transition: all 0.3s ease-in-out
+            }
+      
+            #toggleButton:hover
+            {
+                background-color: #C0C0C0 !important;
+                color: white !important;
+                box-shadow: 0px 2px 7px rgba(150, 150, 150, 0.5);
+                border:solid 1px #C0C0C0 !important;
+            }
+
+            #toggleButton:active
+            {
+                box-shadow:none;
+            }  
             
             #textInput
             {
@@ -73,7 +98,7 @@
                     <input type="text" id="textInput" class="k-textbox"/>
                 </div>
                 <div id="assignCell">
-                    <input type="button" id="toggleButton" class="k-button" value="+ me"/>
+                    <input type="button" id="toggleButton" value="+ me"/>
                 </div>
             </div>
         </div>

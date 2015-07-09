@@ -99,14 +99,21 @@
                 color:#A0A0A0;
                 border:solid 1px #A0A0A0;
                 cursor:default;
+                transition: all 0.3s ease-in-out
             }
-
+      
             #button:hover
             {
-                background-color: #6AC5E8;
-                color: white;
-                border:solid 1px #6AC5E8;
+                background-color: #C0C0C0 !important;
+                color: white !important;
+                box-shadow: 0px 2px 7px rgba(150, 150, 150, 0.5);
+                border:solid 1px #C0C0C0 !important;
             }
+
+            #button:active
+            {
+                box-shadow:none;
+            }  
 
             #updateMessage
             {
@@ -123,10 +130,10 @@
                     <input type="text" id="addTextValue" class="k-input" placeholder="add name"/>
                 </div>
                 <div id="assignCell">
-                    <input type="button" id="addTextButton" class="k-button" value="add" data-ctl-class="button"/>
+                    <input type="button" id="addTextButton" value="add" data-ctl-class="button"/>
                 </div>
                 <div id="meCell">
-                    <input type="button" id="addMeButton" class="k-button" value="+ me" data-ctl-class="button"/>
+                    <input type="button" id="addMeButton" value="+ me" data-ctl-class="button"/>
                 </div>
             </div>
         </div>
