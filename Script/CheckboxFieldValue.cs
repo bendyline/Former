@@ -38,7 +38,7 @@ namespace BL.Forms
             int nowTime = Date.Now.GetTime();
 
             // add a bit of a deadtime to switch around
-            if ((nowTime - lastClickTime) > 200)
+            if ((nowTime - lastClickTime) > 500)
             {
                 lastClickTime = nowTime;
 
