@@ -44,10 +44,24 @@ namespace BL.Forms
         private UserReference activeReference;
 
         private bool commitPending = false;
+        private bool useMeByDefault = false;
         private Control activeUserLoginDialogControl = null;
         private Control activeUserPropertyEditorDialogControl = null;
 
         private UserValueDisplayMode displayMode = UserValueDisplayMode.TextInput;
+
+        public bool UseMeByDefault
+        {
+            get
+            {
+                return this.useMeByDefault;
+            }
+
+            set
+            {
+                this.useMeByDefault = value;
+            }
+        }
 
         public UserValue()
         {
@@ -329,6 +343,11 @@ namespace BL.Forms
                 }
 
                 this.ApplyDisplayMode();
+
+                if (this.useMeByDefault && Context.Current.User != null && !String.IsNullOrEmpty(Context.Current.User.NickName) && this.EffectiveMode != FieldMode.View && String.IsNullOrEmpty(value))
+                {
+                    this.AssignUserValue(false);
+                }
             }
         }
 

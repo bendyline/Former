@@ -105,6 +105,22 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
+                    else if (this.Field.Type == FieldType.ShortText && interfaceType == FieldInterfaceType.MeUser)
+                    {
+                        this.fieldControl = new UserValue();
+
+                        ((UserValue)this.fieldControl).UseMeByDefault = true;
+
+                        if (this.FieldInterface.Mode == FieldMode.View)
+                        {
+                            this.fieldControl.TemplateId = "bl-forms-uservaluedisplay";
+                        }
+
+                        this.ApplyToControl(this.fieldControl);
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }                    
                     else if ((this.Field.Type == FieldType.ShortText || this.Field.Type == FieldType.UnboundedText) && interfaceType == FieldInterfaceType.UserList)
                     {
                         this.fieldControl = new UserList();
