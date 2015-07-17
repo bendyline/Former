@@ -782,8 +782,9 @@ namespace BL.Forms
             {
                 this.ConfirmRow();
                 this.isEditingRow = false;
-                Window.SetTimeout(this.AddContinue, 20);
             }
+
+            Window.SetTimeout(this.AddContinue, 20);
         }
 
         private void AddContinue()

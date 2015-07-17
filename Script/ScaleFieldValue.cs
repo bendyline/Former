@@ -212,19 +212,42 @@ namespace BL.Forms
         {
             String valStr = this.Item.GetStringValue(this.FieldName);
 
-            for (int i=0; i<this.radioButtons.Count; i++)
+            Nullable<ScaleType> scaleType = this.EffectiveUserInterfaceOptions.ScaleType;
+            if (scaleType == ScaleType.FiveStars)
             {
-                InputElement elt = this.radioButtons[i];
+                if (!String.IsNullOrEmpty(valStr))
+                {
+                    int selected = Int32.Parse(valStr);
 
-                if (valStr == this.radioButtons[i].Value)
-                {
-                    elt.ClassName = this.GetElementClass("scaleButton selected");
-                    elt.SetAttribute("checked", 1);
+                    int i = 0;
+
+                    for (; i < selected; i++)
+                    {
+                        this.elementButtons[i].ClassName = this.GetElementClass("star selected") + " glyphicon glyphicon-star";
+                    }
+
+                    for (; i < 5; i++)
+                    {
+                        this.elementButtons[i].ClassName = this.GetElementClass("star normal") + " glyphicon glyphicon-star";
+                    }
                 }
-                else
+            }
+            else
+            {
+                for (int i = 0; i < this.radioButtons.Count; i++)
                 {
-                    elt.RemoveAttribute("checked");
-                    elt.ClassName = this.GetElementClass("scaleButton normal");
+                    InputElement elt = this.radioButtons[i];
+
+                    if (valStr == this.radioButtons[i].Value)
+                    {
+                        elt.ClassName = this.GetElementClass("scaleButton selected");
+                        elt.SetAttribute("checked", 1);
+                    }
+                    else
+                    {
+                        elt.RemoveAttribute("checked");
+                        elt.ClassName = this.GetElementClass("scaleButton normal");
+                    }
                 }
             }
         }
