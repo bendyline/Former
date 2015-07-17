@@ -85,6 +85,7 @@ namespace BL.Forms
 
         private jQueryObject activeSelectedObject;
 
+        private bool isUsingPopupUI = false;
         private Dictionary<String, Form> formsByItemId;
 
         [ScriptName("i_formMode")]
@@ -469,16 +470,7 @@ namespace BL.Forms
 
             if (this.addButton != null)
             {
-                this.addButton.AddEventListener("mousedown", this.AddButtonClick, true);
-                this.addButton.AddEventListener("touchstart", this.AddButtonClick, true);
-
                 this.ApplyAddAndDeleteButtonVisibility();
-            }
-
-            if (this.exportButton != null)
-            {
-                this.exportButton.AddEventListener("mousedown", this.ExportButtonClick, true);
-                this.exportButton.AddEventListener("touchstart", this.ExportButtonClick, true);
             }
 
             if (this.deleteButton != null)
@@ -518,6 +510,12 @@ namespace BL.Forms
 
         private void HandleCancel(ModelEventArgs oe)
         {
+            //delay marking this item as cancelled so that we don't confilct with HandleChange event which will try to edit the item.
+            Window.SetTimeout(this.HasCancelled, 10);
+        }
+
+        private void HasCancelled()
+        {
             this.isEditingRow = false;
 
             this.UpdateIsEditing();
@@ -527,32 +525,49 @@ namespace BL.Forms
         {
             if (oe.Elements.Count > 0)
             {
-                if (this.activeSelectedObject != null)
+                this.ConfirmRow();
+            }
+        }
+
+        private void ConfirmRow()
+        {
+            if (this.activeSelectedObject != null && !this.isUsingPopupUI)
+            {
+                this.grid.SaveRow();
+            }
+
+            ICollection<Element> selectedElts = (ICollection<Element>)this.grid.Select(null);
+
+            if (selectedElts.Count >= 1 && !this.isReadOnly)
+            {
+                Element e = selectedElts[0];
+
+                if (this.activeSelectedObject != null && this.activeSelectedObject.GetElement(0) == e)
                 {
-                    this.grid.SaveRow();
+                    return;
                 }
 
-                ICollection<Element> selectedElts = (ICollection<Element>)this.grid.Select(null);
+                jQueryObject jqo = jQuery.FromElement(e);
 
-                if (selectedElts.Count >= 1 && !this.isReadOnly)
+                this.activeSelectedObject = jqo;
+
+                if (!this.isEditingRow)
                 {
-                    jQueryObject jqo = jQuery.FromElement(selectedElts[0]);
-
-                    this.activeSelectedObject = jqo;
-
                     this.grid.EditRow(this.activeSelectedObject);
-                    if (this.deleteButton != null)
-                    {
-                        this.deleteButton.Disabled = false;
-                    }
                 }
-                else
+
+                if (this.deleteButton != null)
                 {
-                    this.activeSelectedObject = null;
-                    if (this.deleteButton != null)
-                    {
-                        this.deleteButton.Disabled = true;
-                    }
+                    this.deleteButton.Disabled = false;
+                }
+            }
+            else
+            {
+                this.activeSelectedObject = null;
+
+                if (this.deleteButton != null)
+                {
+                    this.deleteButton.Disabled = true;
                 }
             }
         }
@@ -736,7 +751,7 @@ namespace BL.Forms
 
             if (this.isEditingRow)
             {
-                this.addButton.Disabled = true;
+   //             this.addButton.Disabled = true;
             }
             else
             {
@@ -744,6 +759,7 @@ namespace BL.Forms
             }
         }
 
+        [ScriptName("v_onExportButtonClick")]
         private void ExportButtonClick(ElementEvent e)
         {
             this.grid.SaveAsExcel();
@@ -759,8 +775,20 @@ namespace BL.Forms
             }
         }
 
+        [ScriptName("v_onAddButtonClick")]
         private void AddButtonClick(ElementEvent e)
         {
+            if (this.isEditingRow)
+            {
+                this.ConfirmRow();
+                this.isEditingRow = false;
+                Window.SetTimeout(this.AddContinue, 20);
+            }
+        }
+
+        private void AddContinue()
+        {
+
             Dictionary<String, object> newRow = new Dictionary<string, object>();
             IItem item = this.itemSet.Type.CreateItem();
             this.itemSet.Add(item);
@@ -770,6 +798,20 @@ namespace BL.Forms
                 DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
 
                 this.ItemAdded(this, dsiea);
+            }
+
+            // make sure newly edited row is selected.
+            Element row = this.grid.GetRowById(item.LocalOnlyUniqueId);
+
+            if (row != null)
+            {
+                jQueryObject jqo = jQuery.FromElement(row);
+
+                this.activeSelectedObject = jqo;
+
+                this.grid.EditRow(this.activeSelectedObject);
+
+                row.ScrollIntoView(false);
             }
 
             /*     this.grid.AddRow();
@@ -964,7 +1006,18 @@ namespace BL.Forms
                 }
 
                 GridEditableOptions geo = new GridEditableOptions();
-                geo.Mode = "inline";
+
+                if (Context.Current.IsSmallFormFactor)
+                {
+                    this.isUsingPopupUI = true;
+                    geo.Mode = "popup";
+                }
+                else
+                {
+                    this.isUsingPopupUI = false;
+                    geo.Mode = "inline";
+                }
+
                 geo.Update = true;
                 go.Editable = geo;
                 go.Selectable = true;
