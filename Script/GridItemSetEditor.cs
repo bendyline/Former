@@ -611,7 +611,9 @@ namespace BL.Forms
 
         public void SaveAsExcel()
         {
-            this.grid.SaveAsExcel();
+            BL.UI.KendoControls.Grid displayGrid = this.CreateDisplayDataGrid();
+
+            displayGrid.SaveAsExcel();
         }
 
         public void SaveAsPdf()
@@ -762,7 +764,9 @@ namespace BL.Forms
         [ScriptName("v_onExportButtonClick")]
         private void ExportButtonClick(ElementEvent e)
         {
-            this.grid.SaveAsExcel();
+            BL.UI.KendoControls.Grid pureGrid = this.CreateDisplayDataGrid();
+
+            pureGrid.SaveAsExcel();
         }
 
         [ScriptName("v_onDeleteButtonClick")]
@@ -934,6 +938,136 @@ namespace BL.Forms
         {
             return this.ItemSetInterface.FieldInterfaces.GetAdjustedDisplayState(fieldName);
         }
+
+        private BL.UI.KendoControls.Grid CreateDisplayDataGrid()
+        {
+            BL.UI.KendoControls.Grid pureGrid = new BL.UI.KendoControls.Grid();
+
+            pureGrid.EnsureElements();
+
+            if (this.itemSet != null)
+            {
+                GridOptions go = new GridOptions();
+                go.Filterable = false;
+                go.Scrollable = false;
+
+                if (this.saveAsFileNameBase != null)
+                {
+                    String saveAsFileNameBaseSafe = KendoUtilities.SafeifyFileName(this.SaveAsFileNameBase);
+
+                    go.Excel = new ExportFileOptions();
+                    go.Excel.FileName = saveAsFileNameBaseSafe + ".xlsx";
+
+                    go.Pdf = new ExportFileOptions();
+                    go.Pdf.FileName = saveAsFileNameBaseSafe + ".pdf";
+                }
+
+                GridEditableOptions geo = new GridEditableOptions();
+
+                geo.Update = true;
+                go.Editable = geo;
+                go.Selectable = true;
+                go.Resizable = true;
+
+                List<GridColumn> columns = new List<GridColumn>();
+
+                go.Columns = columns;
+
+                List<Field> sortedFields = new List<Field>();
+
+                foreach (Field field in this.ItemSet.Type.Fields)
+                {
+                    DisplayState afs = this.GetAdjustedDisplayState(field.Name);
+
+                    if (afs == DisplayState.Show || afs == DisplayState.ShowInListHideInDetail)
+                    {
+                        sortedFields.Add(field);
+                    }
+                }
+
+                sortedFields.Sort(this.CompareFields);
+
+                ModelOptions m = new ModelOptions();
+                m.Fields = new Dictionary<string, ModelField>();
+                m.Id = "id";
+
+                ModelField mfId = new ModelField();
+                mfId.Editable = false;
+                m.Fields["id"] = mfId;
+
+                int userFieldCount = 0;
+
+                foreach (Field field in sortedFields)
+                {
+                    FieldInterface fs = this.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
+
+                    DisplayState afs = this.GetAdjustedDisplayState(field.Name);
+
+                    if (afs == DisplayState.Show || afs == DisplayState.ShowInListHideInDetail)
+                    {
+                        ModelField mf = new ModelField();
+
+                        GridColumn gc = new GridColumn();
+                        String fieldTitleOverride = fs.TitleOverride;
+
+                        if (fieldTitleOverride != null)
+                        {
+                            gc.Title = fs.TitleOverride;
+                        }
+                        else
+                        {
+                            gc.Title = field.DisplayName;
+                        }
+
+                        gc.Field = field.Name;
+                        columns.Add(gc);
+
+                        if (field.Type == FieldType.BigInteger || field.Type == FieldType.BigNumber || field.Type == FieldType.Integer)
+                        {
+                            mf.Type = "number";
+                        }
+                        else if (field.Type == FieldType.BoolChoice)
+                        {
+                            mf.Type = "boolean";
+                        }
+                        else
+                        {
+                            mf.Type = "string";
+                        }
+
+                            // force the value of the column to have a nbsp at the end to force it to have a space.
+                            String template = "#if (" + field.Name + " == null) {# #=''# #} else {# #: " + field.Name + "# #}#&\\#160;";
+                            Script.Literal("{0}={1}", gc.Template, template);
+                            mf.Editable = false;
+                        m.Fields[gc.Name] = mf;
+                    }
+                }
+
+                List<object> objects = new List<object>();
+
+                foreach (IItem item in this.ItemSet.Items)
+                {
+                    objects.Add(this.CreateDisplayDataObjectForItem(item));
+                }
+
+                DataSourceOptions dso = new DataSourceOptions();
+                dso.Schema = new Schema();
+                dso.Schema.Model = m;
+
+                dso.Data = objects;
+                DataSource ds = new DataSource(dso);
+
+                go.DataSource = ds;
+
+                this.activeDataSource = ds;
+
+                pureGrid.Options = go;
+
+                ds.Read();
+            }
+
+            return pureGrid;
+        }
  
         protected override void OnUpdate()
         {
@@ -1102,7 +1236,7 @@ namespace BL.Forms
                             mf.Validation.Required = true;
                         }
 
-                        if ((field.InterfaceType == FieldInterfaceType.User && fs.InterfaceTypeOverride == null) || fs.InterfaceTypeOverride == FieldInterfaceType.User)
+                        if ((  (field.InterfaceType == FieldInterfaceType.User || field.InterfaceType == FieldInterfaceType.MeUser) && fs.InterfaceTypeOverride == null) || fs.InterfaceTypeOverride == FieldInterfaceType.User || fs.InterfaceTypeOverride == FieldInterfaceType.MeUser)
                         {
 
                             if (userFieldCount == 0)
@@ -1482,9 +1616,89 @@ namespace BL.Forms
         private object CreateDataObjectForItem(IItem item)
         {
             object o = Item.GetDataObject(this.ItemSet, item);
+
             Script.Literal("{0}[\"id\"]={1}.get_localOnlyUniqueId()", o, item);
 
             return o;
+        }
+
+
+        private object CreateDisplayDataObjectForItem(IItem item)
+        {           
+            Dictionary<String, object> newObject = new Dictionary<string, object>();
+
+            foreach (IDataStoreField field in itemSet.Type.Fields)
+            {
+                FieldInterface fs = this.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
+
+                if (((field.InterfaceType == FieldInterfaceType.User || field.InterfaceType == FieldInterfaceType.MeUser) && (fs == null || fs.InterfaceTypeOverride == null)) || 
+                    (fs != null && fs.InterfaceTypeOverride == FieldInterfaceType.User) || 
+                    (fs != null && fs.InterfaceTypeOverride == FieldInterfaceType.MeUser))
+                {
+                    String userJson = item.GetStringValue(field.Name);
+
+                    if (!String.IsNullOrEmpty(userJson))
+                    {
+                        if (userJson.StartsWith("{"))
+                        {
+                            UserReference uref = new UserReference();
+
+                            uref.LoadFromJson(userJson);                            
+
+                            newObject[field.Name] = uref.NickName;
+                        }
+                        else
+                        {
+                            newObject[field.Name] = userJson;
+                        }
+                    }
+                    else
+                    {
+                        newObject[field.Name] = userJson;
+                    }
+                }
+                else if ((field.InterfaceType == FieldInterfaceType.UserList && (fs == null || fs.InterfaceTypeOverride == null)) || 
+                            (fs != null && fs.InterfaceTypeOverride == FieldInterfaceType.UserList))
+                {
+                    String userListJson = item.GetStringValue(field.Name);
+
+                    if (!String.IsNullOrEmpty(userListJson))
+                    {
+                        if (userListJson.StartsWith("{"))
+                        {
+                            UserReferenceSet urefset = new UserReferenceSet();
+
+                            urefset.LoadFromJson(userListJson);
+
+                            String listValue = String.Empty;
+
+                            foreach (UserReference uref in urefset.UserReferences)
+                            {
+                                if (listValue != String.Empty)
+                                {
+                                    listValue += ", ";
+                                }
+
+                                listValue += uref.NickName;
+                            }
+
+                            newObject[field.Name] = listValue;
+                        }
+                    }
+                    else
+                    {
+                        newObject[field.Name] = userListJson;
+                    }
+                }
+                else
+                {
+                    object val = item.GetValue(field.Name);
+
+                    newObject[field.Name] = val;
+                }
+            }
+
+            return newObject;
         }
     }
 }
