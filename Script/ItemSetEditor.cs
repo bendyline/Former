@@ -183,6 +183,8 @@ namespace BL.Forms
             set
             {
                 this.mode = value;
+
+                this.Update();
             }
         }
 
@@ -498,11 +500,14 @@ namespace BL.Forms
                 return;
             }
 
-            if (this.ItemSetInterface != null && (!this.ItemSetInterface.DisplayColumns || Context.Current.IsSmallFormFactor || this.Mode == ItemSetEditorMode.Linear))
+            if (    (this.ItemSetInterface != null && !this.ItemSetInterface.DisplayColumns) || 
+                    Context.Current.IsSmallFormFactor || 
+                    this.Mode == ItemSetEditorMode.Linear)
             {
                 if (this.headerRowElement != null && ElementUtilities.ElementIsChildOf(this.headerRowElement, this.formBin))
                 {
                     this.formBin.RemoveChild(this.headerRowElement);
+                    this.headerRowElement = null;
                 }
 
                 return;
