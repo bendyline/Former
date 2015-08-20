@@ -36,8 +36,8 @@ namespace BL.Forms
             if (this.textInput != null)
             {
                 this.textInput.AddEventListener("change", this.HandleTextInputChanged, true);
-                this.textInput.AddEventListener("keyup", this.HandleTextInputKeyUp, true);
-                this.textInput.AddEventListener("keypress", this.HandleTextInputKeyPressed, true);
+
+                ElementUtilities.RegisterTextInputBehaviors(this.textInput);
 
                 jQueryObject jqo = jQuery.FromObject(this.textInput);
 
@@ -50,18 +50,6 @@ namespace BL.Forms
             base.OnItemChanged();
 
             this.Update();
-        }
-
-        private void HandleTextInputKeyPressed(ElementEvent e)
-        {
-            if (e.KeyCode == 13)
-            {
-                this.textInput.Blur();
-                e.CancelBubble = true;
-                e.StopPropagation();
-                e.StopImmediatePropagation();
-                e.PreventDefault();
-            }
         }
 
         private void HandleTextInputKeyUp(ElementEvent e)
