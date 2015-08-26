@@ -38,7 +38,7 @@ namespace BL.Forms
 
         private UserReferenceSet userReferenceSet;
 
-        private Dictionary<String, UserListToken> tokensByReferenceId;
+        private Dictionary<String, UserListToken> tokensByReferenceUniqueKey;
         
         public UserReferenceSet UserReferenceSet
         {
@@ -58,7 +58,7 @@ namespace BL.Forms
 
         public UserList()
         {
-            this.tokensByReferenceId = new Dictionary<string, UserListToken>();
+            this.tokensByReferenceUniqueKey = new Dictionary<string, UserListToken>();
             this.UserReferenceSet = new UserReferenceSet();
         }
 
@@ -258,6 +258,9 @@ namespace BL.Forms
 
             if (val != null)
             {
+                // temporary somewhat hacky upgrade code to undo that we used to call "uniqueKey" an "id" on the client.
+                val = val.Replace("\"id\"", "\"uniqueKey\"");
+
                 this.UserReferenceSet.LoadFromJson(val);
             }
 
@@ -286,7 +289,7 @@ namespace BL.Forms
             {
                 foreach (UserReference ur in this.UserReferenceSet.UserReferences)
                 {
-                    if (ur.Type == UserReferenceType.StructuredUser && ur.UniqueKey == Context.Current.User.UniqueKey)
+                    if (ur.Type == UserReferenceType.StructuredUser && (ur.Id == Context.Current.User.Id || ur.UniqueKey == Context.Current.User.UniqueKey))
                     {
                         return;
                     }
@@ -295,6 +298,7 @@ namespace BL.Forms
                 UserReference currentUserReference = new UserReference();
 
                 currentUserReference.UniqueKey = Context.Current.User.UniqueKey;
+                currentUserReference.Id = Context.Current.User.Id;
                 currentUserReference.Type = UserReferenceType.StructuredUser;
                 currentUserReference.NickName = Context.Current.User.NickName;
 
@@ -323,7 +327,7 @@ namespace BL.Forms
             ElementUtilities.ClearChildElements(this.userSummaryBin);
 
             List<UserListToken> usedTokens = new List<UserListToken>();
-            foreach (KeyValuePair<String, UserListToken> token in this.tokensByReferenceId)
+            foreach (KeyValuePair<String, UserListToken> token in this.tokensByReferenceUniqueKey)
             {
                 usedTokens.Add(token.Value);
             }
@@ -332,9 +336,9 @@ namespace BL.Forms
             {
                 UserListToken ult = null;
 
-                if (this.tokensByReferenceId.ContainsKey(ur.UniqueKey) && this.tokensByReferenceId[ur.UniqueKey] != null)
+                if (this.tokensByReferenceUniqueKey.ContainsKey(ur.UniqueKey) && this.tokensByReferenceUniqueKey[ur.UniqueKey] != null)
                 {
-                    ult = this.tokensByReferenceId[ur.UniqueKey];
+                    ult = this.tokensByReferenceUniqueKey[ur.UniqueKey];
                     usedTokens.Remove(ult);
                 }
                 else
@@ -345,7 +349,7 @@ namespace BL.Forms
 
                     ult.EnsureElements();
 
-                    this.tokensByReferenceId[ur.UniqueKey] = ult;
+                    this.tokensByReferenceUniqueKey[ur.UniqueKey] = ult;
                 }
 
                 this.userSummaryBin.AppendChild(ult.Element);
@@ -355,7 +359,7 @@ namespace BL.Forms
             {
                 if (ult != null)
                 {
-                    this.tokensByReferenceId[ult.UserReference.UniqueKey] = null;
+                    this.tokensByReferenceUniqueKey[ult.UserReference.UniqueKey] = null;
                     ult.Dispose();
                 }
             }

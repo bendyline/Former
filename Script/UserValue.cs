@@ -317,6 +317,9 @@ namespace BL.Forms
                     {
                         this.activeReference = new UserReference();
 
+                        // temporary somewhat hacky upgrade code to undo that we used to call "uniqueKey" an "id" on the client.
+                        value = value.Replace("\"id\"", "\"uniqueKey\"");
+
                         this.activeReference.ApplyString(value);
 
                         if (this.activeReference.UniqueKey != null && this.activeReference.NickName != null)
