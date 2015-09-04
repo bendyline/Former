@@ -18,7 +18,7 @@
                 padding-top:2px;
                 margin-left:8px;
                 margin-right:8px;
-                padding-bottom:8px;
+                padding-bottom:2px;
                 padding-left:2px;
                 padding-right:2px;
             }
@@ -74,8 +74,7 @@
 
             #fields
             {
-                padding-left:6px;
-                padding-right:6px;
+                width:100%;
             }
         </style>
 	</head>
@@ -88,6 +87,9 @@
                         <div id="grippieArea">
                         </div>
                     </div>
+                    <div id="fields" data-ctl-class="specialCell">
+                        <BL.Forms.FieldIterator id="fieldIterator" FieldTemplateId="bl-forms-unlabeledfield" />
+                    </div>
                     <div data-ctl-class="specialCell">
                         <div id="specialButtons">
                         </div>
@@ -95,9 +97,6 @@
                 </div>
             </div>
 
-            <div id="fields">
-                <BL.Forms.FieldIterator id="fieldIterator" FieldTemplateId="bl-forms-unlabeledfield"/>
-            </div>
         </form> 
     </body>
 </html>
