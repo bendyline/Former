@@ -32,7 +32,7 @@ namespace BL.Forms
         {
             get
             {
-                return   displayReorderItemButton&& 
+                return   this.displayReorderItemButton && 
                             (this.Sort == ItemSetSort.FieldAscending || this.Sort == ItemSetSort.FieldDescending) &&
                             this.SortField != null;
             }

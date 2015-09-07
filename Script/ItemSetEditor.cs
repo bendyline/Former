@@ -848,55 +848,83 @@ namespace BL.Forms
                 return;
             }
 
-            DropZoneTarget dropZoneTarget = this.EnsureDropZoneTargetForForm(formToInsert);
-
-            Form previousForm = null;
-
-            if (this.ItemSetInterface.Sort != ItemSetSort.DefaultState)
+            if (this.ItemSetInterface.IsReorderable)
             {
-                for (int i=0; i<this.formBin.Children.Length; i++)
+                DropZoneTarget dropZoneTarget = this.EnsureDropZoneTargetForForm(formToInsert);
+
+                Form previousForm = null;
+
+                if (this.ItemSetInterface.Sort != ItemSetSort.DefaultState)
                 {
-                    Element e = this.formBin.Children[i];
-
-                    Form existingFormInList = this.GetFormForElement(e);
-
-                    if (existingFormInList != null)
+                    for (int i = 0; i < this.formBin.Children.Length; i++)
                     {
-                        if (existingFormInList.Item.CompareTo(formToInsert.Item, this.ItemSetInterface.Sort, this.ItemSetInterface.SortField) >= 0)
+                        Element e = this.formBin.Children[i];
+
+                        Form existingFormInList = this.GetFormForElement(e);
+
+                        if (existingFormInList != null)
                         {
-                            dropZoneTarget.PreviousControl = previousForm;
-                            dropZoneTarget.NextControl = existingFormInList;
-                            dropZoneTarget.CurrentControl = formToInsert;
-
-                            Element targetToInsertBefore = null;
-
-                            if (previousForm != null)
+                            if (existingFormInList.Item.CompareTo(formToInsert.Item, this.ItemSetInterface.Sort, this.ItemSetInterface.SortField) >= 0)
                             {
-                                DropZoneTarget previousFormZoneTarget = this.EnsureDropZoneTargetForForm(previousForm);
-                                previousFormZoneTarget.NextControl = formToInsert;
+                                dropZoneTarget.PreviousControl = previousForm;
+                                dropZoneTarget.NextControl = existingFormInList;
+                                dropZoneTarget.CurrentControl = formToInsert;
+
+                                Element targetToInsertBefore = null;
+
+                                if (previousForm != null)
+                                {
+                                    DropZoneTarget previousFormZoneTarget = this.EnsureDropZoneTargetForForm(previousForm);
+                                    previousFormZoneTarget.NextControl = formToInsert;
+                                }
+
+                                DropZoneTarget nextFormZoneTarget = this.EnsureDropZoneTargetForForm(existingFormInList);
+                                nextFormZoneTarget.PreviousControl = formToInsert;
+
+                                targetToInsertBefore = nextFormZoneTarget.Element;
+
+                                this.formBin.InsertBefore(formToInsert.Element, targetToInsertBefore);
+                                this.formBin.InsertBefore(dropZoneTarget.Element, formToInsert.Element);
+                                return;
                             }
 
-                            DropZoneTarget nextFormZoneTarget = this.EnsureDropZoneTargetForForm(existingFormInList);
-                            nextFormZoneTarget.PreviousControl = formToInsert;
-
-                            targetToInsertBefore = nextFormZoneTarget.Element;
-
-                            this.formBin.InsertBefore(formToInsert.Element, targetToInsertBefore);
-                            this.formBin.InsertBefore(dropZoneTarget.Element, formToInsert.Element);
-                            return;
+                            previousForm = existingFormInList;
                         }
-
-                        previousForm = existingFormInList;
                     }
                 }
+
+                dropZoneTarget.NextControl = null;
+                dropZoneTarget.CurrentControl = formToInsert;
+                dropZoneTarget.PreviousControl = previousForm;
+
+                this.formBin.AppendChild(dropZoneTarget.Element);
+                this.formBin.AppendChild(formToInsert.Element);
             }
+            else
+            {
+                if (this.ItemSetInterface.Sort != ItemSetSort.DefaultState)
+                {
+                    for (int i = 0; i < this.formBin.Children.Length; i++)
+                    {
+                        Element e = this.formBin.Children[i];
 
-            dropZoneTarget.NextControl = null;
-            dropZoneTarget.CurrentControl = formToInsert;
-            dropZoneTarget.PreviousControl = previousForm;
+                        Form existingFormInList = this.GetFormForElement(e);
 
-            this.formBin.AppendChild(dropZoneTarget.Element);
-            this.formBin.AppendChild(formToInsert.Element);
+                        if (existingFormInList != null)
+                        {
+                            if (existingFormInList.Item.CompareTo(formToInsert.Item, this.ItemSetInterface.Sort, this.ItemSetInterface.SortField) >= 0)
+                            {
+                                Element targetToInsertBefore = existingFormInList.Element;
+
+                                this.formBin.InsertBefore(formToInsert.Element, targetToInsertBefore);
+                                return;
+                            }
+                        }
+                    }
+                }
+                
+                this.formBin.AppendChild(formToInsert.Element);
+            }
         }
 
 
