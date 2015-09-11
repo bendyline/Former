@@ -152,6 +152,7 @@
     <Content Include="UserList.htm" />
     <Content Include="UserListToken.htm" />
     <Content Include="UserValueDisplay.htm" />
+    <Content Include="VerticalLabeledFieldNarrow.htm" />
     <Content Include="VerticalSmallForm.htm" />
     <Content Include="GridItemSetEditor.htm" />
     <Content Include="RowForm.htm" />

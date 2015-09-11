@@ -764,6 +764,12 @@ namespace BL.Forms
         {
             this.draggingElement = this.CreateElement("draggableBar");
 
+            // on touch devices, move the dragging item from underneath the users finger
+            // plus, without doing this, drag-and-drop doesn't work on iOS.
+            if (Context.Current.IsTouchOnly)
+            {
+                this.draggingElement.Style.MarginLeft = "60px";
+            }
 
             return this.draggingElement;
         }

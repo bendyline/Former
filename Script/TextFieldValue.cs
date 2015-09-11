@@ -129,11 +129,22 @@ namespace BL.Forms
             if (this.EffectiveUserInterfaceOptions != null)
             {
                 Nullable<int> suggestedWidth = this.EffectiveUserInterfaceOptions.SuggestedWidth;
-
-
+            
                 if (suggestedWidth != null)
                 {
-                    this.textDisplay.Style.MinWidth = (int)suggestedWidth + "px";
+                    int widthToUse = (int)suggestedWidth;
+
+
+                    if (Context.Current.BrowserInnerWidth < 360 && widthToUse > 200)
+                    {
+                        widthToUse = (widthToUse * 2) / 3;
+                    }
+                    else if (Context.Current.BrowserInnerWidth < 420 && widthToUse > 200)
+                    {
+                        widthToUse = (widthToUse * 3) / 4;
+                    }
+
+                    this.textDisplay.Style.MinWidth = widthToUse + "px";
                     this.textInput.Style.MinWidth = this.textDisplay.Style.MinWidth;
                 }
                 else

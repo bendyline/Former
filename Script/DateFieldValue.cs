@@ -56,7 +56,6 @@ namespace BL.Forms
 
             if (this.EffectiveMode == FieldMode.View)
             {
-
                 String result = String.Empty;
 
                 if (this.CurrentValue != null)

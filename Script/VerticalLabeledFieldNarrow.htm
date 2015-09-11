@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+        <title></title>
 
         <!-- standard template preview content.  point base href at your facer template sample folder.  -->
             <base href="../../facer/ts/" />
@@ -9,19 +10,15 @@
         <!-- end sample preview content -->
 
         <style>
-            BODY
-            {
-            }
 
-            #rowCell{
-                padding-top:4px;
-                padding-bottom:4px;
-            }
+
         </style>
 	</head>
 	<body>        
         <div id="rowCell">
-            <BL.Forms.FieldValue id="fieldValue"/>
-        </div>   
-     </body>
+            <BL.Forms.FieldLabel id="fieldLabel"/>
+            <BL.Forms.FieldValue id="fieldValue" />
+            <BL.Forms.FieldValidationIndicator id="fieldValidationIndicator" />
+        </div>
+    </body>
 </html>
