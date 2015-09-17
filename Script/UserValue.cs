@@ -74,6 +74,8 @@ namespace BL.Forms
 
             if (this.textInput != null)
             {
+                ElementUtilities.RegisterTextInputBehaviors(this.textInput);
+
                 this.textInput.AddEventListener("change", this.HandleTextInputChanged, true);
                 this.textInput.AddEventListener("keypress", this.HandleTextInputKeyPressed, true);
                 this.textInput.AddEventListener("blur", this.HandleTextInputBlurred, true);
