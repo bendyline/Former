@@ -1128,20 +1128,23 @@ namespace BL.Forms
 
                 foreach (IItem item in itemSet.Items)
                 {
-                    itemsNotSeen.Remove(item);
-
-                    Nullable<int>indexToUse = index;
-
-                    if (this.ItemPlacementFieldName != null)
+                    if (item.Status != StandardStatus.Deleted)
                     {
-                        indexToUse = item.GetInt32Value(this.ItemPlacementFieldName);
-                    }
+                        itemsNotSeen.Remove(item);
 
-                    if (indexToUse != null)
-                    {
-                        this.EnsureFormForItem(item, (int)indexToUse);
+                        Nullable<int> indexToUse = index;
 
-                        index++;
+                        if (this.ItemPlacementFieldName != null)
+                        {
+                            indexToUse = item.GetInt32Value(this.ItemPlacementFieldName);
+                        }
+
+                        if (indexToUse != null)
+                        {
+                            this.EnsureFormForItem(item, (int)indexToUse);
+
+                            index++;
+                        }
                     }
                 }
             }
