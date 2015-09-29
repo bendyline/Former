@@ -889,6 +889,11 @@ namespace BL.Forms
 
                                 targetToInsertBefore = nextFormZoneTarget.Element;
 
+                                if (!this.formBin.Contains(targetToInsertBefore))
+                                {
+                                    targetToInsertBefore = existingFormInList.Element;
+                                }
+
                                 this.formBin.InsertBefore(formToInsert.Element, targetToInsertBefore);
                                 this.formBin.InsertBefore(dropZoneTarget.Element, formToInsert.Element);
                                 return;

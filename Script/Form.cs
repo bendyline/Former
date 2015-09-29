@@ -411,7 +411,7 @@ namespace BL.Forms
 
             if (this.grippieArea != null)
             {
-                if (this.grippieElement== null && this.ItemSetInterface.IsReorderable)
+                if (this.grippieElement == null && this.ItemSetInterface.IsReorderable)
                 {
                     this.GrippieElement = this.CreateElement("grippieElement");
 
@@ -421,6 +421,11 @@ namespace BL.Forms
                 }
                 else if (this.grippieElement != null && !this.ItemSetInterface.IsReorderable)
                 {
+                    if (this.grippieArea != null && this.grippieElement != null && this.grippieArea.Contains(this.grippieElement))
+                    {
+                        this.grippieArea.RemoveChild(this.grippieElement);
+                    }
+
                     this.GrippieElement = null;
                 }
             }
