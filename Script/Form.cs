@@ -49,6 +49,8 @@ namespace BL.Forms
 
         private Element deleteButton;
 
+        private Date lastFormSubmit = new Date(2010, 1, 1);
+
         [ScriptName("e_grippie")]
         private Element grippieElement;
 
@@ -351,9 +353,13 @@ namespace BL.Forms
 
         private void HandleFormSubmit(ElementEvent e)
         {
+            this.lastFormSubmit = Date.Now;
+
             e.CancelBubble = true;
             e.StopPropagation();
             e.PreventDefault();
+
+            Script.Literal("return false");
         }
 
         public virtual void Save(AsyncCallback callback, object state)
@@ -434,7 +440,7 @@ namespace BL.Forms
             {
                 if (this.deleteButton == null)
                 {
-                    this.deleteButton = (InputElement)this.CreateElementWithTypeAndAdditionalClasses("deleteButton", "BUTTON", "k-button");
+                    this.deleteButton = (InputElement)this.CreateElement("deleteButton");
                     this.deleteButton.AddEventListener("click", this.HandleItemDelete, true);
 
                     ElementUtilities.SetText(this.deleteButton, "");
@@ -453,6 +459,11 @@ namespace BL.Forms
 
         protected void HandleItemDelete(ElementEvent eventData)
         {
+            if (Date.Now.GetTime() - this.lastFormSubmit.GetTime() < 400)
+            {
+                return;
+            }
+
             this.DeleteItem();
         }
 
