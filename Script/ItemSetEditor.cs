@@ -67,8 +67,35 @@ namespace BL.Forms
         public event DataStoreItemEventHandler ItemAdded;
         public event DataStoreItemEventHandler ItemDeleted;
 
+        private Element scrollContainerElement;
+
         private Form draggingForm;
         private Element draggingElement;
+
+        private int lastMoveOffset = 0;
+
+        public Element ScrollContainerElement
+        {
+            get
+            {
+                return this.scrollContainerElement;
+            }
+
+            set
+            {
+                this.scrollContainerElement = value;
+
+                if (this.scrollContainerElement != null)
+                {
+                    this.scrollContainerElement.AddEventListener(ElementUtilities.GetTouchMoveEventName(), this.HandleMouseMove, true);
+
+                    if (!ElementUtilities.GetIsPointerEnabled())
+                    {
+                        this.scrollContainerElement.AddEventListener("mousemove", this.HandleMouseMove, true);
+                    }
+                }
+            }
+        }
 
         [ScriptName("i_formMode")]
         public FormMode FormMode 
@@ -758,6 +785,9 @@ namespace BL.Forms
 
                 zoneTarget.IsActive = false;
             }
+
+            this.draggingForm = null;
+            this.draggingElement = null;
         }
 
         private Element CreateDragElement(Element[] elements)
@@ -772,6 +802,52 @@ namespace BL.Forms
             }
 
             return this.draggingElement;
+        }
+
+        private void HandleMouseMove(ElementEvent ee)
+        {
+            this.lastMoveOffset = 0;
+
+            if (this.draggingForm == null || this.draggingElement == null || this.scrollContainerElement == null)
+            {
+                return;
+            }
+
+            //ClientRect target = ElementUtilities.GetBoundingRect(ee.Target);
+            ClientRect bin = ElementUtilities.GetBoundingRect(this.scrollContainerElement);
+
+            int mouseY = (int)ElementUtilities.GetPageY(ee);
+            
+            int binTop = (int)bin.Top;
+            int binBottom = (int)bin.Bottom;
+
+            if (mouseY < binTop + 50)
+            {
+                this.lastMoveOffset = -1;
+                this.DragMoveBin();
+            }
+            else if (mouseY > binBottom - 50)
+            {
+                this.lastMoveOffset = 1;
+                this.DragMoveBin();
+            }
+        }
+
+        private void DragMoveBin()
+        {
+            if (this.lastMoveOffset != 0)
+            {
+                int amountToMove = this.lastMoveOffset;
+
+                if (this.scrollContainerElement.ScrollTop + amountToMove < 0)
+                {
+                    amountToMove = -this.scrollContainerElement.ScrollTop;
+                    this.lastMoveOffset = 0;
+                }
+
+                this.scrollContainerElement.ScrollTop += amountToMove;
+                Window.SetTimeout(this.DragMoveBin, 40);
+            }
         }
 
         private void item_ItemChanged(object sender, DataStoreItemChangedEventArgs e)
