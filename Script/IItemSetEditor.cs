@@ -56,6 +56,5 @@ namespace BL.Forms
         void DisposeItemInterfaceItems();
 
         void SetItemSetInterfaceAndItems(ItemSetInterface isi, IDataStoreItemSet newItemSet);
-
     }
 }

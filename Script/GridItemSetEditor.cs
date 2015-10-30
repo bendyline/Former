@@ -18,7 +18,7 @@ using kendo.ui;
 namespace BL.Forms
 {
 
-    public class GridItemSetEditor : Control, IItemSetEditor
+    public class GridItemSetEditor : ItemSetEditor, IItemSetEditor
     {
         [ScriptName("e_gridContainer")]
         private Element gridContainer;
@@ -31,27 +31,14 @@ namespace BL.Forms
 
         private BL.UI.KendoControls.Grid grid;
 
-        private DataStoreItemEventHandler itemInSetChanged;
-        private DataStoreItemSetEventHandler itemSetChanged;
-
-        private ImageBrowserOptions defaultImageBrowserOptions;
-
         private List<IItem> itemsShown;
 
         private List<Field> userListFields;
         private List<Field> contentListFields;
         private List<Field> userListListFields; 
         
-        private IDataStoreItemSet itemSet;
         private DataSource activeDataSource;
         private String saveAsFileNameBase;
-
-        private FormMode formMode = FormMode.EditForm;
-
-        private ItemSetInterface itemSetInterface;
-        private String itemFormTemplateId;
-        private String itemFormTemplateIdSmall;
-        private String itemPlacementFieldName;
 
         [ScriptName("e_addButton")]
         private InputElement addButton;
@@ -62,20 +49,9 @@ namespace BL.Forms
         [ScriptName("e_exportButton")]
         private InputElement exportButton;
 
-        private bool displayAddAndDeleteButtons = true;
-        private bool displayPersistButton = true;
-
         private bool isEditingRow = false;
-        private bool isReadOnly = false;
 
         private String addItemCta;
-
-        private ItemSetEditorMode mode;
-        private PropertyChangedEventHandler itemSetInterfacePropertyChanged;
-        private PropertyChangedEventHandler fieldPropertyChanged;
-        private NotifyCollectionChangedEventHandler fieldInterfaceCollectionChanged;
-        public event DataStoreItemEventHandler ItemAdded;
-        public event DataStoreItemEventHandler ItemDeleted;
 
         private event ModelEventHandler gridSave;
         private event ModelEventHandler gridEdit;
@@ -86,163 +62,6 @@ namespace BL.Forms
         private jQueryObject activeSelectedObject;
 
         private bool isUsingPopupUI = false;
-        private Dictionary<String, Form> formsByItemId;
-
-        [ScriptName("i_formMode")]
-        public FormMode FormMode
-        {
-            get
-            {
-                return this.formMode;
-            }
-
-            set
-            {
-                if (this.formMode == value)
-                {
-                    return;
-                }
-
-                this.formMode = value;
-            }
-        }
-
-        public ImageBrowserOptions DefaultImageBrowserOptions
-        {
-            get
-            {
-                return this.defaultImageBrowserOptions;
-            }
-
-            set
-            {
-                this.defaultImageBrowserOptions = value;
-            }
-        }
-
-        public ItemSetInterface ItemSetInterface
-        {
-            get
-            {
-                return this.itemSetInterface;
-            }
-
-            set
-            {
-                if (this.itemSetInterface == value)
-                {
-                    return;
-                }
-
-                if (this.itemSetInterface != null)
-                {
-                    this.itemSetInterface.PropertyChanged -= this.itemSetInterfacePropertyChanged;
-                    this.itemSetInterface.FieldInterfaces.CollectionChanged -= this.fieldInterfaceCollectionChanged;
-                }
-
-                this.itemSetInterface = value;
-
-                this.Update();
-
-                this.itemSetInterface.PropertyChanged += this.itemSetInterfacePropertyChanged;
-                this.itemSetInterface.FieldInterfaces.CollectionChanged += this.fieldInterfaceCollectionChanged;
-            }
-        }
-
-        [ScriptName("b_isReadOnly")]
-        public bool IsReadOnly
-        {
-            get
-            {
-                return this.isReadOnly;
-            }
-
-            set
-            {
-                this.isReadOnly = value;
-            }
-        }
-
-        public String ItemPlacementFieldName
-        {
-            get
-            {
-                return this.itemPlacementFieldName;
-            }
-
-            set
-            {
-                if (this.itemPlacementFieldName == value)
-                {
-                    return;
-                }
-
-                this.itemPlacementFieldName = value;
-
-                this.Update();
-            }
-        }
-
-        public String ItemFormTemplateId
-        {
-            get
-            {
-                return this.itemFormTemplateId;
-            }
-
-            set
-            {
-                if (this.itemFormTemplateId == value)
-                {
-                    return;
-                }
-
-                this.itemFormTemplateId = value;
-
-                this.Update();
-            }
-        }
-
-        public String ItemFormTemplateIdSmall
-        {
-            get
-            {
-                return this.itemFormTemplateIdSmall;
-            }
-
-            set
-            {
-                if (this.itemFormTemplateIdSmall == value)
-                {
-                    return;
-                }
-
-                this.itemFormTemplateIdSmall = value;
-
-                this.Update();
-            }
-        }
-
-
-        public ItemSetEditorMode Mode
-        {
-            get
-            {
-                return this.mode;
-            }
-
-            set
-            {
-                if (this.mode == value)
-                {
-                    return;
-                }
-
-                this.mode = value;
-
-                this.Update();
-            }
-        }
 
         public String SaveAsFileNameBase
         {
@@ -256,116 +75,13 @@ namespace BL.Forms
                 this.saveAsFileNameBase = value;
             }
         }
-
-        public String AddItemCta
-        {
-            get
-            {
-                return this.addItemCta;
-            }
-
-            set
-            {
-                if (this.addItemCta == value)
-                {
-                    return;
-                }
-
-                this.addItemCta = value;
-
-                return;
-            }
-        }
-
-        [ScriptName("b_displayPersistButton")]
-        public bool DisplayPersistButton
-        {
-            get
-            {
-                return this.displayPersistButton;
-            }
-
-            set
-            {
-                this.displayPersistButton = value;
-
-                this.Update();
-
-                this.ApplyToolbarVisibility();
-            }
-        }
-
-        [ScriptName("b_displayAddAndDeleteButtons")]
-        public bool DisplayAddAndDeleteButtons
-        {
-            get
-            {
-                return this.displayAddAndDeleteButtons;
-            }
-
-            set
-            {
-                if (this.displayAddAndDeleteButtons == value)
-                {
-                    return;
-                }
-
-                this.displayAddAndDeleteButtons = value;
-
-                this.ApplyAddAndDeleteButtonVisibility();
-                this.ApplyToolbarVisibility();
-            }
-        }
-
-        public IDataStoreItemSet ItemSet
-        {
-            get
-            {
-                return this.itemSet;
-            }
-
-            set
-            {
-                if (this.itemSet == value)
-                {
-                    return;
-                }
-
-                if (this.itemSet != null)
-                {
-                    this.itemSet.ItemSetChanged -= this.itemSetChanged;
-                }
-
-                this.itemSet = value;
-
-                if (this.itemSet != null)
-                {
-                    this.itemSet.ItemSetChanged += this.itemSetChanged;
-
-                    this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
-                }
-                else
-                {
-                    this.Update();
-                }
-            }
-        }
-
+        
         public GridItemSetEditor()
         {
             KendoUtilities.EnsureKendoBaseUx(this);
             KendoUtilities.EnsureKendoData(this);
 
             this.itemsShown = new List<IItem>();
-            this.formsByItemId = new Dictionary<string, Form>();
-
-            this.itemInSetChanged = this.itemSet_ItemInSetChanged;
-            this.itemSetChanged = this.itemSet_ItemSetChanged;
-
-            this.itemSetInterfacePropertyChanged = itemSetOrFieldInterface_PropertyChanged;
-            this.fieldPropertyChanged = itemSetOrFieldInterface_PropertyChanged;
-            this.fieldInterfaceCollectionChanged = FieldInterfaceCollection_CollectionChanged;
-
 
             this.gridSave = this.HandleSave;
             this.gridEdit =  this.HandleEdit;
@@ -386,56 +102,23 @@ namespace BL.Forms
             }
         }
 
-
-        public void SetItemSetInterfaceAndItems(ItemSetInterface isi, IDataStoreItemSet newItemSet)
+        protected override void OnItemSetChanged(DataStoreItemSetEventArgs e)
         {
-            if (this.itemSet == newItemSet && this.itemSetInterface == isi)
-            {
-                return;
-            }
+            base.OnItemSetChanged(e);
 
-            if (this.itemSetInterface != null)
-            {
-                this.itemSetInterface.PropertyChanged -= this.itemSetInterfacePropertyChanged;
-                this.itemSetInterface.FieldInterfaces.CollectionChanged -= this.fieldInterfaceCollectionChanged;
-            }
-
-            this.itemSetInterface = isi;
-            this.itemSetInterface.PropertyChanged += this.itemSetInterfacePropertyChanged;
-            this.itemSetInterface.FieldInterfaces.CollectionChanged += this.fieldInterfaceCollectionChanged;
-
-            if (this.itemSet != null)
-            {
-                this.itemSet.ItemSetChanged -= this.itemSetChanged;
-            }
-
-            this.itemSet = newItemSet;
-
-            if (this.itemSet != null)
-            {
-                this.itemSet.ItemSetChanged += this.itemSetChanged;
-
-                this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
-            }
-            else
-            {
-                this.Update();
-            }
+            this.Update();
         }
 
-        public void DisposeItemInterfaceItems()
+        protected override void OnAddAndDeleteVisibilityChange()
         {
+            base.OnAddAndDeleteVisibilityChange();
 
-        }
-
-        private void ApplyAddAndDeleteButtonVisibility()
-        {
             if (this.addButton == null)
             {
                 return;
             }
 
-            if (this.displayAddAndDeleteButtons)
+            if (this.DisplayAddAndDeleteButtons)
             {
                 this.addButton.Style.Display = "";
                 this.deleteButton.Style.Display = "";
@@ -445,6 +128,8 @@ namespace BL.Forms
                 this.addButton.Style.Display = "none";
                 this.deleteButton.Style.Display = "none";
             }
+
+            this.ApplyToolbarVisibility();
         }
 
         private void ApplyToolbarVisibility()
@@ -455,7 +140,7 @@ namespace BL.Forms
 
             }
 
-            if (!this.displayAddAndDeleteButtons && !this.displayPersistButton)
+            if (!this.DisplayAddAndDeleteButtons && !this.DisplayPersistButton)
             {
                 this.toolbar.Style.Display = "none";
             }
@@ -464,13 +149,14 @@ namespace BL.Forms
                 this.toolbar.Style.Display = String.Empty;
             }
         }
+
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
 
             if (this.addButton != null)
             {
-                this.ApplyAddAndDeleteButtonVisibility();
+                this.OnAddAndDeleteVisibilityChange();
             }
 
             if (this.deleteButton != null)
@@ -491,18 +177,13 @@ namespace BL.Forms
 
                 if (!String.IsNullOrEmpty(localId))
                 {
-                    IItem item = this.itemSet.GetItemByLocalOnlyUniqueId(localId);
+                    IItem item = this.ItemSet.GetItemByLocalOnlyUniqueId(localId);
 
                     if (item != null)
                     {
                         item.DeleteItem();
 
-                        if (this.ItemDeleted != null)
-                        {
-                            DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
-
-                            this.ItemDeleted(this, dsiea);
-                        }
+                        this.NotifyItemDeleted(item);
                     }
                 }
             }
@@ -538,7 +219,7 @@ namespace BL.Forms
 
             ICollection<Element> selectedElts = (ICollection<Element>)this.grid.Select(null);
 
-            if (selectedElts.Count >= 1 && !this.isReadOnly)
+            if (selectedElts.Count >= 1 && !this.IsReadOnly)
             {
                 Element e = selectedElts[0];
 
@@ -687,7 +368,7 @@ namespace BL.Forms
                 }
             }
 
-            FieldInterface fi = this.itemSetInterface[field.Name];
+            FieldInterface fi = this.ItemSetInterface[field.Name];
 
             if (fi != null)
             {
@@ -716,34 +397,6 @@ namespace BL.Forms
 
             return true;
         }
-
-        public bool? GetFieldRequiredOverride(String fieldName)
-        {
-            return this.ItemSetInterface.FieldInterfaces.GetFieldRequiredOverride(fieldName);
-        }
-
-        public Nullable<FieldInterfaceType> GetFieldInterfaceTypeOverride(String fieldName)
-        {
-            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOverride(fieldName);
-        }
-
-        public FieldInterfaceTypeOptions GetFieldInterfaceTypeOptionsOverride(String fieldName)
-        {
-            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOptionsOverride(fieldName);
-        }
-
-
-        private void itemSetOrFieldInterface_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            this.Update();
-        }
-
-
-        private void FieldInterfaceCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            this.Update();
-        }
-
         private void UpdateIsEditing()
         {
             if (this.addButton == null)
@@ -795,15 +448,10 @@ namespace BL.Forms
         {
 
             Dictionary<String, object> newRow = new Dictionary<string, object>();
-            IItem item = this.itemSet.Type.CreateItem();
-            this.itemSet.Add(item);
+            IItem item = this.ItemSet.Type.CreateItem();
+            this.ItemSet.Add(item);
 
-            if (this.ItemAdded != null)
-            {
-                DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
-
-                this.ItemAdded(this, dsiea);
-            }
+            this.NotifyItemAdded(item);
 
             // make sure newly edited row is selected.
             Element row = this.grid.GetRowById(item.LocalOnlyUniqueId);
@@ -842,11 +490,6 @@ namespace BL.Forms
 
                 this.ItemAdded(this, dsiea);
             }*/
-        }
-
-        private void ItemsRetrieved(IAsyncResult result)
-        {
-            this.Update();
         }
 
         public void Save()
@@ -934,18 +577,13 @@ namespace BL.Forms
             return orderA - orderB;
         }
 
-        public DisplayState GetAdjustedDisplayState(String fieldName)
-        {
-            return this.ItemSetInterface.FieldInterfaces.GetAdjustedDisplayState(fieldName);
-        }
-
         private BL.UI.KendoControls.Grid CreateDisplayDataGrid()
         {
             BL.UI.KendoControls.Grid pureGrid = new BL.UI.KendoControls.Grid();
 
             pureGrid.EnsureElements();
 
-            if (this.itemSet != null)
+            if (this.ItemSet != null)
             {
                 GridOptions go = new GridOptions();
                 go.Filterable = false;
@@ -1071,6 +709,8 @@ namespace BL.Forms
  
         protected override void OnUpdate()
         {
+            base.OnUpdate();
+
             if (this.gridContainer == null)
             {
                 return;
@@ -1107,7 +747,7 @@ namespace BL.Forms
 
             if (this.persist != null)
             {
-                if (this.displayPersistButton)
+                if (this.DisplayPersistButton)
                 {
                     this.persist.Element.Style.Display = "";
                 }
@@ -1120,8 +760,7 @@ namespace BL.Forms
                 this.persist.ItemSetEditor = this;
             }
 
-
-            if (this.itemSet != null)
+            if (this.ItemSet != null)
             {
                 GridOptions go = new GridOptions();
                 go.Filterable = true;
@@ -1189,12 +828,6 @@ namespace BL.Forms
                 foreach (Field field in sortedFields)
                 {
                     FieldInterface fs = this.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
-
-                    if (fs != null)
-                    {
-                        fs.PropertyChanged -= this.fieldPropertyChanged;
-                        fs.PropertyChanged += this.fieldPropertyChanged;
-                    }
 
                     DisplayState afs = this.GetAdjustedDisplayState(field.Name);
 
@@ -1300,7 +933,6 @@ namespace BL.Forms
                                     gc.Template = this.ContentItemTemplateDisplay1;
                                     break;
 
-
                                 case 2:
                                     gc.Template = this.ContentItemTemplateDisplay2;
                                     break;
@@ -1375,7 +1007,7 @@ namespace BL.Forms
                     }
                 }
 
-                if (!this.isReadOnly)
+                if (!this.IsReadOnly)
                 {
              /*       GridColumn gcCommand = new GridColumn();
 
@@ -1583,7 +1215,7 @@ namespace BL.Forms
 
                     Form f = this.EnsureForm(item);
                     f.ItemSetInterface = this.ItemSetInterface;
-                    f.ItemSet = this.itemSet;
+                    f.ItemSet = this.ItemSet;
                     f.Item = objectItem;
 
                     FieldValue chfe = new FieldValue();
@@ -1598,21 +1230,7 @@ namespace BL.Forms
                 }
             }
         }
-
-        private Form EnsureForm(IItem item)
-        {
-            if (this.formsByItemId.ContainsKey(item.Id))
-            {
-                return this.formsByItemId[item.Id];
-            }
-
-            Form f = new Form();
-
-            this.formsByItemId[item.Id] = f;
-
-            return f;
-        }
-
+        
         private object CreateDataObjectForItem(IItem item)
         {
             object o = Item.GetDataObject(this.ItemSet, item);
@@ -1622,12 +1240,11 @@ namespace BL.Forms
             return o;
         }
 
-
         private object CreateDisplayDataObjectForItem(IItem item)
         {           
             Dictionary<String, object> newObject = new Dictionary<string, object>();
 
-            foreach (IDataStoreField field in itemSet.Type.Fields)
+            foreach (IDataStoreField field in this.ItemSet.Type.Fields)
             {
                 FieldInterface fs = this.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
 

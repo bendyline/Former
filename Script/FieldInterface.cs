@@ -16,6 +16,12 @@ namespace BL.Forms
         IdentifierOnly = 3
     }
 
+    public enum FieldInitializer
+    {
+        None = 0,
+        Choices5DailyDatesFromTomorrow = 1
+    }
+
     public class FieldInterface : SerializableObject
     {
         private FieldDataFormat dataFormatOverride = FieldDataFormat.DefaultFormat;
@@ -24,6 +30,7 @@ namespace BL.Forms
         private bool? allowNullOverride;
         private DisplayState display;
         private FieldChoiceCollection choicesOverride;
+        private FieldInitializer initializer;
         private String name;
         private Nullable<int> order;
         private FieldMode fieldMode;
@@ -49,6 +56,27 @@ namespace BL.Forms
                 this.dataFormatOverride = value;
 
                 this.NotifyPropertyChanged("DataFormatOverride");
+            }
+        }
+
+        [ScriptName("i_initializer")]
+        public FieldInitializer Initializer
+        {
+            get
+            {
+                return this.initializer;
+            }
+
+            set
+            {
+                if (this.initializer == value)
+                {
+                    return;
+                }
+
+                this.initializer = value;
+
+                this.NotifyPropertyChanged("Initializer");
             }
         }
 
@@ -114,6 +142,7 @@ namespace BL.Forms
                 this.NotifyPropertyChanged("TitleOverride");
             }
         }
+
         [ScriptName("b_allowNullOverride")]
         public bool? AllowNullOverride
         {
@@ -303,7 +332,5 @@ namespace BL.Forms
         {
             this.NotifyPropertyChanged("InterfaceTypeOptionsOverride");
         }
-
-
     }
 }

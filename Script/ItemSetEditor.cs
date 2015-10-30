@@ -10,95 +10,76 @@ using BL.UI;
 using BL.Data;
 using System.Runtime.CompilerServices;
 using Kendo.UI;
-using BL.UI.KendoControls;
 
 namespace BL.Forms
 {
     public enum ItemSetEditorMode
     {
         Rows = 0,
-        TemplatePlacedItems=1,
-        Linear=2
+        TemplatePlacedItems = 1,
+        Linear = 2
     }
-
 
     public class ItemSetEditor : Control, IItemSetEditor
     {
+        private DataStoreItemSetEventHandler itemSetChanged;
+        
         private IDataStoreItemSet itemSet;
-
-        [ScriptName("e_formBin")]
-        private Element formBin;
-
-        [ScriptName("c_persist")]
-        private PersistButton persist;
-
-        private FormMode formMode = FormMode.EditForm;
-
         private ImageBrowserOptions defaultImageBrowserOptions;
 
-        private String itemPlacementFieldName;
-
-        private ItemSetEditorMode mode = ItemSetEditorMode.Rows;
-
-        private List<Element> itemElements;
-
-        private List<IItem> itemsShown;
-        private Dictionary<String, Form> formsByLocalId;
-        private List<Form> forms;
+        private FormMode formMode = FormMode.EditForm;
 
         private ItemSetInterface itemSetInterface;
         private String itemFormTemplateId;
         private String itemFormTemplateIdSmall;
+        private String itemPlacementFieldName;
 
-        [ScriptName("e_addButton")]
-        private InputElement addButton;
-
-        private Dictionary<String, DropZoneTarget> dropZoneTargetsByLocalId;
-
-        private bool reorderItemsOnNextUpdate = false;
-        private bool useRowFormsIfPossible = true;
-        private bool displayAddButton = true;
+        private bool displayAddAndDeleteButtons = true;
         private bool displayPersistButton = true;
-        private String addItemCta;
 
-        private Element headerRowElement;
-        private event DataStoreItemSetEventHandler itemSetEventHandler;
+        private bool isReadOnly = false;
+
+        private String addItemCta;
+        private Dictionary<String, Form> formsByItemId;
+        private List<Form> forms;
+
+        private ItemSetEditorMode mode;
+        private PropertyChangedEventHandler itemSetInterfacePropertyChanged;
+        private PropertyChangedEventHandler fieldPropertyChanged;
+        private NotifyCollectionChangedEventHandler fieldInterfaceCollectionChanged;
         private event DataStoreItemChangedEventHandler itemChangedEventHandler;
+
         public event DataStoreItemEventHandler ItemAdded;
         public event DataStoreItemEventHandler ItemDeleted;
 
-        private Element scrollContainerElement;
-
-        private Form draggingForm;
-        private Element draggingElement;
-
-        private int lastMoveOffset = 0;
-
-        public Element ScrollContainerElement
+        public ImageBrowserOptions DefaultImageBrowserOptions
         {
             get
             {
-                return this.scrollContainerElement;
+                return this.defaultImageBrowserOptions;
             }
 
             set
             {
-                this.scrollContainerElement = value;
+                this.defaultImageBrowserOptions = value;
+            }
+        }
 
-                if (this.scrollContainerElement != null)
+        protected List<Form> Forms
+        {
+            get
+            {
+                if (this.forms == null)
                 {
-                    this.scrollContainerElement.AddEventListener(ElementUtilities.GetTouchMoveEventName(), this.HandleMouseMove, true);
-
-                    if (!ElementUtilities.GetIsPointerEnabled())
-                    {
-                        this.scrollContainerElement.AddEventListener("mousemove", this.HandleMouseMove, true);
-                    }
+                    this.forms = new List<Form>();
                 }
+
+                return this.forms;
             }
         }
 
         [ScriptName("i_formMode")]
-        public FormMode FormMode 
+        public FormMode FormMode
         {
             get
             {
@@ -114,23 +95,187 @@ namespace BL.Forms
 
                 this.formMode = value;
 
-                foreach (Form f in this.forms)
+                if (this.forms != null)
                 {
-                    f.Mode = this.formMode;
+                    foreach (Form f in this.forms)
+                    {
+                        f.Mode = this.formMode;
+                    }
                 }
             }
         }
-
-        public ImageBrowserOptions DefaultImageBrowserOptions
+        
+        public ItemSetInterface ItemSetInterface
         {
             get
             {
-                return this.defaultImageBrowserOptions;
+                return this.itemSetInterface;
             }
 
             set
             {
-                this.defaultImageBrowserOptions = value;
+                if (this.itemSetInterface == value)
+                {
+                    return;
+                }
+
+                if (this.itemSetInterface != null)
+                {
+                    this.itemSetInterface.PropertyChanged -= this.itemSetInterfacePropertyChanged;
+                    this.itemSetInterface.FieldInterfaces.CollectionChanged -= this.fieldInterfaceCollectionChanged;
+                }
+
+                this.itemSetInterface = value;
+
+
+                if (this.forms != null)
+                {
+                    foreach (Form f in this.forms)
+                    {
+                        f.ItemSetInterface = this.itemSetInterface;
+                    }
+                }
+
+                this.Update();
+
+                this.itemSetInterface.PropertyChanged += this.itemSetInterfacePropertyChanged;
+                this.itemSetInterface.FieldInterfaces.CollectionChanged += this.fieldInterfaceCollectionChanged;
+            }
+        }
+
+        [ScriptName("b_isReadOnly")]
+        public bool IsReadOnly
+        {
+            get
+            {
+                return this.isReadOnly;
+            }
+
+            set
+            {
+                this.isReadOnly = value;
+            }
+        }
+
+        public String ItemPlacementFieldName
+        {
+            get
+            {
+                return this.itemPlacementFieldName;
+            }
+
+            set
+            {
+                if (this.itemPlacementFieldName == value)
+                {
+                    return;
+                }
+
+                this.itemPlacementFieldName = value;
+
+                this.Update();
+            }
+        }
+
+        public String ItemFormTemplateId
+        {
+            get
+            {
+                return this.itemFormTemplateId;
+            }
+
+            set
+            {
+                if (this.itemFormTemplateId == value)
+                {
+                    return;
+                }
+
+                this.itemFormTemplateId = value;
+
+                if (!Context.Current.IsSmallFormFactor)
+                {
+                    if (this.forms != null)
+                    {
+                        foreach (Form f in this.forms)
+                        {
+                            f.TemplateId = this.itemFormTemplateId;
+                        }
+                    }
+                }
+
+                this.Update();
+            }
+        }
+
+        public String ItemFormTemplateIdSmall
+        {
+            get
+            {
+                return this.itemFormTemplateIdSmall;
+            }
+
+            set
+            {
+                if (this.itemFormTemplateIdSmall == value)
+                {
+                    return;
+                }
+
+                this.itemFormTemplateIdSmall = value;
+
+                if (Context.Current.IsSmallFormFactor)
+                {
+                    if (this.forms != null)
+                    {
+                        foreach (Form f in this.forms)
+                        {
+                            f.TemplateId = this.itemFormTemplateIdSmall;
+                        }
+                    }
+                }
+
+                this.Update();
+            }
+        }
+
+        public ItemSetEditorMode Mode
+        {
+            get
+            {
+                return this.mode;
+            }
+
+            set
+            {
+                if (this.mode == value)
+                {
+                    return;
+                }
+
+                this.mode = value;
+
+                this.Update();
+            }
+        }
+        
+        public String AddItemCta
+        {
+            get
+            {
+                return this.addItemCta;
+            }
+
+            set
+            {
+                if (this.addItemCta == value)
+                {
+                    return;
+                }
+
+                this.addItemCta = value;
+
+                this.OnAddItemCtaChange();
             }
         }
 
@@ -146,72 +291,7 @@ namespace BL.Forms
             {
                 this.displayPersistButton = value;
 
-                this.Update();
-            }
-        }
-
-        [ScriptName("s_addItemCta")]
-        public String AddItemCta
-        {
-            get
-            {
-                return this.addItemCta;
-            }
-
-            set
-            {
-                this.addItemCta = value;
-            }
-        }
-
-        public bool UseRowFormsIfPossible
-        {
-            get
-            {
-                return this.useRowFormsIfPossible;
-            }
-
-            set
-            {
-                this.useRowFormsIfPossible = value;
-            }
-        }
-
-        public bool IsReorderable
-        {
-            get
-            {
-                return this.ItemSetInterface != null && this.ItemSetInterface.IsReorderable;
-            }
-        }
-
-        [ScriptName("s_itemPlacementFieldName")]
-        public String ItemPlacementFieldName
-        {
-            get
-            {
-                return this.itemPlacementFieldName;
-            }
-
-            set
-            {
-                this.itemPlacementFieldName = value;
-            }
-        }
-
-        [ScriptName("i_mode")]
-        public ItemSetEditorMode Mode
-        {
-            get
-            {
-                return this.mode;
-            }
-
-            set
-            {
-                this.mode = value;
-
-                this.Update();
+                this.OnPersistVisibilityChange();
             }
         }
 
@@ -220,81 +300,19 @@ namespace BL.Forms
         {
             get
             {
-                return this.displayAddButton;
+                return this.displayAddAndDeleteButtons;
             }
 
             set
             {
-                this.displayAddButton = value;
-
-                this.ApplyAddButtonVisibility();
-            }
-        }
-
-        public String ItemFormTemplateId
-        {
-            get
-            {
-                return this.itemFormTemplateId;
-            }
-
-            set
-            {
-                this.itemFormTemplateId = value;
-
-                if (!Context.Current.IsSmallFormFactor)
+                if (this.displayAddAndDeleteButtons == value)
                 {
-                    foreach (Form f in this.forms)
-                    {
-                        f.TemplateId = this.itemFormTemplateId;
-                    }
-                }
-            }
-        }
-
-        public String ItemFormTemplateIdSmall
-        {
-            get
-            {
-                return this.itemFormTemplateIdSmall;
-            }
-
-            set
-            {
-                this.itemFormTemplateIdSmall = value;
-
-                if (Context.Current.IsSmallFormFactor)
-                {
-                    foreach (Form f in this.forms)
-                    {
-                        f.TemplateId = this.itemFormTemplateIdSmall;
-                    }
-                }
-            }
-        }
-
-        public ItemSetInterface ItemSetInterface
-        {
-            get
-            {
-                if (this.itemSetInterface == null)
-                {
-                    this.itemSetInterface = new ItemSetInterface();
+                    return;
                 }
 
-                return this.itemSetInterface;
-            }
+                this.displayAddAndDeleteButtons = value;
 
-            set
-            {
-                this.itemSetInterface = value;
-
-                foreach (Form f in this.forms)
-                {
-                    f.ItemSetInterface = this.itemSetInterface;
-                }
-
-                this.Update();
+                OnAddAndDeleteVisibilityChange();
             }
         }
 
@@ -314,7 +332,7 @@ namespace BL.Forms
 
                 if (this.itemSet != null)
                 {
-                    this.itemSet.ItemSetChanged -= this.itemSetEventHandler;
+                    this.itemSet.ItemSetChanged -= this.itemSetChanged;
                     this.itemSet.ItemInSetChanged -= this.itemChangedEventHandler;
                 }
 
@@ -322,7 +340,7 @@ namespace BL.Forms
 
                 if (this.itemSet != null)
                 {
-                    this.itemSet.ItemSetChanged += this.itemSetEventHandler;
+                    this.itemSet.ItemSetChanged += this.itemSetChanged;
                     this.itemSet.ItemInSetChanged += this.itemChangedEventHandler;
 
                     this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
@@ -336,107 +354,60 @@ namespace BL.Forms
 
         public ItemSetEditor()
         {
-            KendoUtilities.EnsureKendoBaseUx(this);
+            this.formsByItemId = new Dictionary<string, Form>();
 
-            this.itemsShown = new List<IItem>();
-            this.formsByLocalId = new Dictionary<String, Form>();
-            this.forms = new List<Form>();
-            this.dropZoneTargetsByLocalId = new Dictionary<string, DropZoneTarget>();
-
-            this.itemSetEventHandler = this.itemSet_ItemSetChanged;
+            this.itemSetChanged = this.itemSet_ItemSetChanged;
             this.itemChangedEventHandler = this.item_ItemChanged;
+
+            this.itemSetInterfacePropertyChanged = itemSetOrFieldInterface_PropertyChanged;
+            this.fieldPropertyChanged = itemSetOrFieldInterface_PropertyChanged;
+            this.fieldInterfaceCollectionChanged = FieldInterfaceCollection_CollectionChanged;
 
             this.EnqueueUpdates = true;
         }
 
-        private void ApplyAddButtonVisibility()
+        public void SetItemSetInterfaceAndItems(ItemSetInterface isi, IDataStoreItemSet newItemSet)
         {
-            if (this.addButton == null)
+            if (this.itemSet == newItemSet && this.itemSetInterface == isi)
             {
                 return;
             }
 
-            if (this.displayAddButton)
+            if (this.itemSetInterface != null)
             {
-                this.addButton.Style.Display = "block";
+                this.itemSetInterface.PropertyChanged -= this.itemSetInterfacePropertyChanged;
+                this.itemSetInterface.FieldInterfaces.CollectionChanged -= this.fieldInterfaceCollectionChanged;
+            }
+
+            this.itemSetInterface = isi;
+            this.itemSetInterface.PropertyChanged += this.itemSetInterfacePropertyChanged;
+            this.itemSetInterface.FieldInterfaces.CollectionChanged += this.fieldInterfaceCollectionChanged;
+
+            if (this.itemSet != null)
+            {
+                this.itemSet.ItemSetChanged -= this.itemSetChanged;
+            }
+
+            this.itemSet = newItemSet;
+
+            if (this.itemSet != null)
+            {
+                this.itemSet.ItemSetChanged += this.itemSetChanged;
+
+                this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
             }
             else
             {
-                this.addButton.Style.Display = "none";
+                this.Update();
             }
         }
 
-        protected override void OnApplyTemplate()
+        protected virtual void SetDefaultItemValues(IItem item)
         {
-            base.OnApplyTemplate();
-
-            if (this.addButton != null)
-            {
-                this.addButton.AddEventListener("mousedown", this.AddButtonClick, true);
-                this.addButton.AddEventListener("touchstart", this.AddButtonClick, true);
-
-                this.ApplyAddButtonVisibility();
-            }
-
-            this.itemElements = new List<Element>();
-
-            for (int i=0; i<20; i++)
-            {
-                Element e = this.GetTemplateElementById("item" + i);
-
-                if (e != null)
-                {
-                    while (this.itemElements.Count < i)
-                    {
-                        this.itemElements.Add(null);
-                    }
-
-                    this.itemElements[i] = e;
-                }
-            }
-        }
-
-        private void AddButtonClick(ElementEvent e)
-        {
-            IItem item = this.itemSet.Type.CreateItem();
-
-            // if the type has an order field, make sure that this new item is at the bottom of the list.
-            foreach (FieldInterface fieldInterface in this.itemSetInterface.FieldInterfaces)
-            {
-                if (fieldInterface.InterfaceTypeOverride == FieldInterfaceType.Order)
-                {
-                    int maxOrder = 0;
-
-                    foreach (IItem existingItem in this.itemSet.Items)
-                    {
-                        int? itemOrder = existingItem.GetInt32Value(fieldInterface.Name);
-
-                        if (itemOrder != null && itemOrder > maxOrder)
-                        {
-                            maxOrder = (int)itemOrder;
-                        }
-                    }
-
-                    item.SetInt32Value(fieldInterface.Name, maxOrder + 10);
-                }
-            }
-
-            this.itemSet.Add(item);
-
-            int placementIndex = this.itemSet.Items.Count - 1;
- 
-            if (this.ItemPlacementFieldName != null)
-            {
-                //IDataStoreField f = this.ItemSet.Type.GetField(this.ItemPlacementFieldName);
-
-                placementIndex = (int)item.GetInt32Value(this.ItemPlacementFieldName);                
-            }
-
-
             // set default data values, where applicable
-            foreach (IDataStoreField f in this.itemSet.Type.Fields)
+            foreach (IDataStoreField f in this.ItemSet.Type.Fields)
             {
-                FieldInterface fi = this.itemSetInterface.FieldInterfaces.GetFieldByName(f.Name);
+                FieldInterface fi = this.ItemSetInterface.FieldInterfaces.GetFieldByName(f.Name);
 
                 if (f.Type == FieldType.Integer)
                 {
@@ -450,9 +421,34 @@ namespace BL.Forms
                     }
                 }
             }
+        }
 
-            this.EnsureFormForItem(item, placementIndex);
+        protected virtual void EnsureItemIsAtEndOfList(IItem item)
+        {
+            // if the type has an order field, make sure that this new item is at the bottom of the list.
+            foreach (FieldInterface fieldInterface in this.ItemSetInterface.FieldInterfaces)
+            {
+                if (fieldInterface.InterfaceTypeOverride == FieldInterfaceType.Order)
+                {
+                    int maxOrder = 0;
 
+                    foreach (IItem existingItem in this.ItemSet.Items)
+                    {
+                        int? itemOrder = existingItem.GetInt32Value(fieldInterface.Name);
+
+                        if (itemOrder != null && itemOrder > maxOrder)
+                        {
+                            maxOrder = (int)itemOrder;
+                        }
+                    }
+
+                    item.SetInt32Value(fieldInterface.Name, maxOrder + 10);
+                }
+            }
+        }
+
+        protected virtual void NotifyItemAdded(IItem item)
+        {
             if (this.ItemAdded != null)
             {
                 DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
@@ -461,150 +457,105 @@ namespace BL.Forms
             }
         }
 
+        protected virtual void NotifyItemDeleted(IItem item)
+        {
+            if (this.ItemDeleted != null)
+            {
+                DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(item);
+
+                this.ItemDeleted(this, dsiea);
+            }
+        }
+
+        protected override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            if (this.ItemSet != null)
+            {
+                foreach (Field field in this.ItemSet.Type.Fields)
+                {
+                    FieldInterface fs = this.ItemSetInterface.FieldInterfaces.GetFieldByName(field.Name);
+
+                    if (fs != null)
+                    {
+                        fs.PropertyChanged -= this.fieldPropertyChanged;
+                        fs.PropertyChanged += this.fieldPropertyChanged;
+                    }
+                }
+            }
+        }
+
+
+        public virtual void DisposeItemInterfaceItems()
+        {
+
+        }
+
+        protected virtual void OnAddAndDeleteVisibilityChange()
+        {
+        }
+
+        protected virtual void OnPersistVisibilityChange()
+        {
+        }
+        protected virtual void OnAddItemCtaChange()
+        {
+        }
+
+        public virtual void Save()
+        {
+
+        }
+
+        public bool? GetFieldRequiredOverride(String fieldName)
+        {
+            return this.ItemSetInterface.FieldInterfaces.GetFieldRequiredOverride(fieldName);
+        }
+
+        public Nullable<FieldInterfaceType> GetFieldInterfaceTypeOverride(String fieldName)
+        {
+            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOverride(fieldName);
+        }
+
+        public FieldInterfaceTypeOptions GetFieldInterfaceTypeOptionsOverride(String fieldName)
+        {
+            return this.ItemSetInterface.FieldInterfaces.GetFieldInterfaceTypeOptionsOverride(fieldName);
+        }
+
+        private void itemSetOrFieldInterface_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            this.Update();
+        }
+
+        private void FieldInterfaceCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            this.Update();
+        }
+        
         private void ItemsRetrieved(IAsyncResult result)
         {
             this.Update();
         }
-
-        public void Save()
+        
+        private void item_ItemChanged(object sender, DataStoreItemChangedEventArgs e)
         {
-            foreach (Form f in this.forms)
-            {
-                f.Save(null, null);
-            }
+            this.OnItemInSetChanged(e);
+        }
+
+        protected virtual void OnItemInSetChanged(DataStoreItemChangedEventArgs e)
+        {
+
         }
 
         private void itemSet_ItemSetChanged(object sender, DataStoreItemSetEventArgs e)
         {
-            if (e.RemovedItems != null)
-            {
-                foreach (IItem item in e.RemovedItems)
-                {
-                    Debug.WriteLine("(ItemSetEditor::itemSet_ItemSetChanged) - Item " + item.LocalOnlyUniqueId + " was removed.");
-
-                    Form f = this.formsByLocalId[item.LocalOnlyUniqueId];
-
-                    if (f != null)
-                    {
-                        this.RemoveFormFromDisplay(f);
-
-                        this.formsByLocalId[item.LocalOnlyUniqueId] = null;
-                        this.forms.Remove(f);
-
-                        f.Dispose();
-                    }
-                }
-            }
-
-            this.Update();
+            this.OnItemSetChanged(e);
         }
 
-        private void RemoveFormFromDisplay(Form f)
+        protected virtual void OnItemSetChanged(DataStoreItemSetEventArgs e)
         {
-            if (ElementUtilities.ElementIsChildOf(f.Element, this.formBin))
-            {
-                this.formBin.RemoveChild(f.Element);
-            }
 
-            DropZoneTarget dtz = this.dropZoneTargetsByLocalId[f.Item.LocalOnlyUniqueId];
-
-            if (dtz != null)
-            {
-                if (this.formBin != null && this.formBin.Contains(dtz.Element))
-                {
-                    this.formBin.RemoveChild(dtz.Element);
-                }
-            }
-
-
-            this.itemsShown.Remove(f.Item);
-        }
-        
-        private void EnsureHeaderRow()
-        {
-            if (this.formBin == null || this.ItemSet == null)
-            {
-                return;
-            }
-
-            if (    (this.ItemSetInterface != null && !this.ItemSetInterface.DisplayColumns) || 
-                    Context.Current.IsSmallFormFactor || 
-                    this.Mode == ItemSetEditorMode.Linear)
-            {
-                if (this.headerRowElement != null && ElementUtilities.ElementIsChildOf(this.headerRowElement, this.formBin))
-                {
-                    this.formBin.RemoveChild(this.headerRowElement);
-                    this.headerRowElement = null;
-                }
-
-                return;
-            }
-
-            if (this.headerRowElement == null)
-            {
-                this.headerRowElement = this.CreateElement("headerRow");
-
-                if (this.formBin.ChildNodes.Length > 0)
-                {
-                    this.formBin.InsertBefore(this.headerRowElement, this.formBin.ChildNodes[0]);
-                }
-                else
-                {
-                    this.formBin.AppendChild(this.headerRowElement);
-                }
-            }
-
-            ElementUtilities.ClearChildElements(this.headerRowElement);
-
-            List<Field> sortedFields = new List<Field>();
-
-            foreach (Field field in this.ItemSet.Type.Fields)
-            {
-                sortedFields.Add(field);
-            }
-
-            sortedFields.Sort(this.ItemSetInterface.CompareFields);
-
-            // add a placeholder cell for the drag-and-drop grippie column
-            if (this.IsReorderable)
-            {
-                Element cellElement = this.CreateElement("headerCell");
-
-                ElementUtilities.SetHtml(cellElement, "&#160;");
-
-                this.headerRowElement.AppendChild(cellElement);
-            }
-
-            foreach (Field field in sortedFields)
-            {
-                DisplayState afs = this.GetAdjustedDisplayState(field.Name);
-
-                if (afs == DisplayState.Show || afs == DisplayState.ShowInListHideInDetail)
-                {
-                    Element cellElement = this.CreateElement("headerCell");
-
-                    String text = this.GetFieldTitleOverride(field.Name);
-
-                    if (text == null)
-                    {
-                        text = String.Empty;
-                    }
-
-                    ElementUtilities.SetText(cellElement, text);
-
-                    this.headerRowElement.AppendChild(cellElement);
-                }
-            }
-
-            Element spacer = this.CreateElement("headerCell");
-            spacer.Style.Width = "100%";
-            ElementUtilities.SetHtml(spacer, "&#160;");
-            this.headerRowElement.AppendChild(spacer);
-        }
-
-        private DisplayState GetAdjustedDisplayState(String fieldName)
-        {
-            return this.ItemSetInterface.FieldInterfaces.GetAdjustedDisplayState(fieldName);
         }
 
         public String GetFieldTitleOverride(String fieldName)
@@ -612,648 +563,23 @@ namespace BL.Forms
             return this.ItemSetInterface.FieldInterfaces.GetFieldTitleOverride(fieldName);
         }
 
-        private void EnsureFormForItem(IItem item, int index)
+        public DisplayState GetAdjustedDisplayState(String fieldName)
         {
-            Form f = formsByLocalId[item.LocalOnlyUniqueId];
-
-            if (f != null)
-            {
-                if (!this.itemsShown.Contains(item))
-                {
-                    f.ItemSetInterface = this.ItemSetInterface;
-                    f.ItemSet = this.itemSet;
-                    f.Item = item;
-                    
-                    this.itemsShown.Add(item);
-
-                    this.InsertFormInOrder(f);
-                }
-
-                return;
-            }
-
-            if (this.mode == ItemSetEditorMode.Rows && !Context.Current.IsSmallFormFactor && this.useRowFormsIfPossible)
-            {
-                f = new RowForm();
-
-                Debug.WriteLine("(ItemSetEditor::EnsureFormForItem) - Creating new rowform for item " + item.LocalOnlyUniqueId);
-                f.IteratorFieldTemplateId = "bl-forms-horizontalunlabeledfield";
-            }
-            else
-            {
-                f = new Form();
-                Debug.WriteLine("(ItemSetEditor::EnsureFormForItem) - Creating new form for item " + item.LocalOnlyUniqueId);
-            }
-
-            f.ItemDeleted += f_ItemDeleted;
-            f.GrippieElementChanged += f_GrippieChanged;
-
-            if (this.itemFormTemplateId != null && (!Context.Current.IsSmallFormFactor || this.itemFormTemplateIdSmall == null))
-            {
-                f.TemplateId = this.itemFormTemplateId;
-            }
-            else if (this.itemFormTemplateIdSmall  != null && Context.Current.IsSmallFormFactor)
-            {
-                f.TemplateId = this.itemFormTemplateIdSmall;
-            }
-
-            f.DefaultImageBrowserOptions = this.DefaultImageBrowserOptions;
-            f.ItemSetInterface = this.ItemSetInterface;
-            f.ItemSet = this.itemSet;
-            f.Item = item;
-            f.Mode = this.formMode;
-            
-
-            this.formsByLocalId[item.LocalOnlyUniqueId] = f;
-            this.forms.Add(f);
-            this.itemsShown.Add(item);
-
-            f.EnsureElements();
-
-            /*
-            // Banding effect for Row Forms
-            if (f is RowForm)
-            {
-                if (index % 2 == 1)
-                {
-                    f.Element.Style.BackgroundColor = "#F8F8F8";
-                }
-                else
-                {
-                    f.Element.Style.BackgroundColor = "";
-                }
-            }*/
-
-            if (this.mode == ItemSetEditorMode.Rows || this.mode == ItemSetEditorMode.Linear || Context.Current.IsSmallFormFactor)
-            {
-                if (this.mode == ItemSetEditorMode.Rows)
-                {
-                    this.formBin.Style.Display = "table";
-                }
-
-                this.InsertFormInOrder(f);
-            }
-            else
-            {
-                if (index < this.itemElements.Count)
-                {
-                    Element itemBin = this.itemElements[index];
-
-                    while (itemBin.ChildNodes.Length > 0)
-                    {
-                        itemBin.RemoveChild(itemBin.ChildNodes[0]);
-                    }
-
-                    itemBin.AppendChild(f.Element);
-                }
-            }
+            return this.ItemSetInterface.FieldInterfaces.GetAdjustedDisplayState(fieldName);
         }
 
-        private void f_GrippieChanged(object sender, EventArgs e)
+        protected Form EnsureForm(IItem item)
         {
-            if (this.IsReorderable && ((Form)sender).GrippieElement != null)
+            if (this.formsByItemId.ContainsKey(item.Id))
             {
-                DraggableOptions options = new DraggableOptions();
-
-                options.Hint = this.CreateDragElement;
-                options.Axis = "y";
-                options.DragStart = this.HandleDragStart;
-                options.DragEnd = this.HandleDragEnd;
-                options.DragCancel = this.HandleDragEnd;
-
-                KendoUtilities.CreateDraggable(((Form)sender).GrippieElement, options);
-            }
-        }
-
-        
-        private void HandleDragStart(jQueryEvent eventData)
-        {
-            Element targetElt = eventData.CurrentTarget;
-
-            // the jqueryevent definition says that this is an element, but it looks like it's coming in as a collection of elements.
-            Script.Literal("{0}={0}[0]", targetElt);
-
-            this.draggingForm = null;
-
-            while (targetElt != null && this.draggingForm == null)
-            {
-                foreach (Form f in this.forms)
-                {
-                    if (f.Element == targetElt)
-                    {
-                        this.draggingForm = f;
-                        break;
-                    }
-                }
-
-                targetElt = targetElt.ParentNode;
+                return this.formsByItemId[item.Id];
             }
 
-            this.draggingForm.Element.Style.Opacity = ".1";
+            Form f = new Form();
 
-            ElementUtilities.SetText(this.draggingElement, this.draggingForm.Item.Title);
+            this.formsByItemId[item.Id] = f;
 
-            ClientRect rect = ElementUtilities.GetBoundingRect(this.draggingForm.Element);
-
-            this.draggingElement.Style.MinWidth = (rect.Right - rect.Left) + "px";
-
-            this.draggingElement.Style.MaxWidth = this.draggingElement.Style.MinWidth;
-
-            foreach (String targetItemId in this.dropZoneTargetsByLocalId.Keys)
-            {
-                DropZoneTarget zoneTarget = this.dropZoneTargetsByLocalId[targetItemId];
-
-                zoneTarget.ExpandedHeight = (int)(rect.Bottom - rect.Top);
-                if (zoneTarget.CurrentControl != this.draggingForm && zoneTarget.PreviousControl != this.draggingForm)
-                {
-                    zoneTarget.IsActive = true;
-                }
-                else
-                {
-                    zoneTarget.IsActive = false;
-                }
-            }
-        }
-
-        private void HandleDragEnd(jQueryEvent eventData)
-        {
-            this.draggingForm.Element.Style.Opacity = "1";
-
-            foreach (String targetItemId in this.dropZoneTargetsByLocalId.Keys)
-            {
-                DropZoneTarget zoneTarget = this.dropZoneTargetsByLocalId[targetItemId];
-
-                zoneTarget.IsActive = false;
-            }
-
-            this.draggingForm = null;
-            this.draggingElement = null;
-        }
-
-        private Element CreateDragElement(Element[] elements)
-        {
-            this.draggingElement = this.CreateElement("draggableBar");
-
-            // on touch devices, move the dragging item from underneath the users finger
-            // plus, without doing this, drag-and-drop doesn't work on iOS.
-            if (Context.Current.IsTouchOnly)
-            {
-                this.draggingElement.Style.MarginLeft = "60px";
-            }
-
-            return this.draggingElement;
-        }
-
-        private void HandleMouseMove(ElementEvent ee)
-        {
-            this.lastMoveOffset = 0;
-
-            if (this.draggingForm == null || this.draggingElement == null || this.scrollContainerElement == null)
-            {
-                return;
-            }
-
-            //ClientRect target = ElementUtilities.GetBoundingRect(ee.Target);
-            ClientRect bin = ElementUtilities.GetBoundingRect(this.scrollContainerElement);
-
-            int mouseY = (int)ElementUtilities.GetPageY(ee);
-            
-            int binTop = (int)bin.Top;
-            int binBottom = (int)bin.Bottom;
-
-            if (mouseY < binTop + 50)
-            {
-                this.lastMoveOffset = -1;
-                this.DragMoveBin();
-            }
-            else if (mouseY > binBottom - 50)
-            {
-                this.lastMoveOffset = 1;
-                this.DragMoveBin();
-            }
-        }
-
-        private void DragMoveBin()
-        {
-            if (this.lastMoveOffset != 0)
-            {
-                int amountToMove = this.lastMoveOffset;
-
-                if (this.scrollContainerElement.ScrollTop + amountToMove < 0)
-                {
-                    amountToMove = -this.scrollContainerElement.ScrollTop;
-                    this.lastMoveOffset = 0;
-                }
-
-                this.scrollContainerElement.ScrollTop += amountToMove;
-                Window.SetTimeout(this.DragMoveBin, 40);
-            }
-        }
-
-        private void item_ItemChanged(object sender, DataStoreItemChangedEventArgs e)
-        {
-            if (this.ItemSetInterface != null)
-            {
-                if ((this.ItemSetInterface.Sort == ItemSetSort.FieldAscending || this.ItemSetInterface.Sort == ItemSetSort.FieldDescending) && this.ItemSetInterface.SortField != null)
-                {
-                    foreach (String changedFieldName in e.ChangedProperties)
-                    {
-                        if (changedFieldName == this.ItemSetInterface.SortField)
-                        {
-                            this.reorderItemsOnNextUpdate = true;
-                            this.Update();
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        public void SetItemSetInterfaceAndItems(ItemSetInterface isi, IDataStoreItemSet newItemSet)
-        {
-            if (this.itemSet == newItemSet && this.itemSetInterface == isi)
-            {
-                return;
-            }
-
-            this.itemSetInterface = isi;
-
-            foreach (Form f in this.forms)
-            {
-                f.ItemSetInterface = this.itemSetInterface;
-            }
-
-            if (this.itemSet != null)
-            {
-                this.itemSet.ItemSetChanged -= this.itemSetEventHandler;
-                this.itemSet.ItemInSetChanged -= this.itemChangedEventHandler;
-            }
-
-            this.itemSet = newItemSet;
-
-            if (this.itemSet != null)
-            {
-                this.itemSet.ItemSetChanged += this.itemSetEventHandler;
-                this.itemSet.ItemInSetChanged += this.itemChangedEventHandler;
-
-                this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
-            }
-            else
-            {
-                this.Update();
-            }
-        }
-
-        private DropZoneTarget EnsureDropZoneTargetForForm(Form form)
-        {
-            DropZoneTarget dropZoneTarget = this.dropZoneTargetsByLocalId[form.Item.LocalOnlyUniqueId];
-
-            if (dropZoneTarget == null)
-            {
-                dropZoneTarget = new DropZoneTarget();
-
-                dropZoneTarget.TemplateId = "bl-forms-rowdropzonetarget";
-
-                dropZoneTarget.EnsureElements();
-                dropZoneTarget.DroppedOn += dropZoneTarget_DroppedOn;
-
-                this.dropZoneTargetsByLocalId[form.Item.LocalOnlyUniqueId] = dropZoneTarget;
-            }
-
-            return dropZoneTarget;
-        }
-
-        private void InsertFormInOrder(Form formToInsert)
-        {
-            if (this.formBin == null)
-            {
-                return;
-            }
-
-            if (this.ItemSetInterface.IsReorderable)
-            {
-                DropZoneTarget dropZoneTarget = this.EnsureDropZoneTargetForForm(formToInsert);
-
-                Form previousForm = null;
-
-                if (this.ItemSetInterface.Sort != ItemSetSort.DefaultState)
-                {
-                    for (int i = 0; i < this.formBin.Children.Length; i++)
-                    {
-                        Element e = this.formBin.Children[i];
-
-                        Form existingFormInList = this.GetFormForElement(e);
-
-                        if (existingFormInList != null)
-                        {
-                            if (existingFormInList.Item.CompareTo(formToInsert.Item, this.ItemSetInterface.Sort, this.ItemSetInterface.SortField) >= 0)
-                            {
-                                dropZoneTarget.PreviousControl = previousForm;
-                                dropZoneTarget.NextControl = existingFormInList;
-                                dropZoneTarget.CurrentControl = formToInsert;
-
-                                Element targetToInsertBefore = null;
-
-                                if (previousForm != null)
-                                {
-                                    DropZoneTarget previousFormZoneTarget = this.EnsureDropZoneTargetForForm(previousForm);
-                                    previousFormZoneTarget.NextControl = formToInsert;
-                                }
-
-                                DropZoneTarget nextFormZoneTarget = this.EnsureDropZoneTargetForForm(existingFormInList);
-                                nextFormZoneTarget.PreviousControl = formToInsert;
-
-                                targetToInsertBefore = nextFormZoneTarget.Element;
-
-                                if (!this.formBin.Contains(targetToInsertBefore))
-                                {
-                                    targetToInsertBefore = existingFormInList.Element;
-                                }
-
-                                this.formBin.InsertBefore(formToInsert.Element, targetToInsertBefore);
-                                this.formBin.InsertBefore(dropZoneTarget.Element, formToInsert.Element);
-                                return;
-                            }
-
-                            previousForm = existingFormInList;
-                        }
-                    }
-                }
-
-                dropZoneTarget.NextControl = null;
-                dropZoneTarget.CurrentControl = formToInsert;
-                dropZoneTarget.PreviousControl = previousForm;
-
-                this.formBin.AppendChild(dropZoneTarget.Element);
-                this.formBin.AppendChild(formToInsert.Element);
-            }
-            else
-            {
-                if (this.ItemSetInterface.Sort != ItemSetSort.DefaultState)
-                {
-                    for (int i = 0; i < this.formBin.Children.Length; i++)
-                    {
-                        Element e = this.formBin.Children[i];
-
-                        Form existingFormInList = this.GetFormForElement(e);
-
-                        if (existingFormInList != null)
-                        {
-                            if (existingFormInList.Item.CompareTo(formToInsert.Item, this.ItemSetInterface.Sort, this.ItemSetInterface.SortField) >= 0)
-                            {
-                                Element targetToInsertBefore = existingFormInList.Element;
-
-                                this.formBin.InsertBefore(formToInsert.Element, targetToInsertBefore);
-                                return;
-                            }
-                        }
-                    }
-                }
-                
-                this.formBin.AppendChild(formToInsert.Element);
-            }
-        }
-
-
-        private void dropZoneTarget_DroppedOn(object sender, EventArgs e)
-        {
-            DropZoneTarget droppedOnTarget = (DropZoneTarget)sender;
-
-            Form targetNextForm= droppedOnTarget.CurrentControl as Form;
-            Form targetPreviousForm = droppedOnTarget.PreviousControl as Form;
-
-            List<IItem> items= this.ItemSet.GetSortedItems(this.ItemSetInterface.Sort, this.ItemSetInterface.SortField);
-
-            int targetNextIndex = 0;
-
-            if (targetNextForm != null)
-            {
-                targetNextIndex = items.IndexOf(targetNextForm.Item);
-            }
-
-            int targetPreviousIndex = 0;
-
-            if (targetPreviousForm!= null)
-            {
-                targetPreviousIndex = items.IndexOf(targetPreviousForm.Item);
-            }
-
-            int sourceIndex = items.IndexOf(draggingForm.Item);
-
-            if (sourceIndex < Math.Max(targetNextIndex, targetPreviousIndex)) // we're dragging an element lower in the list (down)
-            {
-                 int? fieldTargetOrder = 0;
-
-                IItem targetItem = targetPreviousForm.Item;
-                fieldTargetOrder = targetItem.GetInt32Value(this.ItemSetInterface.SortField);
-
-                for (int i = targetPreviousIndex; i > sourceIndex; i--)
-                {
-                    IItem currentItem= items[i];
-                    IItem previousItem = items[i - 1];
-
-                    currentItem.SetInt32Value(this.ItemSetInterface.SortField, previousItem.GetInt32Value(this.ItemSetInterface.SortField));
-                }
-
-                this.draggingForm.Item.SetInt32Value(this.ItemSetInterface.SortField, fieldTargetOrder);
-            }
-            else // we're dragging an element higher in the list (up)
-            {
-                int? fieldTargetOrder = 0;
-
-                IItem targetItem = targetNextForm.Item;
-                fieldTargetOrder = targetItem.GetInt32Value(this.ItemSetInterface.SortField);
-
-                for (int i = targetNextIndex; i < sourceIndex; i++)
-                {
-                    IItem currentItem = items[i];
-
-                    int nextOrder = 0;
-
-                    if (i + 1 < items.Count)
-                    {
-                        IItem nextItem = items[i + 1];
-
-                        if (nextItem.GetInt32Value(this.ItemSetInterface.SortField) != null)
-                        {
-                            nextOrder = (int)nextItem.GetInt32Value(this.ItemSetInterface.SortField);
-                        }
-                    }
-
-                    currentItem.SetInt32Value(this.ItemSetInterface.SortField, nextOrder);
-                }
-
-                this.draggingForm.Item.SetInt32Value(this.ItemSetInterface.SortField, fieldTargetOrder);
-            }
-
-            this.reorderItemsOnNextUpdate = true;
-            this.Update();
-        }
-
-        private Form GetFormForElement(Element e)
-        {
-            foreach (Form f in this.forms)
-            {
-                if (f.Element == e)
-                {
-                    return f;
-                }
-            }
-
-            return null;
-        }
-
-        private void f_ItemDeleted(object sender, DataStoreItemEventArgs e)
-        {
-            if (this.ItemDeleted != null)
-            {
-                DataStoreItemEventArgs dsiea = new DataStoreItemEventArgs(e.Item);
-
-                this.ItemDeleted(this, dsiea);
-            }
-        }
-
-        public void DisposeItemInterfaceItems()
-        {
-            foreach (String key in this.formsByLocalId.Keys)
-            {
-                if (key != null)
-                {
-                    Form f = this.formsByLocalId[key];
-
-                    if (f != null)
-                    {
-                        f.Dispose();
-                    }
-
-                }
-            }
-
-            this.formsByLocalId = new Dictionary<string, Form>();
-        }
-
-        protected override void OnTemplateDisposed()
-        {
-            this.DisposeItemInterfaceItems();
-
-            base.OnTemplateDisposed();
-        }
-
-        protected override void OnUpdate()
-        {
-            if (!this.TemplateWasApplied)
-            {
-                return;
-            }
-
-            if (this.addButton != null && this.addItemCta != null)
-            {
-                this.addButton.Value = this.addItemCta;
-            }
-            else if (this.addButton != null && this.ItemSetInterface != null && this.ItemSetInterface.AddItemCta != null)
-            {
-                this.addButton.Value = this.ItemSetInterface.AddItemCta;
-            }
-            else if (this.addButton != null)
-            {
-                this.addButton.Value = "add item";
-            }
-
-            if (this.persist != null)
-            {
-                if (this.displayPersistButton)
-                {
-                    this.persist.Visible = true;
-                }
-                else
-                {
-                    this.persist.Visible = false;
-                }
-
-                this.persist.ItemSet = this.ItemSet;
-                this.persist.ItemSetEditor = this;
-            }
-
-            List<IItem> itemsNotSeen = new List<IItem>();
-
-            foreach (IItem item in this.itemsShown)
-            {
-                itemsNotSeen.Add(item);
-            }
-
-            if (this.reorderItemsOnNextUpdate)
-            {
-                List<IItem> tempShownItems = new List<IItem>();
-
-                foreach (IItem item in this.itemsShown)
-                {
-                    tempShownItems.Add(item);
-                }
-
-                foreach (IItem item in tempShownItems)
-                {
-                    Form f = formsByLocalId[item.LocalOnlyUniqueId];
-
-                    this.RemoveFormFromDisplay(f);
-                }
-                this.itemsShown = new List<IItem>();
-
-                this.reorderItemsOnNextUpdate = false;
-            }
-
-            this.EnsureHeaderRow();
-
-            if (this.itemSet != null)
-            {
-                int index = 0;
-
-                foreach (IItem item in itemSet.Items)
-                {
-                    if (item.Status != StandardStatus.Deleted)
-                    {
-                        itemsNotSeen.Remove(item);
-
-                        Nullable<int> indexToUse = index;
-
-                        if (this.ItemPlacementFieldName != null)
-                        {
-                            indexToUse = item.GetInt32Value(this.ItemPlacementFieldName);
-                        }
-
-                        if (indexToUse != null)
-                        {
-                            this.EnsureFormForItem(item, (int)indexToUse);
-
-                            index++;
-                        }
-                    }
-                }
-            }
-
-            foreach (IItem item in itemsNotSeen)
-            {
-                Form f = formsByLocalId[item.LocalOnlyUniqueId];
-
-                if (f != null)
-                {
-                    if (this.formBin != null && this.formBin.Contains(f.Element))
-                    {
-                        this.formBin.RemoveChild(f.Element);
-                    }
-                }
-
-                DropZoneTarget dtz = this.dropZoneTargetsByLocalId[item.LocalOnlyUniqueId];
-
-                if (dtz != null)
-                {
-                    if (this.formBin != null && this.formBin.Contains(dtz.Element))
-                    {
-                        this.formBin.RemoveChild(dtz.Element);
-                    }
-                }
-
-                this.itemsShown.Remove(item);
-            }
+            return f;
         }
     }
 }

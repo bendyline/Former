@@ -362,7 +362,7 @@ namespace BL.Forms
             Script.Literal("return false");
         }
 
-        public virtual void Save(AsyncCallback callback, object state)
+        public void PersistTotItem()
         {
             foreach (Control ic in this.TemplateControls)
             {
@@ -371,6 +371,11 @@ namespace BL.Forms
                     ((FieldControl)ic).PersistToItem();
                 }
             }
+        }
+
+        public virtual void Save(AsyncCallback callback, object state)
+        {
+            this.PersistTotItem();
 
             ((ODataEntity)this.Item).Save(callback, state);
         }
