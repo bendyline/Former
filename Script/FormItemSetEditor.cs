@@ -21,9 +21,7 @@ namespace BL.Forms
 
         [ScriptName("c_persist")]
         private PersistButton persist;
-
-        private ItemSetEditorMode mode = ItemSetEditorMode.Rows;
-
+        
         private List<Element> itemElements;
         private List<IItem> itemsShown;
 
@@ -332,7 +330,7 @@ namespace BL.Forms
                 return;
             }
 
-            if (this.mode == ItemSetEditorMode.Rows && !Context.Current.IsSmallFormFactor && this.useRowFormsIfPossible)
+            if (this.Mode == ItemSetEditorMode.Rows && !Context.Current.IsSmallFormFactor && this.useRowFormsIfPossible)
             {
                 f = new RowForm();
 
@@ -384,11 +382,16 @@ namespace BL.Forms
                 }
             }*/
 
-            if (this.mode == ItemSetEditorMode.Rows || this.mode == ItemSetEditorMode.Linear || Context.Current.IsSmallFormFactor)
+            if (this.Mode == ItemSetEditorMode.Rows || 
+                this.Mode == ItemSetEditorMode.Linear || 
+                Context.Current.IsSmallFormFactor)
             {
-                if (this.mode == ItemSetEditorMode.Rows)
+                if (this.Mode == ItemSetEditorMode.Rows)
                 {
-                    this.formBin.Style.Display = "table";
+                    if (this.formBin != null)
+                    { 
+                        this.formBin.Style.Display = "table";
+                    }
                 }
 
                 this.InsertFormInOrder(f);

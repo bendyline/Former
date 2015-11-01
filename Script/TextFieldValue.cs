@@ -146,6 +146,7 @@ namespace BL.Forms
 
                     this.textDisplay.Style.MinWidth = widthToUse + "px";
                     this.textInput.Style.MinWidth = this.textDisplay.Style.MinWidth;
+                    this.textInput.Style.MaxWidth = this.textInput.Style.MinWidth;
                 }
                 else
                 {
