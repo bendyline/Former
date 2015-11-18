@@ -46,6 +46,9 @@ namespace BL.Forms
         [ScriptName("e_deleteButton")]
         private InputElement deleteButton;
 
+        [ScriptName("e_doneButton")]
+        private InputElement doneButton;
+
         [ScriptName("e_exportButton")]
         private InputElement exportButton;
 
@@ -198,7 +201,7 @@ namespace BL.Forms
         private void HasCancelled()
         {
             this.isEditingRow = false;
-
+            
             this.UpdateIsEditing();
         }
 
@@ -261,7 +264,7 @@ namespace BL.Forms
         private void HandleEdit(ModelEventArgs oe)
         {
             this.isEditingRow = true;
-
+            
             this.UpdateIsEditing();
       /*      Model model = oe.Model;
 
@@ -305,7 +308,7 @@ namespace BL.Forms
         private void HandleSave(ModelEventArgs oe)
         {
             this.isEditingRow = false;
-
+            
             this.UpdateIsEditing();
 
             Model model = oe.Model;
@@ -344,7 +347,6 @@ namespace BL.Forms
             return true;
         
         }
-
 
         public bool IsModelFieldValidForItem(IDataStoreField field, Model model)
         {
@@ -406,10 +408,12 @@ namespace BL.Forms
 
             if (this.isEditingRow)
             {
-   //             this.addButton.Disabled = true;
+                this.doneButton.Style.Display = "";
             }
             else
             {
+                this.doneButton.Style.Display = "none";
+
                 this.addButton.Disabled = false;
             }
         }
@@ -432,6 +436,19 @@ namespace BL.Forms
             }
         }
 
+
+        [ScriptName("v_onDoneButtonClick")]
+        private void DoneButtonClick(ElementEvent e)
+        {
+            if (this.isEditingRow)
+            {
+                this.ConfirmRow();
+                this.isEditingRow = false;
+                this.UpdateIsEditing();
+            }
+        }
+
+
         [ScriptName("v_onAddButtonClick")]
         private void AddButtonClick(ElementEvent e)
         {
@@ -439,6 +456,7 @@ namespace BL.Forms
             {
                 this.ConfirmRow();
                 this.isEditingRow = false;
+                this.UpdateIsEditing();
             }
 
             Window.SetTimeout(this.AddContinue, 20);
