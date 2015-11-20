@@ -19,6 +19,7 @@ namespace BL.Forms
         event DataStoreItemEventHandler ItemDeleted;
 
         ImageBrowserOptions DefaultImageBrowserOptions { get; set;}
+        String[] DefaultStylesheets { get; set;  }
 
         [ScriptName("b_displayAddAndDeleteButtons")]
         bool DisplayAddAndDeleteButtons { get; set; }

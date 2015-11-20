@@ -26,6 +26,7 @@ namespace BL.Forms
         
         private IDataStoreItemSet itemSet;
         private ImageBrowserOptions defaultImageBrowserOptions;
+        private String[] defaultStylesheets;
 
         private FormMode formMode = FormMode.EditForm;
 
@@ -62,6 +63,19 @@ namespace BL.Forms
             set
             {
                 this.defaultImageBrowserOptions = value;
+            }
+        }
+
+        public String[] DefaultStylesheets
+        {
+            get
+            {
+                return this.defaultStylesheets;
+            }
+
+            set
+            {
+                this.defaultStylesheets = value;
             }
         }
 

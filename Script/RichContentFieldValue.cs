@@ -59,6 +59,7 @@ namespace BL.Forms
             if (this.Form != null) 
             {
                 this.editor.EditorOptions.ImageBrowser = this.Form.DefaultImageBrowserOptions;
+                this.editor.Stylesheets = this.Form.DefaultStylesheets;
             }
 
             if (this.EffectiveMode == FieldMode.View)

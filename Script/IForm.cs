@@ -16,6 +16,7 @@ namespace BL.Forms
     {
 
         ImageBrowserOptions DefaultImageBrowserOptions { get; set; }
+        String[] DefaultStylesheets { get; set; }
 
         ItemSetInterface ItemSetInterface { get; set;  }
         FormMode Mode { get; set; }

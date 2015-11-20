@@ -1236,6 +1236,9 @@ namespace BL.Forms
                     f.ItemSet = this.ItemSet;
                     f.Item = objectItem;
 
+                    f.DefaultImageBrowserOptions = this.DefaultImageBrowserOptions;
+                    f.DefaultStylesheets = this.DefaultStylesheets;
+
                     FieldValue chfe = new FieldValue();
 
                     chfe.Item = objectItem;

@@ -61,7 +61,7 @@ namespace BL.Forms
         public event EventHandler GrippieElementChanged;
         
         private ImageBrowserOptions defaultImageBrowserOptions;
-
+        private String[] defaultStylesheets;
 
         public Element GrippieElement
         {
@@ -96,6 +96,19 @@ namespace BL.Forms
             set
             {
                 this.defaultImageBrowserOptions = value;
+            }
+        }
+        
+        public String[] DefaultStylesheets
+        {
+            get
+            {
+                return this.defaultStylesheets;
+            }
+
+            set
+            {
+                this.defaultStylesheets = value;
             }
         }
 
