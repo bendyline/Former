@@ -63,9 +63,13 @@
     <Compile Include="DateTimeFieldControl.cs" />
     <Compile Include="BooleanFieldControl.cs" />
     <Compile Include="DateFieldValue.cs" />
+    <Compile Include="DisplayState.cs" />
+    <Compile Include="FieldMode.cs" />
+    <Compile Include="FormMode.cs" />
     <Compile Include="ItemSetEditor.cs" />
     <Compile Include="IImageEditor.cs" />
     <Compile Include="OrderFieldValue.cs" />
+    <Compile Include="Properties\AssemblyInfo.script.cs" />
     <Compile Include="RadioChoiceFieldValue.cs" />
     <Compile Include="ChoiceFieldControl.cs" />
     <Compile Include="DateTimeFieldValue.cs" />
@@ -103,7 +107,6 @@
     <Compile Include="FormTemplate.cs" />
     <Compile Include="Form.cs" />
     <Compile Include="QueryGrid.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Script.Web">

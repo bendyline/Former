@@ -13,23 +13,7 @@ using Kendo.UI;
 
 namespace BL.Forms
 {
-    public enum FormMode
-    {
-        EditForm = 0,
-        NewForm = 1,
-        ViewForm = 2,
-        Example = 3
-    }
-
-    public enum DisplayState
-    {
-        DefaultState = 0,
-        Hide = 1,
-        Show = 2,
-        ShowInDetailHideInList = 3,
-        ShowInListHideInDetail = 4
-    }
-
+  
     public class Form : ItemControl, IForm
     {
         private ItemSetInterface itemSetInterface;

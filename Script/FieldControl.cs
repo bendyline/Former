@@ -13,14 +13,6 @@ using System.Runtime.CompilerServices;
 
 namespace BL.Forms
 {
-    public enum FieldMode
-    {
-        FormDefault = 0,
-        Edit = 1,
-        View = 2,
-        Example = 3
-    }
-
     public class FieldControl : FormControl 
     {
         private IDataStoreField field;

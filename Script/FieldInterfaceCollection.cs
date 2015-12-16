@@ -4,10 +4,18 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+#if NET
+using Bendyline.Base.ScriptCompatibility;
+using System.ComponentModel;
+using Bendyline.Base;
+using Bendyline.Data;
+namespace Bendyline.Forms
+#elif SCRIPTSHARP
 using BL;
 using BL.Data;
 
 namespace BL.Forms
+#endif
 {
     public class FieldInterfaceCollection : ISerializableCollection, IEnumerable, INotifyCollectionAndStateChanged
     {

@@ -1,12 +1,21 @@
 ﻿/* Copyright (c) Bendyline LLC. All rights reserved. Licensed under the Apache License, Version 2.0.
     You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0. */
-
-using BL.Data;
 using System;
 using System.Collections.Generic;
+
+#if NET
+using Bendyline.Base.ScriptCompatibility;
+using System.ComponentModel;
+using Bendyline.Base;
+using Bendyline.Data;
+namespace Bendyline.Forms
+#elif SCRIPTSHARP
+using BL.Data;
+
 using System.Runtime.CompilerServices;
 
 namespace BL.Forms
+#endif
 {
     public class ItemSetInterface :  SerializableObject
     {
@@ -279,6 +288,5 @@ namespace BL.Forms
 
             return orderA - orderB;
         }
-
     }
 }
