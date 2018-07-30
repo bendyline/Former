@@ -35,7 +35,7 @@ namespace BL.Forms
                 return;
             }
 
-            String newHash = this.GetOptionsHash();
+            String newHash = this.GetOptionsHashWithValue();
 
             if (this.lastOptionsHash != newHash)
             {

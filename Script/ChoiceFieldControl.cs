@@ -60,7 +60,6 @@ namespace BL.Forms
 
             return false;
         }
-
         protected String GetOptionsHash()
         {
             String results = this.EffectiveMode.ToString();
@@ -74,13 +73,20 @@ namespace BL.Forms
                 fcc = alternateChoices;
             }
 
-            String id = this.Item.GetStringValue(this.FieldName);
-
             foreach (FieldChoice fc in fcc)
             {
                 results += "|" + fc.Id + "|" + fc.DisplayName + "|" + fc.ImageUrl;
             }
+            
+            return results;
+        }
 
+        protected String GetOptionsHashWithValue()
+        {
+            String results = this.GetOptionsHash();
+
+            String id = this.Item.GetStringValue(this.FieldName);
+            
             results += id;
 
             return results;

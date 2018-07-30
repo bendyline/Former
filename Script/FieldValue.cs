@@ -137,9 +137,21 @@ namespace BL.Forms
 
                         this.fieldBin.AppendChild(this.fieldControl.Element);
                     }
+                    else if ((this.Field.Type == FieldType.ShortText || this.Field.Type == FieldType.UnboundedText) && interfaceType == FieldInterfaceType.Url)
+                    {
+                        this.fieldControl = new UrlFieldValue();
+                        this.ApplyToControl(this.fieldControl);
+                        this.fieldControl.EnsureElements();
+
+                        this.fieldBin.AppendChild(this.fieldControl.Element);
+                    }
                     else if ((this.Field.Type == FieldType.ShortText || this.Field.Type == FieldType.Integer) && interfaceType == FieldInterfaceType.Choice)
                     {
-                        if (styleId == 1)
+                        if (styleId == 2)
+                        {
+                            this.fieldControl = new DropDownFieldValue();
+                        }
+                        else if (styleId == 1)
                         {
                             this.fieldControl = new RadioChoiceFieldValue();
                         }
