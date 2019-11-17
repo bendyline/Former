@@ -160,7 +160,7 @@ namespace BL.Forms
                 {
                     this.textDisplay.Style.FontSize = (int)fontSize + "pt";
                     this.textInput.Style.FontSize = (int)fontSize + "pt";
-                    this.textInput.Style.MaxHeight = "1.8em";
+           //         this.textInput.Style.MaxHeight = "1.8em";
                     this.textInput.Style.TextIndent = "0.1em";
                 }
                 else
