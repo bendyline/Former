@@ -253,6 +253,7 @@ namespace BL.Forms
             }
         }
 
+        [ScriptName("i_mode")]
         public ItemSetEditorMode Mode
         {
             get
