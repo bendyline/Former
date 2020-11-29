@@ -16,13 +16,13 @@ namespace BL.Forms
     {
 
         
-        public FieldChoiceCollection EffectiveFieldChoices
+        public FieldChoiceCollectionBase EffectiveFieldChoices
         {
             get
             {
-                FieldChoiceCollection fcc = this.Field.Choices;
+                FieldChoiceCollectionBase fcc = this.Field.Choices;
 
-                FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
+                FieldChoiceCollectionBase alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
 
                 if (alternateChoices != null)
                 {
@@ -64,9 +64,9 @@ namespace BL.Forms
         {
             String results = this.EffectiveMode.ToString();
 
-            FieldChoiceCollection fcc = this.Field.Choices;
+            FieldChoiceCollectionBase fcc = this.Field.Choices;
 
-            FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
+            FieldChoiceCollectionBase alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
 
             if (alternateChoices != null)
             {

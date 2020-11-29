@@ -91,9 +91,9 @@ namespace BL.Forms
             {
                 this.lastOptionsHash = newHash;
 
-                FieldChoiceCollection fcc = this.Field.Choices;
+                FieldChoiceCollectionBase fcc = this.Field.Choices;
 
-                FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
+                FieldChoiceCollectionBase alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
 
                 if (alternateChoices != null)
                 {

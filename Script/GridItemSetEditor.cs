@@ -672,7 +672,7 @@ namespace BL.Forms
                         }
                         else
                         {
-                            gc.Title = field.DisplayName;
+                            gc.Title = field.Title;
                         }
 
                         gc.Field = field.Name;
@@ -862,7 +862,7 @@ namespace BL.Forms
                        }
                        else
                        {
-                           gc.Title = field.DisplayName;
+                           gc.Title = field.Title;
                        }
 
                         gc.Field = field.Name;

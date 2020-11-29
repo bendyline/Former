@@ -329,6 +329,8 @@ namespace BL.Forms
 
                 return;
             }
+            
+            // Log.DAO("Creating a new form for item.", item);
 
             if (this.Mode == ItemSetEditorMode.Rows && !Context.Current.IsSmallFormFactor && this.useRowFormsIfPossible)
             {

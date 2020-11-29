@@ -80,6 +80,8 @@ namespace BL.Forms
                 fieldsNotUsed.Add(lf);
             }
 
+            // Log.DAO("Adding form fields in field iterator", this.Item);
+            
             List<Field> sortedFields = new List<Field>();
 
             foreach (Field field in this.Item.Type.Fields)

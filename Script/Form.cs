@@ -301,9 +301,9 @@ namespace BL.Forms
             return this.ItemSetInterface.FieldInterfaces.GetFieldAllowNullOverride(fieldName);
         }
 
-        public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
+        public FieldChoiceCollectionBase GetFieldChoicesOverride(String fieldName)
         {
-            FieldChoiceCollection fcc = this.ItemSetInterface.FieldInterfaces.GetFieldChoicesOverride(fieldName);
+            FieldChoiceCollectionBase fcc = this.ItemSetInterface.FieldInterfaces.GetFieldChoicesOverride(fieldName);
 
             return fcc;
         }

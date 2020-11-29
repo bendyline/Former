@@ -108,7 +108,7 @@ namespace BL.Forms
 
                 if (fieldToUse != null)
                 {
-                    return fieldToUse.DisplayName;
+                    return fieldToUse.Title;
                 }
 
                 return null;

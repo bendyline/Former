@@ -264,7 +264,7 @@ namespace BL.Forms
         }
 
         [ScriptName("p_choicesOverride")]
-        public FieldChoiceCollection ChoicesOverride
+        public FieldChoiceCollectionBase ChoicesOverride
         {
             get
             {
@@ -278,7 +278,7 @@ namespace BL.Forms
 
             set
             {
-                this.choicesOverride = value;
+                this.choicesOverride = (FieldChoiceCollection)value;
 
                 this.NotifyPropertyChanged("ChoicesOverride");
             }

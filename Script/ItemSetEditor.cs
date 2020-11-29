@@ -358,7 +358,7 @@ namespace BL.Forms
                     this.itemSet.ItemSetChanged += this.itemSetChanged;
                     this.itemSet.ItemInSetChanged += this.itemChangedEventHandler;
 
-                    this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
+                    this.itemSet.Retrieve(this.ItemsRetrieved, null);
                 }
                 else
                 {
@@ -409,7 +409,7 @@ namespace BL.Forms
             {
                 this.itemSet.ItemSetChanged += this.itemSetChanged;
 
-                this.itemSet.BeginRetrieve(this.ItemsRetrieved, null);
+                this.itemSet.Retrieve(this.ItemsRetrieved, null);
             }
             else
             {

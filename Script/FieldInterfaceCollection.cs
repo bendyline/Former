@@ -124,7 +124,7 @@ namespace BL.Forms
         }
 
 
-        public FieldChoiceCollection GetFieldChoicesOverride(String fieldName)
+        public FieldChoiceCollectionBase GetFieldChoicesOverride(String fieldName)
         {
             FieldInterface fs = this.fieldsByStorageFieldName[fieldName];
 

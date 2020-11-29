@@ -48,7 +48,7 @@ namespace BL.Forms
 
                 if (this.EffectiveMode == FieldMode.View)
                 {
-                    FieldChoiceCollection fcc = this.EffectiveFieldChoices;
+                    FieldChoiceCollectionBase fcc = this.EffectiveFieldChoices;
 
                     foreach (FieldChoice fc in fcc)
                     {
@@ -72,7 +72,7 @@ namespace BL.Forms
                 }
                 else
                 {
-                    FieldChoiceCollection fcc = this.EffectiveFieldChoices;
+                    FieldChoiceCollectionBase fcc = this.EffectiveFieldChoices;
 
                     foreach (FieldChoice fc in fcc)
                     {
@@ -187,9 +187,9 @@ namespace BL.Forms
 
             object val = element.GetAttribute("data-choiceId");
 
-            FieldChoiceCollection fcc = this.Field.Choices;
+            FieldChoiceCollectionBase fcc = this.Field.Choices;
 
-            FieldChoiceCollection alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
+            FieldChoiceCollectionBase alternateChoices = this.Form.GetFieldChoicesOverride(this.FieldName);
 
             if (alternateChoices != null)
             {
